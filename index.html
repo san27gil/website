@@ -3,17 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hola mundo</title>
-  
-  <!-- Fuente minimalista y cálida: "Spectral" (Google Fonts) -->
-  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;600&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="styles.css">
+  <title>Santi Gil | Quant Dev & Finance</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💹</text></svg>">
 </head>
 <body>
-  <main class="center">
-    <h1>Hola mundo</h1>
-    <p class="subtitle">Bienvenido al otoño digital</p>
-  </main>
+  <div class="matrix"></div>
+
+  <div class="terminal">
+    <div class="title-bar">
+      <span class="title">santigil.quant ~ /webapps</span>
+      <div class="buttons">
+        <div class="btn close"></div>
+        <div class="btn minimize"></div>
+        <div class="btn maximize"></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <pre class="ascii">
+   ████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗     
+   ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║     
+      ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║     
+      ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║     
+      ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
+      ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
+                                                                      
+   ╔═══════════════════════════════════════════════════════════╗
+   ║  > Welcome to the Quant Terminal v2.0.69                  ║
+   ║  > Type 'help' for commands • Type 'money' for profits    ║
+   ╚═══════════════════════════════════════════════════════════╝
+</pre>
+
+      <h1><span class="prompt">></span> Santi Gil</h1>
+      <p class="subtitle">Quant Developer · Finance + Code = ❤️</p>
+
+      <div class="ticker">
+        <span id="live-price"></span> <span class="blink">|</span>
+      </div>
+
+      <pre class="code">
+// Cargando webapps financieras...
+import pandas as pd
+import yfinance as yf
+from fastapi import FastAPI
+
+apps = [
+  "Backtester que siempre gana (hasta que lo pones en real)",
+  "Dashboard cripto en tiempo real",
+  "Calculadora de opciones", 
+  "Bot de arbitraje DEX",
+  "Simulador de qué pasaría si hubiera comprado Tesla en 2010"
+]
+      </pre>
+
+      <div class="grid">
+        <a href="#" class="card" data-app="backtester">
+          <span class="icon">📈</span>
+          <h3>Backtester Pro</h3>
+          <p>Siempre gana (hasta que lo pones en real)</p>
+        </a>
+        <a href="#" class="card" data-app="crypto">
+          <span class="icon">₿</span>
+          <h3>Crypto Dashboard</h3>
+          <p>Live prices · Order books · Fear & Greed</p>
+        </a>
+        <a href="#" class="card" data-app="options">
+          <span class="icon">😎</span>
+          <h3>Options</h3>
+          <p>Black-Scholes</p>
+        </a>
+        <a href="#" class="card coming">
+          <span class="icon">🤖</span>
+          <h3>Arbitraje Bot</h3>
+          <p>coming soon™</p>
+        </a>
+      </div>
+
+      <div class="footer">
+        <p>$ <span class="command">git clone https://github.com/san27gil</span></p>
+        <p>$ <span class="command">npm run money</span> <span class="blink">_</span></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Precio fake en vivo (cada 3s)
+    const symbols = ["BTC", "ETH", "SOL", "AAPL", "TSLA"];
+    const priceEl = document.getElementById("live-price");
+    setInterval(() => {
+      const sym = symbols[Math.floor(Math.random()*symbols.length)];
+      const price = (Math.random()*50000 + 1000).toFixed(2);
+      const change = (Math.random()*10 - 5).toFixed(2);
+      const color = change > 0 ? "#00ff9d" : "#ff0066";
+      priceEl.innerHTML = `${sym}/USD <span style="color:${color};">$${price}</span> (${change>0?"+":""}${change}%)`;
+    }, 3000);
+  </script>
 </body>
 </html>
