@@ -1,0 +1,80 @@
+/* Reset ultra-minimalista */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Colores otoñales suaves */
+  background: #f9f1e7;                    /* crema cálido */
+  background: linear-gradient(
+    135deg,
+    #f9f1e7 0%,
+    #e8d8c4 30%,
+    #d8b79f 70%,
+    #b87d64 100%
+  );
+  
+  font-family: 'Spectral', Georgia, serif;
+  color: #5a3a22;                         /* marrón chocolate */
+}
+
+/* Contenido centrado */
+.center {
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Título principal */
+h1 {
+  font-size: clamp(3rem, 12vw, 8rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 1rem;
+  
+  /* Sombra sutil que recuerda hojas caídas */
+  text-shadow: 3px 3px 0px rgba(184, 125, 100, 0.15);
+}
+
+/* Subtítulo */
+.subtitle {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  font-weight: 300;
+  color: #8a5a3c;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Pequeña animación de entrada */
+.center {
+  animation: fadeUp 1.8s ease-out forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive extra-suave */
+@media (max-width: 480px) {
+  .center { padding: 1.5rem; }
+}
