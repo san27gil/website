@@ -13,8 +13,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'JetBrains Mono', monospace;
-  overflow: hidden;
   height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .matrix {
