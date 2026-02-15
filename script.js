@@ -100,13 +100,13 @@ async function getExchangeRateForDate(dateStr) {
         }
     }
     
-    // Buscar la fecha exacta o la mÃ¡s cercana anterior
+    // Buscar la fecha exacta o la más cercana anterior
     if (fxHistory) {
-        // Si la fecha existe, devolverla. Si no (fin de semana), la API suele manejarlo, pero por seguridad podrÃ­amos buscar hacia atrÃ¡s.
+        // Si la fecha existe, devolverla. Si no (fin de semana), la API suele manejarlo, pero por seguridad podríamos buscar hacia atrás.
         // Por simplicidad, intentamos acceso directo o fallback al actual.
         if (fxHistory[dateStr]) return parseFloat(fxHistory[dateStr]['4. close']);
         
-        // Intento simple de buscar dÃ­as anteriores si es fin de semana
+        // Intento simple de buscar días anteriores si es fin de semana
         let d = new Date(dateStr);
         for(let i=0; i<5; i++) {
             d.setDate(d.getDate() - 1);
@@ -135,7 +135,7 @@ async function addStock() {
         return;
     }
 
-    // Si el sÃ­mbolo no existe, crear entrada nueva
+    // Si el sí­mbolo no existe, crear entrada nueva
     if (!portfolio[symbol]) {
         portfolio[symbol] = {
             symbol: symbol,
@@ -151,7 +151,7 @@ async function addStock() {
         exchangeRate = await getExchangeRateForDate(date);
     }
 
-    // AÃ±adir nuevo lote
+    // Añadir nuevo lote
     portfolio[symbol].lots.push({
         shares: shares,
         purchasePrice: price,
@@ -178,7 +178,7 @@ function deleteLot(symbol, lotId) {
     if (portfolio[symbol]) {
         portfolio[symbol].lots = portfolio[symbol].lots.filter(lot => lot.id !== lotId);
         
-        // Si no quedan lotes, eliminar el sÃ­mbolo
+        // Si no quedan lotes, eliminar el símbolo
         if (portfolio[symbol].lots.length === 0) {
             delete portfolio[symbol];
         }
@@ -203,12 +203,12 @@ async function updatePortfolio() {
     
     if (symbols.length === 0) {
         document.getElementById('holdingsBody').innerHTML = 
-            '<tr><td colspan="8" class="loading">No hay posiciones todavÃ­a. AÃ±ade tu primera posiciÃ³n arriba.</td></tr>';
+            '<tr><td colspan="8" class="loading">No hay posiciones todavía. Añade tu primera posición arriba.</td></tr>';
         updateStats();
         return;
     }
 
-    // Obtener precios actuales para todos los sÃ­mbolos
+    // Obtener precios actuales para todos los sí­mbolos
     const promises = symbols.map(async symbol => {
         const currentPrice = await fetchStockPrice(symbol);
         return { symbol, currentPrice };
@@ -245,7 +245,7 @@ async function fetchStockPrice(symbol) {
         }
         
         if (data.Note) {
-            showError('LÃ­mite de la API alcanzado. Por favor, espera un minuto.');
+            showError('Lí­mite de la API alcanzado. Por favor, espera un minuto.');
         }
         
         return null;
@@ -277,7 +277,7 @@ function renderHoldings() {
     const symbols = Object.keys(portfolio);
     
     if (symbols.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="loading">No hay posiciones todavÃ­a. AÃ±ade tu primera posiciÃ³n arriba.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="loading">No hay posiciones todavía. Añade tu primera posición arriba.</td></tr>';
         return;
     }
 
@@ -351,9 +351,9 @@ function renderHoldings() {
                                     <th>Fecha Compra</th>
                                     <th>Acciones</th>
                                     <th>Precio Compra</th>
-                                    <th>Coste Total (â‚¬)</th>
-                                    <th>Valor Actual (â‚¬)</th>
-                                    <th>Ganancia/PÃ©rdida (â‚¬)</th>
+                                    <th>Coste Total</th>
+                                    <th>Valor Actual</th>
+                                    <th>Ganancia/Pérdida</th>
                                     <th>Retorno %</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -444,7 +444,7 @@ function updateStats() {
     percentElement.className = `stat-change ${unrealizedPercent >= 0 ? 'positive' : 'negative'}`;
 
     // Cambio diario (placeholder - requerirÃ­a datos intradiarios)
-    document.getElementById('dailyChange').textContent = 'â‚¬0,00';
+    document.getElementById('dailyChange').textContent = '0,00';
     document.getElementById('dailyPercent').textContent = '0,00%';
 }
 

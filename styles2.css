@@ -239,7 +239,7 @@ button:active {
 }
 
 .expandable-row td:first-child::before {
-    content: 'â–¸ ';
+    content: '>';
     display: inline-block;
     transition: transform 0.2s;
     margin-right: 0.25rem;
