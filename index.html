@@ -1,103 +1,202 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>document.documentElement.classList.add('js');</script>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Santi Gil | Code & Finance</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>santi gil</title>
+  <meta name="description" content="santi gil — cosas que voy construyendo." />
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect width='100' height='100' rx='22' fill='%23111'/&gt;&lt;text x='50' y='70' font-size='52' font-family='monospace' fill='%23fff' text-anchor='middle'&gt;sg&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="matrix"></div>
-
-  <div class="terminal">
-    <div class="title-bar">
-      <span class="title">finance /webapps</span>
-      <div class="buttons">
-        <div class="btn close"></div>
-        <div class="btn minimize"></div>
-        <div class="btn maximize"></div>
-      </div>
+  <nav class="nav">
+    <a class="name" href="#top">santi gil</a>
+    <div class="nav-links">
+      <a href="#proyectos">proyectos</a>
+      <a href="https://github.com/san27gil" target="_blank" rel="noopener">github <span class="arrow">↗</span></a>
     </div>
+  </nav>
 
-    <div class="content">
-      <pre class="ascii">
-   ████████╗███████╗██████╗ ███╗   ███╗██╗███╗   ██╗ █████╗ ██╗     
-   ╚══██╔══╝██╔════╝██╔══██╗████╗ ████║██║████╗  ██║██╔══██╗██║     
-      ██║   █████╗  ██████╔╝██╔████╔██║██║██╔██╗ ██║███████║██║     
-      ██║   ██╔══╝  ██╔══██╗██║╚██╔╝██║██║██║╚██╗██║██╔══██║██║     
-      ██║   ███████╗██║  ██║██║ ╚═╝ ██║██║██║ ╚████║██║  ██║███████╗
-      ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
-                                                                      
-   ╔═══════════════════════════════════════════════════════════╗
-   ║  > Welcome to the Quant Terminal v2.0.69                  ║
-   ║  > Type 'help' for commands • Type 'money' for profits    ║
-   ╚═══════════════════════════════════════════════════════════╝
-</pre>
+  <main id="top">
+    <!-- ── Intro ────────────────────────────────────────── -->
+    <header class="intro reveal">
+      <p class="lede">Cosas que voy construyendo. Algunas incluso funcionan.</p>
 
-      <h1><span class="prompt">></span> Santi Gil</h1>
-      <p class="subtitle">Finance + Code</p>
+      <figure class="chart" aria-hidden="true">
+        <div class="chart-head">
+          <span class="chart-sym">$SG</span>
+          <span class="chart-quote"><span id="last">—</span><span id="chg" class="chg"></span></span>
+        </div>
+        <div class="chart-body">
+          <svg class="line" viewBox="0 0 1000 240" preserveAspectRatio="none">
+            <g class="grid">
+              <line x1="0" x2="1000" y1="48" y2="48" />
+              <line x1="0" x2="1000" y1="96" y2="96" />
+              <line x1="0" x2="1000" y1="144" y2="144" />
+              <line x1="0" x2="1000" y1="192" y2="192" />
+            </g>
+            <path class="area" id="area" />
+            <path class="line-path" id="lp" />
+          </svg>
+          <div class="y-axis">
+            <span style="top:20%">135</span>
+            <span style="top:40%">125</span>
+            <span style="top:60%">115</span>
+            <span style="top:80%">105</span>
+          </div>
+        </div>
+      </figure>
+    </header>
 
-      <div class="ticker">
-        <span id="live-price"></span> <span class="blink">|</span>
+    <!-- ── Proyectos ────────────────────────────────────── -->
+    <section id="proyectos" class="section reveal">
+      <div class="section-head">
+        <h2 class="section-title">proyectos</h2>
+        <span class="section-count">02</span>
       </div>
 
-      <pre class="code">
-// Cargando webapps financieras...
-import pandas as pd
-import yfinance as yf
-from fastapi import FastAPI
+      <!-- Para añadir un proyecto, copia un bloque <a class="project"> -->
+      <div class="projects">
+        <a class="project" href="#" target="_blank" rel="noopener">
+          <span class="project-index">01</span>
+          <span class="project-body">
+            <span class="project-name">Simulador de qué pasaría si hubiera comprado Tesla en 2010</span>
+            <span class="project-desc">Spoiler: serías rico. Cierra la pestaña y vuelve al trabajo.</span>
+          </span>
+          <span class="project-meta">2026</span>
+          <span class="project-arrow" aria-hidden="true">↗</span>
+        </a>
 
-apps = [
-  "Backtester que siempre gana (hasta que lo pones en real)",
-  "Dashboard cripto en tiempo real",
-  "Calculadora de opciones", 
-  "Bot de arbitraje DEX",
-  "Simulador de qué pasaría si hubiera comprado Tesla en 2010"
-]
-      </pre>
-
-      <div class="grid">
-        <a href="#" class="card" data-app="backtester">
-          <span class="icon">📈</span>
-          <h3>Backtester Pro</h3>
-          <p>Siempre gana (hasta que lo pones en real)</p>
-        </a>
-        <a href="#" class="card" data-app="crypto">
-          <span class="icon">₿</span>
-          <h3>Crypto Dashboard</h3>
-          <p>Live prices · Order books · Fear & Greed</p>
-        </a>
-        <a href="#" class="card" data-app="options">
-          <span class="icon">😎</span>
-          <h3>Options</h3>
-          <p>Black-Scholes</p>
-        </a>
-        <a href="https://github.com/san27gil/investment-portfolio-tracker" class="card" target="_blank"></a>
-          <span class="icon">💼</span>
-          <h3>Portfolio Tracker</h3>
-          <p>Seguimiento de cartera en tiempo real</p>
+        <a class="project" href="#" target="_blank" rel="noopener">
+          <span class="project-index">02</span>
+          <span class="project-body">
+            <span class="project-name">Backtester que siempre gana (hasta que lo pones en real)</span>
+            <span class="project-desc">+9000% en el histórico, −3% en producción. Pura magia financiera.</span>
+          </span>
+          <span class="project-meta">2026</span>
+          <span class="project-arrow" aria-hidden="true">↗</span>
         </a>
       </div>
+    </section>
+  </main>
 
-      <div class="footer">
-        <p>$ <span class="command">git clone https://github.com/san27gil</span></p>
-        <p>$ <span class="command">npm run money</span> <span class="blink">_</span></p>
-      </div>
-    </div>
-  </div>
+  <footer class="footer">
+    <span>rentabilidades pasadas no garantizan rentabilidades futuras</span>
+    <span id="year"></span>
+  </footer>
 
   <script>
-    // Precio fake en vivo (cada 3s)
-    const symbols = ["BTC", "ETH", "SOL", "AAPL", "TSLA"];
-    const priceEl = document.getElementById("live-price");
-    setInterval(() => {
-      const sym = symbols[Math.floor(Math.random()*symbols.length)];
-      const price = (Math.random()*50000 + 1000).toFixed(2);
-      const change = (Math.random()*10 - 5).toFixed(2);
-      const color = change > 0 ? "#00ff9d" : "#ff0066";
-      priceEl.innerHTML = `${sym}/USD <span style="color:${color};">$${price}</span> (${change>0?"+":""}${change}%)`;
-    }, 3000);
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ── Gráfico de bolsa en vivo (streaming + ratón) ──── */
+    (function () {
+      const svg = document.querySelector('.line');
+      const line = document.getElementById('lp');
+      const area = document.getElementById('area');
+      const lastEl = document.getElementById('last');
+      const chgEl = document.getElementById('chg');
+      const W = 1000, H = 240, N = 72;
+      const top = 24, bot = 216, range = bot - top;
+      const sigma = W * 0.10, maxAmp = 70, speed = 0.06;
+
+      const xs = [];
+      for (let i = 0; i < N; i++) xs.push(i / (N - 1) * W);
+
+      // PRNG con semilla fija
+      let seed = 20260614;
+      function rnd() {
+        seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      }
+
+      // Camino aleatorio con reversión a la media → cotización
+      let v = 0.5;
+      function nextPrice() {
+        v += (rnd() - 0.5) * 0.30;      // volatilidad (alta → se ve el movimiento)
+        v += (0.5 - v) * 0.02;          // reversión suave a la media
+        return Math.max(0.05, Math.min(0.95, v));
+      }
+      const priceToY = p => bot - p * range;
+      const priceVal = p => 100 + p * 40;   // escala mostrada en el eje
+
+      // Buffer de precios (uno más para interpolar el desplazamiento)
+      const buf = [];
+      for (let i = 0; i < N + 1; i++) buf.push(nextPrice());
+
+      const bump = new Array(N).fill(0);
+      let frac = 0, mx = null, my = H / 2, tick = 0;
+
+      function build() {
+        let d = '', lastY = 0;
+        for (let i = 0; i < N; i++) {
+          const base = priceToY(buf[i] + (buf[i + 1] - buf[i]) * frac);
+          const y = base + bump[i];
+          d += (i ? ' L' : 'M') + xs[i].toFixed(1) + ',' + y.toFixed(1);
+          lastY = y;
+        }
+        line.setAttribute('d', d);
+        area.setAttribute('d', d + ' L' + W + ',' + H + ' L0,' + H + ' Z');
+        return lastY;
+      }
+
+      function quote() {
+        const last = priceVal(buf[N - 1] + (buf[N] - buf[N - 1]) * frac);
+        const first = priceVal(buf[0] + (buf[1] - buf[0]) * frac);
+        const chg = (last - first) / first * 100;
+        lastEl.textContent = last.toFixed(2);
+        chgEl.textContent = (chg >= 0 ? '▲ +' : '▼ ') + chg.toFixed(2) + '%';
+        chgEl.className = 'chg ' + (chg >= 0 ? 'up' : 'down');
+      }
+
+      if (reduce) { build(); quote(); return; }
+
+      window.addEventListener('mousemove', (e) => {
+        const r = svg.getBoundingClientRect();
+        mx = (e.clientX - r.left) / r.width * W;
+        const yy = (e.clientY - r.top) / r.height * H;
+        my = H / 2 + Math.max(-maxAmp, Math.min(maxAmp, yy - H / 2));
+      }, { passive: true });
+      window.addEventListener('mouseleave', () => { mx = null; });
+
+      (function frame() {
+        // streaming: desplaza el gráfico a la izquierda
+        frac += speed;
+        while (frac >= 1) { frac -= 1; buf.shift(); buf.push(nextPrice()); }
+
+        // empuje del ratón (gaussiano, con muelle)
+        for (let i = 0; i < N; i++) {
+          let target = 0;
+          if (mx !== null) {
+            const dx = xs[i] - mx;
+            target = (my - H / 2) * Math.exp(-(dx * dx) / (2 * sigma * sigma));
+          }
+          bump[i] += (target - bump[i]) * 0.16;
+        }
+
+        build();
+        if ((tick++ % 10) === 0) quote();
+        requestAnimationFrame(frame);
+      })();
+    })();
+
+    /* ── Revelado progresivo de secciones ─────────────── */
+    if (!reduce && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    } else {
+      document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+    }
   </script>
 </body>
 </html>
