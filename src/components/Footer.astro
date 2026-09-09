@@ -1,0 +1,15 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <span>rentabilidades pasadas no garantizan rentabilidades futuras</span>
+  <span id="year">{year}</span>
+</footer>
+
+<script>
+  // El año se renderiza en el build; se refresca en cliente por si la web
+  // lleva tiempo desplegada sin volver a construirse.
+  const el = document.getElementById('year');
+  if (el) el.textContent = String(new Date().getFullYear());
+</script>

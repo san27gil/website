@@ -1,0 +1,26 @@
+---
+import { projects } from '../data/projects';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section id="proyectos" class="section reveal">
+  <div class="section-head">
+    <h2 class="section-title">proyectos</h2>
+    <span class="section-count">{pad(projects.length)}</span>
+  </div>
+
+  <div class="projects">
+    {projects.map((p, i) => (
+      <a class="project" href={p.href} target="_blank" rel="noopener">
+        <span class="project-index">{pad(i + 1)}</span>
+        <span class="project-body">
+          <span class="project-name">{p.name}</span>
+          <span class="project-desc">{p.desc}</span>
+        </span>
+        <span class="project-meta">{p.year}</span>
+        <span class="project-arrow" aria-hidden="true">↗</span>
+      </a>
+    ))}
+  </div>
+</section>
