@@ -21,3 +21,15 @@
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# Dashboard: HTML estático en public/dashboard/ + funciones de login y datos.
+# Siempre la última versión (no se cachea) y la API nunca se cachea.
+[[headers]]
+  for = "/dashboard/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"

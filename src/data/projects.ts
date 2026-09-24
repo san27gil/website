@@ -13,6 +13,12 @@ export interface Project {
 // y el contador de la sección se calculan solos.
 export const projects: Project[] = [
   {
+    name: 'Dashboard personal en pixel art',
+    desc: 'Peso, tiempo, actividad, hábitos, portfolio, tareas y eventos en un solo panel. Pruébalo: tus datos se quedan en tu navegador.',
+    href: '/dashboard/',
+    year: '2026',
+  },
+  {
     name: 'Simulador de qué pasaría si hubiera comprado Tesla en 2010',
     desc: 'Spoiler: serías rico. Cierra la pestaña y vuelve al trabajo.',
     href: '#',

@@ -1,0 +1,3021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard personal · Santi Gil</title>
+<meta name="description" content="Dashboard personal en pixel art: peso, tiempo, actividad, hábitos, portfolio, tareas y eventos. Los datos se guardan en tu navegador.">
+<meta name="theme-color" content="#0c0c1e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Crect width='8' height='8' fill='%23000'/%3E%3Crect x='1' y='1' width='6' height='6' fill='%231d2b53'/%3E%3Crect x='2' y='4' width='1' height='2' fill='%23ffec27'/%3E%3Crect x='3' y='3' width='1' height='3' fill='%23ffec27'/%3E%3Crect x='4' y='2' width='1' height='4' fill='%2300e436'/%3E%3Crect x='5' y='3' width='1' height='3' fill='%2329adff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  /* ════════════════════════════════════════════════════════════════
+     PIXEL ART — paleta inspirada en PICO-8, bordes duros, sin radios
+     ════════════════════════════════════════════════════════════════ */
+  :root {
+    /* Paleta TIC-80 (Sweetie 16) */
+    --bg: #1a1c2c;
+    --bg-soft: #222640;
+    --surface: #333c57;
+    --surface-hi: #566c86;
+    --line: #566c86;
+    --line-soft: #414b6a;
+    --ink: #0d0e16;
+    --text: #f4f4f4;
+    --text-mid: #c9d6df;
+    --text-dim: #94b0c2;
+    --accent: #ffcd75;
+    --accent-soft: rgba(255, 205, 117, 0.12);
+    --up: #a7f070;
+    --up-deep: #38b764;
+    --down: #ef7d57;
+    --down-deep: #b13e53;
+    --warn: #ffcd75;
+    --info: #41a6f6;
+    --cyan: #73eff7;
+    --pink: #ef7d57;
+    --purple: #5d275d;
+    --navy: #29366f;
+    --blue: #3b5dc9;
+    --teal: #257179;
+
+    --pixel: 'Silkscreen', monospace;
+    --serif: 'Chakra Petch', system-ui, sans-serif;
+    --sans: 'Chakra Petch', system-ui, sans-serif;
+    --mono: 'Chakra Petch', system-ui, sans-serif;
+
+    --radius: 0;
+    --radius-sm: 0;
+    --px: 3px;
+    --shadow: 5px 5px 0 var(--ink);
+    --bevel: inset 3px 3px 0 rgba(255,255,255,0.10), inset -3px -3px 0 rgba(0,0,0,0.30);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; }
+
+  html {
+    font-synthesis: none; /* sin cursivas ni negritas falsas en fuentes pixel */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html, body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    padding: 28px clamp(16px, 4vw, 56px) 64px;
+    background-image:
+      radial-gradient(rgba(148,176,194,0.10) 1px, transparent 1.5px);
+    background-size: 16px 16px;
+    image-rendering: pixelated;
+  }
+
+  ::selection { background: var(--accent); color: var(--ink); }
+
+  /* Scrollbars cuadradas */
+  * { scrollbar-width: thin; scrollbar-color: var(--line) var(--bg); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--line); border: 2px solid var(--bg); }
+
+  /* ─── HEADER ─── */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    padding-bottom: 22px;
+    margin-bottom: 28px;
+    border-bottom: 4px dashed var(--line-soft);
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    font-family: var(--pixel);
+    font-size: clamp(1.5rem, 3.6vw, 2.4rem);
+    line-height: 1.25;
+    color: var(--text);
+    text-shadow: 3px 3px 0 var(--ink);
+  }
+  .brand .dot { color: var(--accent); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .year-progress { margin-top: 14px; max-width: 460px; }
+  .yp-bar {
+    height: 18px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 2px;
+    margin-bottom: 8px;
+  }
+  .yp-fill {
+    height: 100%;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent 8px 10px);
+    transition: width 0.6s steps(12);
+  }
+  .yp-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    color: var(--text-dim);
+  }
+  .yp-meta .yp-pct { color: var(--accent); }
+
+  .header-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+  .meta-date {
+    font-family: var(--mono);
+    font-size: 0.96rem;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .pill-btn {
+    background: var(--surface);
+    border: var(--px) solid var(--ink);
+    box-shadow: var(--bevel), 3px 3px 0 var(--ink);
+    color: var(--text);
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill-btn:hover { background: var(--surface-hi); color: var(--accent); }
+  .pill-btn:active { transform: translate(3px, 3px); box-shadow: var(--bevel); }
+
+  /* ─── TODAY STRIP ─── */
+  .today-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .today-cell {
+    background: var(--surface);
+    border: var(--px) solid var(--ink);
+    box-shadow: var(--bevel), 4px 4px 0 var(--ink);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .today-label {
+    font-family: var(--pixel);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+  .today-value {
+    font-family: var(--sans); font-weight: 700;
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
+    color: var(--text);
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .today-value .unit { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); margin-left: 4px; }
+  .today-value.up { color: var(--up); }
+  .today-value.down { color: var(--down); }
+  .today-value.warn { color: var(--warn); }
+  .today-sub { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); }
+
+  /* ─── GRID / CARDS ─── */
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 22px; }
+
+  .card {
+    background: var(--surface);
+    border: 4px solid var(--ink);
+    box-shadow: var(--bevel), 6px 6px 0 var(--ink);
+    padding: 20px 22px 22px;
+    position: relative;
+    min-width: 0;
+  }
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: -20px -22px 18px;
+    padding: 12px 22px;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--bg-soft);
+    border-bottom: 4px solid var(--ink);
+  }
+
+  .card-title {
+    font-family: var(--pixel);
+    font-weight: 400;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+  .card-title-num {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--ink);
+    padding: 2px 6px;
+    margin-right: 12px;
+    font-size: 0.8em;
+    vertical-align: 2px;
+  }
+  .card-meta { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
+
+  .span-4 { grid-column: span 4; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-7 { grid-column: span 7; }
+  .span-8 { grid-column: span 8; }
+  .span-12 { grid-column: span 12; }
+
+  /* ─── INPUTS ─── */
+  input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="time"], select, textarea {
+    background: var(--bg);
+    border: var(--px) solid var(--ink);
+    box-shadow: inset 3px 3px 0 rgba(0,0,0,0.45);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 1rem;
+    padding: 8px 10px;
+    outline: none;
+    min-width: 0;
+    color-scheme: dark;
+  }
+  input[type="number"], input[type="date"], input[type="time"] { font-family: var(--mono); font-size: 0.96rem; padding: 5px 10px; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  input::placeholder, textarea::placeholder { color: var(--text-dim); }
+
+  .input-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+
+  .btn {
+    background: var(--surface-hi);
+    border: var(--px) solid var(--ink);
+    box-shadow: var(--bevel), 3px 3px 0 var(--ink);
+    color: var(--text);
+    padding: 8px 14px;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--ink); font-weight: 600; }
+  .btn.primary:hover { background: #ffe0a3; color: var(--ink); }
+  .btn.ghost { background: var(--bg-soft); color: var(--text-mid); }
+  .btn:active, .btn.primary:active { transform: translate(3px, 3px); box-shadow: var(--bevel); }
+  .btn:disabled { opacity: 0.5; cursor: wait; }
+
+  /* ─── WEIGHT ─── */
+  .chart-area {
+    position: relative;
+    height: 180px;
+    margin-top: 8px;
+    background: var(--bg);
+    border: var(--px) solid var(--ink);
+  }
+  canvas { width: 100% !important; height: 100% !important; image-rendering: pixelated; display: block; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .stat-row .cell {
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  .stat-row .lbl { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+  .stat-row .val { font-family: var(--sans); font-weight: 700; font-size: 1.16rem; color: var(--text); line-height: 1.4; }
+  .stat-row .val.up { color: var(--up); }
+  .stat-row .val.down { color: var(--down); }
+
+  /* ─── WEATHER ─── */
+  .weather-now { display: flex; align-items: center; gap: 22px; margin-bottom: 18px; }
+  .weather-icon-big { font-size: 4.6rem; line-height: 1; filter: drop-shadow(4px 4px 0 var(--ink)); }
+  .weather-temp {
+    font-family: var(--sans); font-weight: 700;
+    font-size: 3.6rem;
+    color: var(--text);
+    line-height: 1;
+    text-shadow: 4px 4px 0 var(--ink);
+  }
+  .weather-temp sup { font-family: var(--sans); font-weight: 700; font-size: 1.16rem; color: var(--accent); margin-left: 4px; vertical-align: top; }
+  .weather-city { font-family: var(--sans); font-size: 1.15rem; font-weight: 500; color: var(--text-mid); margin-top: 8px; }
+  .weather-desc { font-family: var(--mono); font-size: 0.96rem; color: var(--info); margin-top: 2px; }
+
+  .weather-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wd-item {
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+  .wd-item .ic { font-size: 1.4rem; }
+  .wd-item .lbl { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); }
+  .wd-item .v { font-family: var(--mono); font-size: 1.08rem; color: var(--text); }
+
+  .weather-tomorrow {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .weather-tomorrow .tag { font-family: var(--pixel); font-size: 0.8rem; color: var(--accent); text-transform: uppercase; }
+
+  /* ─── ACTIVITY ─── */
+  .date-picker-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .date-picker-row .nav-day { display: inline-flex; align-items: center; gap: 6px; }
+  .date-picker-row .btn { padding: 4px 10px; }
+
+  .ring-display { display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px; }
+
+  .pix-bars { display: flex; flex-direction: column; gap: 10px; }
+  .pbar { display: grid; grid-template-columns: 44px 1fr 52px; align-items: center; gap: 10px; }
+  .pbar-lbl { font-family: var(--pixel); font-size: 0.87rem; }
+  .pbar-track {
+    height: 22px;
+    background: var(--bg);
+    border: var(--px) solid var(--ink);
+    padding: 2px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .pbar-fill {
+    height: 100%;
+    width: 0;
+    background: repeating-linear-gradient(90deg, var(--c) 0 10px, transparent 10px 12px);
+    transition: width 0.6s steps(10);
+  }
+  .pbar-pct { font-family: var(--mono); font-size: 1.0rem; color: var(--text-mid); text-align: right; }
+
+  .ring-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ring-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    min-width: 0;
+  }
+  .ring-stat .label { font-family: var(--mono); font-size: 0.84rem; text-transform: uppercase; }
+  .ring-stat .value { font-family: var(--sans); font-weight: 700; font-size: 1.16rem; color: var(--text); line-height: 1.5; }
+  .ring-stat .value .small { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); margin-left: 4px; }
+
+  .activity-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+  .activity-form > input { width: 100%; }
+  .activity-form > .btn { grid-column: 1 / -1; }
+
+  /* ─── HABITS ─── */
+  .habit-table-wrap { overflow-x: auto; padding-bottom: 6px; }
+  .habit-table { width: 100%; border-collapse: separate; border-spacing: 3px; }
+  .habit-table th { font-family: var(--mono); font-size: 0.76rem; color: var(--text-dim); padding: 2px 0; font-weight: 400; text-align: center; }
+  .habit-name-col { text-align: left !important; min-width: 130px; font-family: var(--mono); color: var(--text-mid); }
+  .habit-row td { padding: 0; vertical-align: middle; }
+  .habit-row .name-cell { font-family: var(--sans); font-size: 1rem; color: var(--text); padding-right: 8px; white-space: nowrap; }
+  .streak, .habit-row .streak {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink);
+    margin-left: 6px;
+    background: var(--warn);
+    border: 2px solid var(--ink);
+    padding: 0 5px;
+    vertical-align: middle;
+  }
+  .habit-delete {
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-family: var(--mono); font-size: 0.96rem;
+    padding: 0 6px; margin-left: 4px; opacity: 0;
+  }
+  .habit-row:hover .habit-delete { opacity: 1; }
+  .habit-delete:hover { color: var(--down); }
+
+  .cell-box {
+    width: 18px; height: 18px;
+    background: var(--bg);
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    display: block;
+    margin: auto;
+  }
+  .cell-box:hover { background: var(--line); }
+  .cell-box.done { background: var(--accent); box-shadow: inset -3px -3px 0 rgba(0,0,0,0.25), inset 3px 3px 0 rgba(255,255,255,0.4); }
+  .cell-box.today { outline: 2px solid var(--info); outline-offset: 1px; }
+  .cell-box.future { cursor: not-allowed; opacity: 0.3; }
+
+  .habit-rate { font-family: var(--mono); font-size: 0.88rem; color: var(--text); text-align: right; padding-left: 6px !important; }
+  .habit-rate .lbl-rate { color: var(--text-dim); margin-right: 3px; }
+
+  .month-nav { display: inline-flex; align-items: center; gap: 6px; }
+  .month-nav button {
+    background: var(--surface-hi);
+    border: var(--px) solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    color: var(--text);
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 1.04rem;
+    line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .month-nav button:hover { color: var(--accent); }
+  .month-nav button:active { transform: translate(2px, 2px); box-shadow: none; }
+  .month-label { font-family: var(--mono); font-size: 0.96rem; color: var(--text-mid); min-width: 120px; text-align: center; }
+
+  .legend { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); }
+  .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 12px; height: 12px; border: 2px solid var(--ink); }
+
+  .empty-state {
+    padding: 24px 18px;
+    text-align: center;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.96rem;
+    border: var(--px) dashed var(--line);
+    background: var(--bg-soft);
+  }
+
+  .year-month-header {
+    font-family: var(--pixel);
+    font-size: 0.87rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 16px 0 8px;
+    border-top: var(--px) dashed var(--line-soft);
+    margin-top: 6px;
+  }
+  .year-month-header:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+
+  /* ─── PORTFOLIO ─── */
+  .apikey-row {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 16px; padding: 10px 12px;
+    background: var(--bg-soft);
+    border: var(--px) dashed var(--line);
+  }
+  .apikey-row .lbl { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
+  .apikey-row input { flex: 1; min-width: 180px; font-family: var(--mono); font-size: 0.88rem; }
+  .apikey-status { font-family: var(--mono); font-size: 0.88rem; }
+
+  .portfolio-add { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .portfolio-add input[type="text"] { width: 110px; text-transform: uppercase; font-family: var(--mono); font-size: 0.96rem; padding: 5px 10px; }
+  .portfolio-add input[type="number"] { width: 120px; }
+  .portfolio-add input[type="date"] { width: 160px; }
+
+  .portfolio-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+  .pnl-box {
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 12px 14px;
+    min-width: 0;
+  }
+  .pnl-box .lbl { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; }
+  .pnl-box .val { font-family: var(--sans); font-weight: 700; font-size: 1.23rem; color: var(--text); line-height: 1.4; overflow-wrap: anywhere; }
+  .pnl-box .sub { font-family: var(--mono); font-size: 0.88rem; margin-top: 4px; color: var(--text-dim); }
+  .pnl-box .val.up, .pnl-box .sub.up { color: var(--up); }
+  .pnl-box .val.down, .pnl-box .sub.down { color: var(--down); }
+
+  .stocks-wrap { overflow-x: auto; border: var(--px) solid var(--ink); background: var(--bg); }
+  .stocks-table { width: 100%; min-width: 720px; border-collapse: collapse; }
+  .stocks-table th {
+    font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim);
+    text-transform: uppercase; padding: 8px 12px; text-align: right;
+    background: var(--bg-soft); border-bottom: var(--px) solid var(--ink);
+    font-weight: 400; white-space: nowrap;
+  }
+  .stocks-table th:first-child { text-align: left; }
+  .stocks-table td {
+    padding: 8px 12px; font-family: var(--mono); font-size: 0.96rem;
+    text-align: right; border-bottom: 2px dashed var(--line-soft); white-space: nowrap;
+  }
+  .stocks-table td:first-child { text-align: left; }
+  .stocks-table tr:last-child td { border-bottom: none; }
+
+  .main-row { cursor: pointer; }
+  .main-row:hover td { background: var(--bg-soft); }
+  .expand-arrow { display: inline-block; margin-right: 8px; font-size: 0.8rem; color: var(--text-dim); }
+  .main-row.expanded .expand-arrow { transform: rotate(90deg); color: var(--accent); }
+  .ticker-badge { display: inline-block; padding: 0 6px; font-family: var(--mono); font-size: 0.96rem; border: 2px solid; }
+  .lots-badge { font-family: var(--mono); font-size: 0.8rem; color: var(--text-dim); margin-left: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 3px; padding: 0 6px; font-size: 1.1rem; border: 2px solid var(--ink); }
+  .pill.up { background: var(--up); color: var(--ink); }
+  .pill.down { background: var(--down-deep); color: var(--text); }
+  .pill.neutral { background: var(--bg-soft); color: var(--text-dim); }
+
+  .del-lot-btn {
+    background: var(--bg-soft); border: 2px solid var(--ink); color: var(--text-dim);
+    cursor: pointer; font-family: var(--mono); font-size: 0.8rem; padding: 1px 8px;
+  }
+  .del-lot-btn:hover { color: var(--text); background: var(--down-deep); }
+
+  .refresh-icon { display: inline-block; }
+
+  /* ─── TODO ─── */
+  .todo-input-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .todo-input-row #todoInput { flex: 1 1 180px; }
+  .todo-priority-select { width: 120px; cursor: pointer; }
+  .todo-list { display: flex; flex-direction: column; gap: 8px; max-height: 360px; overflow-y: auto; padding-right: 4px; }
+  .todo-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 12px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+  }
+  .todo-item:hover { background: var(--surface-hi); }
+  .todo-item.done { opacity: 0.5; }
+  .todo-check {
+    width: 20px; height: 20px;
+    border: var(--px) solid var(--ink);
+    background: var(--bg);
+    cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.88rem; line-height: 1;
+  }
+  .todo-check:hover { border-color: var(--accent); }
+  .todo-item.done .todo-check { background: var(--up); color: var(--ink); }
+  .todo-text { flex: 1; font-size: 1rem; color: var(--text); line-height: 1.35; min-width: 0; overflow-wrap: anywhere; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-dim); }
+  .todo-badge {
+    font-family: var(--mono); font-size: 0.76rem; padding: 0 6px;
+    text-transform: uppercase; flex-shrink: 0; border: 2px solid var(--ink);
+  }
+  .todo-badge.alta { background: var(--down-deep); color: var(--text); }
+  .todo-badge.media { background: var(--warn); color: var(--ink); }
+  .todo-badge.baja { background: var(--line); color: var(--text); }
+  .todo-del, .event-del, .rep-del {
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-family: var(--mono); font-size: 0.96rem; padding: 0 6px; opacity: 0;
+  }
+  .todo-item:hover .todo-del, .event-item:hover .event-del, .rep-item:hover .rep-del { opacity: 1; }
+  .todo-del:hover, .event-del:hover, .rep-del:hover { color: var(--down); }
+  .todo-stats { display: flex; gap: 14px; font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
+  .todo-stats .hl { color: var(--accent); }
+
+  /* ─── EVENTS ─── */
+  .events-list { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
+  .event-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 12px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+  }
+  .event-item:hover { background: var(--surface-hi); }
+  .event-countdown { text-align: center; flex-shrink: 0; width: 64px; }
+  .event-days { font-family: var(--sans); font-weight: 700; font-size: 1.38rem; line-height: 1.2; }
+  .event-days-label { font-family: var(--mono); font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
+  .event-days.urgent { color: var(--down); }
+  .event-days.warn { color: var(--warn); }
+  .event-days.ok { color: var(--up); }
+  .event-days.far { color: var(--text-mid); }
+  .event-divider { width: 3px; height: 36px; background: repeating-linear-gradient(180deg, var(--line) 0 4px, transparent 4px 7px); flex-shrink: 0; }
+  .event-info { flex: 1; min-width: 0; }
+  .event-title { font-size: 1rem; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .event-date-str { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
+  .event-urgency-bar { width: 8px; height: 38px; flex-shrink: 0; border: 2px solid var(--ink); }
+  .event-urgency-bar.urgent { background: var(--down); animation: blink 1.2s steps(1) infinite; }
+  .event-urgency-bar.warn { background: var(--warn); }
+  .event-urgency-bar.ok { background: var(--up); }
+  .event-urgency-bar.far { background: var(--line); }
+  .event-add-form { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; margin-bottom: 14px; }
+  .event-add-form input[type="date"] { width: 160px !important; }
+
+  /* ─── COCHE ─── */
+  .coche-km-block {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 12px 14px; margin-bottom: 16px;
+    background: var(--bg);
+    border: var(--px) solid var(--ink);
+  }
+  .coche-km-label { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); text-transform: uppercase; }
+  .coche-km-value {
+    font-family: var(--sans); font-weight: 700; font-size: 1.59rem; color: var(--up);
+    line-height: 1; flex: 1; letter-spacing: 0.05em;
+    text-shadow: 0 0 6px rgba(167,240,112,0.45);
+  }
+  .coche-km-value .unit { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); margin-left: 6px; text-shadow: none; }
+  .coche-km-edit, .mant-btn {
+    background: var(--surface-hi); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink);
+    color: var(--text); font-family: var(--mono); font-size: 0.84rem; padding: 2px 10px; cursor: pointer;
+  }
+  .coche-km-edit:hover, .mant-btn:hover { color: var(--accent); }
+  .mant-btn.del:hover { color: var(--text); background: var(--down-deep); }
+
+  .coche-section-title {
+    font-family: var(--pixel); font-size: 0.87rem; text-transform: uppercase;
+    color: var(--accent); margin: 16px 0 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .coche-section-title:first-child { margin-top: 0; }
+
+  .mant-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .mant-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 12px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+  }
+  .mant-info { flex: 1; min-width: 0; }
+  .mant-concepto { font-size: 1rem; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mant-progress-bar { height: 12px; background: var(--bg); border: 2px solid var(--ink); margin-top: 6px; padding: 1px; }
+  .mant-progress-fill { height: 100%; transition: width 0.4s steps(8); }
+  .mant-progress-fill.urgent { background: repeating-linear-gradient(90deg, var(--down) 0 6px, transparent 6px 8px); }
+  .mant-progress-fill.warn { background: repeating-linear-gradient(90deg, var(--warn) 0 6px, transparent 6px 8px); }
+  .mant-progress-fill.ok { background: repeating-linear-gradient(90deg, var(--up) 0 6px, transparent 6px 8px); }
+  .mant-progress-fill.far { background: repeating-linear-gradient(90deg, var(--text-dim) 0 6px, transparent 6px 8px); }
+  .mant-meta { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); display: flex; gap: 8px; flex-wrap: wrap; }
+  .mant-meta .kmleft.urgent { color: var(--down); }
+  .mant-meta .kmleft.warn { color: var(--warn); }
+  .mant-meta .kmleft.ok { color: var(--up); }
+  .mant-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .coche-add-link {
+    width: 100%; padding: 8px; cursor: pointer;
+    background: none; border: var(--px) dashed var(--line);
+    color: var(--text-dim); font-family: var(--mono); font-size: 0.92rem;
+  }
+  .coche-add-link:hover { border-color: var(--accent); color: var(--accent); }
+
+  .rep-form { display: grid; grid-template-columns: 160px 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 14px; }
+  .rep-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .rep-stat { padding: 10px 12px; background: var(--bg-soft); border: var(--px) solid var(--ink); min-width: 0; }
+  .rep-stat .lbl { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+  .rep-stat .val { font-family: var(--sans); font-weight: 700; font-size: 1.16rem; color: var(--text); line-height: 1.5; }
+  .rep-stat .val .unit { font-family: var(--mono); color: var(--text-dim); font-size: 0.84rem; margin-left: 4px; }
+
+  .rep-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
+  .rep-item {
+    display: grid; grid-template-columns: 80px 1fr 1fr 1fr auto; gap: 12px; align-items: center;
+    padding: 6px 12px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    font-family: var(--mono); font-size: 0.92rem;
+  }
+  .rep-item .rep-date { color: var(--text-mid); }
+  .rep-item .rep-val { color: var(--text); }
+  .rep-item .rep-val .lbl { color: var(--text-dim); margin-right: 3px; }
+  .rep-item .rep-consumo { color: var(--accent); }
+
+  /* ─── ESTADOS ─── */
+  .spinner {
+    width: 14px; height: 14px;
+    background: var(--accent);
+    animation: pixspin 0.8s steps(4) infinite;
+  }
+  @keyframes pixspin { to { transform: rotate(360deg); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-state, .error-state {
+    padding: 20px; font-family: var(--mono); font-size: 0.96rem; color: var(--text-dim);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .error-state { color: var(--down); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(200%);
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+    box-shadow: var(--bevel), 4px 4px 0 var(--ink);
+    padding: 10px 18px;
+    font-family: var(--mono); font-size: 1.0rem; color: var(--text);
+    z-index: 1000;
+    transition: transform 0.3s steps(4);
+    max-width: calc(100vw - 32px);
+  }
+  .toast::before { content: '▶ '; color: var(--accent); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--up); }
+  .toast.error { border-color: var(--down); }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,28,44,0.9);
+    z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 4px solid var(--ink);
+    box-shadow: var(--bevel), 8px 8px 0 var(--ink);
+    padding: 26px;
+    max-width: 440px; width: 100%;
+    max-height: calc(100vh - 32px); overflow-y: auto;
+  }
+  .modal h2 { font-family: var(--pixel); font-weight: 400; font-size: 1.23rem; line-height: 1.5; margin-bottom: 20px; color: var(--accent); text-transform: uppercase; }
+  .modal-note { font-size: 0.95rem; color: var(--text-dim); line-height: 1.45; margin: -8px 0 18px; }
+  .login-form { display: flex; flex-direction: column; gap: 10px; }
+  .login-form input { width: 100%; font-size: 1.05rem; }
+  .login-form #loginCode { font-family: var(--mono); letter-spacing: 0.3em; }
+  .login-error { min-height: 1.2em; color: var(--down); font-size: 0.95rem; }
+  .login-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+  .sync-status { font-family: var(--mono); font-size: 0.85rem; color: var(--text-dim); }
+  .sync-status.ok { color: var(--up); }
+  .sync-status.pending { color: var(--accent); }
+  .sync-status.offline, .sync-status.error { color: var(--down); }
+
+  .shortcut-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 2px dashed var(--line-soft); }
+  .shortcut-row:last-child { border-bottom: none; }
+  .shortcut-row .desc { font-size: 1rem; color: var(--text-mid); }
+  .key {
+    font-family: var(--mono); font-size: 0.92rem; padding: 0 9px;
+    background: var(--bg); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); color: var(--text);
+  }
+
+  /* ─── ANIM ─── */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.3s steps(3); border-color: var(--down) !important; }
+
+  /* En pantallas táctiles no hay hover: botones de borrar siempre visibles */
+  @media (hover: none) {
+    .todo-del, .event-del, .rep-del, .habit-delete { opacity: 1; }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1100px) {
+    .span-4, .span-5, .span-6, .span-7, .span-8 { grid-column: span 12; }
+  }
+  @media (max-width: 640px) {
+    body { padding: 18px 16px 48px; }
+    header { align-items: flex-start; }
+    .header-meta { align-items: flex-start; }
+    .grid { gap: 18px; }
+    .card { padding: 16px 14px 18px; box-shadow: var(--bevel), 4px 4px 0 var(--ink); }
+    .card-head { margin: -16px -14px 16px; padding: 10px 14px; }
+    .today-strip { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .portfolio-top { grid-template-columns: 1fr 1fr; }
+    .stat-row { gap: 6px; }
+    .stat-row .val { font-size: 0.65rem; }
+    .weather-temp { font-size: 1.9rem; }
+    .weather-icon-big { font-size: 3.6rem; }
+    .event-add-form { grid-template-columns: 1fr auto; }
+    .event-add-form #eventTitle { grid-column: 1 / -1; }
+    .event-add-form input[type="date"] { width: 100% !important; }
+    .rep-form { grid-template-columns: 1fr 1fr; }
+    .rep-form .btn { grid-column: 1 / -1; }
+    .rep-stats { grid-template-columns: 1fr; }
+    .rep-item { grid-template-columns: 1fr 1fr auto; row-gap: 2px; }
+    .rep-item .rep-consumo { grid-column: 1 / 3; }
+    .mant-item { flex-wrap: wrap; }
+    .portfolio-add input[type="text"], .portfolio-add input[type="number"], .portfolio-add input[type="date"], .portfolio-add select { flex: 1 1 40%; width: auto; }
+    .portfolio-add .btn { flex: 1 1 100%; }
+    .input-row input[type="date"] { flex: 1 1 100% !important; }
+    .todo-input-row #todoInput { flex-basis: 100%; }
+    .todo-priority-select { flex: 1; }
+    .btn { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="brand" id="brandMark"></div>
+    <div class="year-progress">
+      <div class="yp-bar"><div class="yp-fill" id="ypFill"></div></div>
+      <div class="yp-meta">
+        <span id="ypDay"></span>
+        <span class="yp-pct" id="ypPct"></span>
+      </div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-date" id="headerDate"></div>
+    <div class="header-actions">
+      <button class="pill-btn" onclick="exportData()" title="Exportar todos los datos">↓ Exportar</button>
+      <button class="pill-btn" onclick="document.getElementById('importFile').click()" title="Importar JSON">↑ Importar</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="pill-btn" onclick="showShortcuts()" title="Atajos de teclado">⌘ Atajos</button>
+      <button class="pill-btn" id="authBtn" onclick="authButton()" title="Acceso del propietario">🔒 Entrar</button>
+    </div>
+    <div class="sync-status local" id="syncStatus">💾 Local</div>
+  </div>
+</header>
+
+<!-- TODAY SUMMARY -->
+<div class="today-strip" id="todayStrip"></div>
+
+<!-- GRID -->
+<div class="grid">
+
+  <!-- WEIGHT -->
+  <div class="card span-7">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">01</span>Peso corporal</h3>
+      <span class="card-meta">12 meses</span>
+    </div>
+    <div class="input-row">
+      <input type="date" id="weightDate" style="flex:1">
+      <input type="number" id="weightVal" placeholder="kg" step="0.1" min="20" max="300" style="width:90px">
+      <button class="btn primary" onclick="addWeight()">Añadir</button>
+    </div>
+    <div class="chart-area">
+      <canvas id="weightChart"></canvas>
+    </div>
+    <div class="stat-row">
+      <div class="cell">
+        <div class="lbl">Actual</div>
+        <div class="val" id="statLast">—</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Mínimo 12m</div>
+        <div class="val" id="statMin">—</div>
+      </div>
+      <div class="cell">
+        <div class="lbl">Cambio</div>
+        <div class="val" id="statDiff">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="card span-5">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">02</span>Tiempo</h3>
+      <span class="card-meta" id="weatherMeta"></span>
+    </div>
+    <div class="input-row">
+      <input type="text" id="cityInput" placeholder="Ciudad (ej. Vigo)" style="flex:1" onkeydown="if(event.key==='Enter')searchWeather()">
+      <button class="btn" onclick="searchWeather()">Buscar</button>
+    </div>
+    <div id="weatherContent">
+      <div class="loading-state"><div class="spinner"></div> Cargando…</div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY (Apple Watch) -->
+  <div class="card span-5">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">03</span>Actividad</h3>
+      <div class="date-picker-row" style="margin:0">
+        <div class="nav-day">
+          <button class="btn ghost" style="padding:4px 10px" onclick="changeActivityDay(-1)">‹</button>
+          <input type="date" id="activityDate" onchange="renderActivity()" style="width:140px">
+          <button class="btn ghost" style="padding:4px 10px" onclick="changeActivityDay(1)">›</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ring-display">
+      <div class="pix-bars">
+        <div class="pbar">
+          <span class="pbar-lbl" style="color:var(--down)">MOV</span>
+          <div class="pbar-track"><div class="pbar-fill" id="ringMove" style="--c:var(--down)"></div></div>
+          <span class="pbar-pct" id="ringMovePct">0%</span>
+        </div>
+        <div class="pbar">
+          <span class="pbar-lbl" style="color:var(--up)">EJE</span>
+          <div class="pbar-track"><div class="pbar-fill" id="ringExercise" style="--c:var(--up)"></div></div>
+          <span class="pbar-pct" id="ringExercisePct">0%</span>
+        </div>
+        <div class="pbar">
+          <span class="pbar-lbl" style="color:var(--cyan)">PIE</span>
+          <div class="pbar-track"><div class="pbar-fill" id="ringStand" style="--c:var(--cyan)"></div></div>
+          <span class="pbar-pct" id="ringStandPct">0%</span>
+        </div>
+      </div>
+
+      <div class="ring-stats">
+        <div class="ring-stat">
+          <span class="label" style="color:var(--accent)">■ Pasos</span>
+          <span class="value"><span id="actSteps">0</span><span class="small" id="actStepsGoal">/ 10k</span></span>
+        </div>
+        <div class="ring-stat">
+          <span class="label" style="color:var(--down)">■ Kcal activas</span>
+          <span class="value"><span id="actKcal">0</span><span class="small">kcal</span></span>
+        </div>
+        <div class="ring-stat">
+          <span class="label" style="color:var(--up)">■ Ejercicio</span>
+          <span class="value"><span id="actExercise">0</span><span class="small">min</span></span>
+        </div>
+        <div class="ring-stat" id="hrStat" style="display:none">
+          <span class="label" style="color:var(--pink)">♥ Pulso</span>
+          <span class="value"><span id="actHrRest">—</span><span class="small" id="actHrRange"></span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="activity-form">
+      <input type="number" id="inSteps" placeholder="Pasos" min="0">
+      <input type="number" id="inKcal" placeholder="Kcal act." min="0">
+      <input type="number" id="inExercise" placeholder="Ejer. min" min="0">
+      <input type="number" id="inStand" placeholder="Hrs pie" min="0" max="24">
+      <button class="btn primary" onclick="saveActivity()">Guardar</button>
+    </div>
+
+    <button class="btn ghost" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px" onclick="document.getElementById('healthImport').click()">
+      <span style="font-size:1rem">🍎</span>
+      Importar de Apple Salud (export.zip o .xml)
+    </button>
+    <input type="file" id="healthImport" accept=".xml,.zip" style="display:none" onchange="importHealth(event)">
+  </div>
+
+  <!-- HABITS -->
+  <div class="card span-7">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">04</span>Hábitos</h3>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="month-nav" id="monthNavControls">
+          <button onclick="changeMonth(-1)">‹</button>
+          <span class="month-label" id="monthLabel"></span>
+          <button onclick="changeMonth(1)">›</button>
+        </div>
+        <button class="btn ghost" id="expandBtn" style="padding:5px 12px;font-size:1.05rem" onclick="toggleYearView()">Año</button>
+      </div>
+    </div>
+    <div class="input-row">
+      <input type="text" id="habitName" placeholder="Nuevo hábito (ej. Meditación, Lectura)" style="flex:1" onkeydown="if(event.key==='Enter')addHabit()">
+      <button class="btn primary" onclick="addHabit()">+ Añadir</button>
+    </div>
+    <div class="habit-table-wrap">
+      <div id="habitGrid"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Completado</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bg)"></div>Vacío</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bg);box-shadow:0 0 0 2px var(--info)"></div>Hoy</div>
+      <div class="legend-item"><span class="streak" style="margin:0">7🔥</span>Racha</div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="card span-12">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">05</span>Portfolio</h3>
+      <div style="display:flex;gap:10px;align-items:center;margin-left:auto">
+        <span id="portfolioStatus" style="font-family:var(--mono);font-size:0.84rem;color:var(--up);display:none">● en vivo</span>
+        <button class="btn" onclick="pRefreshPrices()" style="display:inline-flex;align-items:center;gap:6px">
+          <span class="refresh-icon" id="refreshIcon">↻</span> Actualizar
+        </button>
+      </div>
+    </div>
+
+    <div class="apikey-row" id="apikeyRow">
+      <span class="lbl">Alpha Vantage API key</span>
+      <input type="text" id="apiKeyInput" placeholder="Pega tu API key y guarda">
+      <button class="btn primary" style="padding:7px 14px" onclick="pSaveKey()">Guardar</button>
+      <span class="apikey-status" id="apikeyStatus"></span>
+    </div>
+
+    <div class="portfolio-add">
+      <input type="text" id="pTicker" placeholder="Ticker" maxlength="12" oninput="this.value=this.value.toUpperCase()">
+      <input type="number" id="pShares" placeholder="Acciones" min="0.0001" step="any">
+      <input type="number" id="pPrice" placeholder="Precio" min="0" step="any">
+      <select id="pCurrency">
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+      </select>
+      <input type="date" id="pDate">
+      <button class="btn primary" onclick="pAddLot()">+ Añadir</button>
+    </div>
+    <div id="pError" style="display:none;color:var(--down);font-size:0.88rem;margin-bottom:12px;font-family:var(--mono)"></div>
+
+    <div class="portfolio-top">
+      <div class="pnl-box">
+        <div class="lbl">Valor total</div>
+        <div class="val" id="pTotalVal">€—</div>
+      </div>
+      <div class="pnl-box">
+        <div class="lbl">Coste</div>
+        <div class="val" id="pTotalCost">€—</div>
+      </div>
+      <div class="pnl-box">
+        <div class="lbl">G/P no realizada</div>
+        <div class="val" id="pGainAbs">—</div>
+        <div class="sub" id="pGainPct">—</div>
+      </div>
+      <div class="pnl-box">
+        <div class="lbl">Posiciones</div>
+        <div class="val" id="pPositions">0</div>
+      </div>
+    </div>
+
+    <div class="stocks-wrap">
+      <table class="stocks-table" id="holdingsTable">
+        <thead>
+          <tr>
+            <th style="text-align:left">Símbolo</th>
+            <th>Acciones</th>
+            <th>Coste medio</th>
+            <th>Precio actual</th>
+            <th>Valor (€)</th>
+            <th>G/P (€)</th>
+            <th>Retorno</th>
+            <th>Peso</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="holdingsBody">
+          <tr><td colspan="9" style="text-align:center;color:var(--text-dim);padding:32px;font-family:var(--serif);font-style:italic">Añade tu primera posición para comenzar.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TODO LIST -->
+  <div class="card span-6">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">06</span>Tareas</h3>
+      <div class="todo-stats">
+        <span id="todoPending"><span class="hl" id="todoPendingN">0</span> pendientes</span>
+        <span id="todoDoneCount"><span class="hl" id="todoDoneN">0</span> hechas</span>
+      </div>
+    </div>
+    <div class="todo-input-row">
+      <input type="text" id="todoInput" placeholder="Nueva tarea…" style="flex:1" onkeydown="if(event.key==='Enter')addTodo()">
+      <select class="todo-priority-select" id="todoPriority">
+        <option value="alta">🔴 Alta</option>
+        <option value="media" selected>🟡 Media</option>
+        <option value="baja">⚪ Baja</option>
+      </select>
+      <button class="btn primary" onclick="addTodo()">+ Añadir</button>
+    </div>
+    <div class="todo-list" id="todoList"></div>
+  </div>
+
+  <!-- EVENTS / REMINDERS -->
+  <div class="card span-6">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">07</span>Eventos futuros</h3>
+      <span class="card-meta" id="eventsMeta"></span>
+    </div>
+    <div class="event-add-form">
+      <input type="text" id="eventTitle" placeholder="Descripción del evento…" onkeydown="if(event.key==='Enter')addEvent()">
+      <input type="date" id="eventDate" style="width:150px">
+      <button class="btn primary" onclick="addEvent()">+ Añadir</button>
+    </div>
+    <div class="events-list" id="eventsList"></div>
+  </div>
+
+  <!-- COCHE -->
+  <div class="card span-12">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">08</span>Coche</h3>
+      <span class="card-meta" id="cocheMeta"></span>
+    </div>
+
+    <div class="coche-km-block">
+      <span class="coche-km-label">Km actuales</span>
+      <span class="coche-km-value"><span id="cocheKmDisplay">0</span><span class="unit">km</span></span>
+      <button class="coche-km-edit" onclick="editCocheKm()">Editar</button>
+    </div>
+
+    <div class="coche-section-title">
+      <span>Mantenimiento</span>
+    </div>
+    <div class="mant-list" id="mantList"></div>
+    <button class="coche-add-link" onclick="addMantenimiento()">+ Añadir concepto de mantenimiento</button>
+
+    <div class="coche-section-title" style="margin-top:22px"><span>Repostajes</span></div>
+    <div class="rep-form">
+      <input type="date" id="repDate">
+      <input type="number" id="repKm" placeholder="Km recorridos" min="0" step="1">
+      <input type="number" id="repLitros" placeholder="Litros" min="0" step="0.01">
+      <input type="number" id="repPrecio" placeholder="Precio €" min="0" step="0.01">
+      <button class="btn primary" onclick="addRepostaje()">+ Añadir</button>
+    </div>
+    <div class="rep-stats" id="repStats"></div>
+    <div class="rep-list" id="repList"></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Login modal (solo propietario) -->
+<div class="modal-overlay" id="loginModal" onclick="if(event.target===this)hideLogin()">
+  <div class="modal">
+    <h2>Acceso privado</h2>
+    <p class="modal-note">Solo para el propietario. No hace falta entrar para usar el dashboard: como visitante, tus datos se guardan únicamente en este navegador.</p>
+    <form class="login-form" onsubmit="event.preventDefault();doLogin()">
+      <input type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password">
+      <input type="text" id="loginCode" placeholder="Código 2FA (6 dígitos)" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      <div class="login-error" id="loginError"></div>
+      <div class="login-actions">
+        <button class="btn ghost" type="button" onclick="hideLogin()">Cancelar</button>
+        <button class="btn primary" type="submit" id="loginSubmit">Entrar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Shortcuts modal -->
+<div class="modal-overlay" id="shortcutsModal" onclick="if(event.target===this)hideShortcuts()">
+  <div class="modal">
+    <h2>Atajos de teclado</h2>
+    <div class="shortcut-row"><span class="desc">Añadir peso</span><span class="key">W</span></div>
+    <div class="shortcut-row"><span class="desc">Añadir hábito</span><span class="key">H</span></div>
+    <div class="shortcut-row"><span class="desc">Foco actividad</span><span class="key">A</span></div>
+    <div class="shortcut-row"><span class="desc">Exportar datos</span><span class="key">E</span></div>
+    <div class="shortcut-row"><span class="desc">Mostrar atajos</span><span class="key">?</span></div>
+    <div class="shortcut-row"><span class="desc">Cerrar</span><span class="key">Esc</span></div>
+  </div>
+</div>
+
+<!-- Apple Health import modal -->
+<div class="modal-overlay" id="healthModal">
+  <div class="modal" style="max-width:520px">
+    <h2 id="healthModalTitle">Importar de Apple Salud</h2>
+
+    <div id="healthModalBody">
+      <div id="healthProgress" style="display:none">
+        <div style="font-family:var(--mono);font-size:0.88rem;color:var(--text-mid);margin-bottom:10px" id="healthStage">Preparando…</div>
+        <div style="height:6px;background:var(--bg-soft);border-radius:3px;overflow:hidden;margin-bottom:8px">
+          <div id="healthBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.2s ease"></div>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.84rem;color:var(--text-dim)" id="healthDetail">—</div>
+      </div>
+
+      <div id="healthSummary" style="display:none"></div>
+
+      <div id="healthError" style="display:none;color:var(--down);padding:14px;background:rgba(255,107,138,0.06);border:1px solid rgba(255,107,138,0.2);border-radius:8px;font-size:0.85rem;line-height:1.5"></div>
+    </div>
+
+    <div style="margin-top:22px;display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="hideHealthModal()" id="healthCloseBtn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   STORAGE — todo bajo un único objeto root, fácil de exportar
+   ════════════════════════════════════════════════════════════════ */
+const ROOT_KEY = 'myspace_v2';          // visitante: datos solo en este navegador
+const OWNER_KEY = 'myspace_owner_v1';   // propietario: copia local de los datos de la nube
+const SESSION_KEY = 'myspace_session';
+const SYNC_BASE_KEY = 'myspace_owner_base';   // versión de la nube sobre la que se trabaja
+const SYNC_DIRTY_KEY = 'myspace_owner_dirty'; // hay cambios locales sin subir
+const API = '/api/dashboard';
+
+const DEFAULTS = {
+  weight: [],
+  habits: [],
+  habitData: {},
+  activity: {},      // { 'YYYY-MM-DD': {steps, kcal, exercise, stand, hrRest, hrMin, hrMax} }
+  weatherCity: 'Madrid',
+  portfolio: {},
+  fxRate: 0.92,
+  goals: { steps: 10000, calories: 1850, exerciseMin: 30, stand: 12 },
+  todos: [],         // [{id, text, priority, done, createdAt}]
+  events: [],        // [{id, title, date}]
+  coche: {
+    km: 0,
+    mantenimiento: [],   // [{id, concepto, kmObjetivo, notas, historial: [{fecha, km, kmObjetivoAnterior}]}]
+    repostajes: []       // [{id, date, km, litros, precio}]
+  }
+};
+
+function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+function lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
+
+// Sesión del propietario (token firmado por el servidor, caduca a los 30 días)
+let session = null;
+try {
+  session = JSON.parse(lsGet(SESSION_KEY) || 'null');
+  if (session && (!session.token || session.exp < Date.now())) { session = null; lsDel(SESSION_KEY); }
+} catch(e) { session = null; }
+const isOwner = () => !!session;
+const storageKey = () => isOwner() ? OWNER_KEY : ROOT_KEY;
+
+function withDefaults(parsed) {
+  const base = structuredClone(DEFAULTS);
+  const merged = { ...base, ...parsed, goals: { ...base.goals, ...(parsed.goals||{}) }, coche: { ...base.coche, ...(parsed.coche||{}) } };
+  if (merged.goals.calories === 2200) merged.goals.calories = 1850;
+  return merged;
+}
+
+let DB = loadDB();
+function loadDB() {
+  try {
+    const raw = lsGet(storageKey());
+    if (raw) return withDefaults(JSON.parse(raw));
+  } catch(e) {}
+  if (isOwner()) return withDefaults({});
+  // Migración desde versiones anteriores (solo modo local)
+  const migrated = withDefaults({});
+  try {
+    const wd = JSON.parse(lsGet('weightData') || 'null');
+    if (Array.isArray(wd)) migrated.weight = wd;
+    const h = JSON.parse(lsGet('habits') || 'null');
+    if (Array.isArray(h)) migrated.habits = h;
+    const hd = JSON.parse(lsGet('habitData') || 'null');
+    if (hd) migrated.habitData = hd;
+    const wc = JSON.parse(lsGet('weatherCity') || 'null');
+    if (wc) migrated.weatherCity = wc;
+    const pf = JSON.parse(lsGet('portfolio') || 'null');
+    if (pf && typeof pf === 'object' && !Array.isArray(pf)) migrated.portfolio = pf;
+  } catch(e) {}
+  return migrated;
+}
+function saveDB() {
+  DB._updatedAt = Date.now();
+  lsSet(storageKey(), JSON.stringify(DB));
+  if (isOwner()) {
+    lsSet(SYNC_DIRTY_KEY, '1');
+    scheduleSync();
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SINCRONIZACIÓN CON LA NUBE (solo propietario)
+   ════════════════════════════════════════════════════════════════ */
+let syncTimer = null;
+let syncing = false;
+
+function setSyncStatus(state) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  const map = {
+    local:   ['💾 Local', 'Modo visitante: tus datos se guardan solo en este navegador'],
+    ok:      ['☁ Sincronizado', 'Datos guardados en la nube'],
+    pending: ['☁ Guardando…', 'Subiendo cambios'],
+    offline: ['☁ Sin conexión', 'Los cambios se subirán al recuperar la conexión'],
+    error:   ['☁ Error', 'No se pudo sincronizar']
+  };
+  const [txt, title] = map[state] || map.local;
+  el.textContent = txt;
+  el.title = title;
+  el.className = 'sync-status ' + state;
+}
+
+function scheduleSync() {
+  setSyncStatus('pending');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushToCloud, 1200);
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(API + path, {
+    ...options,
+    headers: { 'content-type': 'application/json', authorization: 'Bearer ' + session.token, ...(options.headers || {}) }
+  });
+  if (res.status === 401) { endSession('Sesión caducada. Vuelve a entrar.'); throw new Error('401'); }
+  return res;
+}
+
+function applyCloud(remote) {
+  DB = withDefaults(remote.data || {});
+  lsSet(OWNER_KEY, JSON.stringify(DB));
+  lsSet(SYNC_BASE_KEY, String(remote.updatedAt || 0));
+  lsDel(SYNC_DIRTY_KEY);
+  pLoadKey();
+  renderAll();
+}
+
+async function pushToCloud(force = false) {
+  if (!isOwner() || syncing) return;
+  syncing = true;
+  try {
+    const res = await api('/data', {
+      method: 'PUT',
+      body: JSON.stringify({ data: DB, base: Number(lsGet(SYNC_BASE_KEY) || 0), force })
+    });
+    if (res.status === 409) {
+      // Otro dispositivo guardó algo más reciente
+      const remote = await res.json();
+      if (confirm('Hay cambios más recientes guardados desde otro dispositivo.\n\nAceptar: cargar los de la nube (se pierden los cambios de aquí).\nCancelar: sobrescribir la nube con los de este dispositivo.')) {
+        applyCloud(remote);
+        toast('Datos actualizados desde la nube');
+      } else {
+        syncing = false;
+        return pushToCloud(true);
+      }
+    } else if (res.ok) {
+      const { updatedAt } = await res.json();
+      lsSet(SYNC_BASE_KEY, String(updatedAt));
+      lsDel(SYNC_DIRTY_KEY);
+    } else {
+      throw new Error('HTTP ' + res.status);
+    }
+    setSyncStatus('ok');
+  } catch (e) {
+    if (e.message !== '401') setSyncStatus(navigator.onLine ? 'error' : 'offline');
+  } finally {
+    syncing = false;
+  }
+}
+
+async function pullFromCloud() {
+  if (!isOwner() || syncing) return;
+  try {
+    const res = await api('/data');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const remote = await res.json();
+    const base = Number(lsGet(SYNC_BASE_KEY) || 0);
+    const dirty = lsGet(SYNC_DIRTY_KEY) === '1';
+
+    if (!remote.data) {
+      // Nube vacía: primera vez. Ofrecer subir los datos locales de este navegador.
+      const localRaw = lsGet(ROOT_KEY);
+      if (!dirty && localRaw && confirm('Tu nube está vacía.\n¿Subir los datos que hay guardados en este navegador?')) {
+        DB = withDefaults(JSON.parse(localRaw));
+        renderAll();
+      }
+      saveDB();
+      return pushToCloud();
+    }
+    if (dirty && remote.updatedAt <= base) return pushToCloud();
+    if (dirty) return pushToCloud(); // pushToCloud resolverá el conflicto (409)
+    if (remote.updatedAt !== base) applyCloud(remote);
+    setSyncStatus('ok');
+  } catch (e) {
+    if (e.message !== '401') setSyncStatus(navigator.onLine ? 'error' : 'offline');
+  }
+}
+
+function endSession(msg) {
+  session = null;
+  [SESSION_KEY, OWNER_KEY, SYNC_BASE_KEY, SYNC_DIRTY_KEY].forEach(lsDel);
+  if (msg) alert(msg);
+  location.reload();
+}
+
+/* ─── Login / logout ─── */
+function authButton() {
+  if (!isOwner()) return showLogin();
+  if (lsGet(SYNC_DIRTY_KEY) === '1' && !confirm('Hay cambios sin subir a la nube. ¿Salir igualmente?')) return;
+  endSession();
+}
+function showLogin() {
+  document.getElementById('loginModal').classList.add('show');
+  document.getElementById('loginError').textContent = '';
+  setTimeout(() => document.getElementById('loginPass').focus(), 50);
+}
+function hideLogin() { document.getElementById('loginModal').classList.remove('show'); }
+
+async function doLogin() {
+  const pass = document.getElementById('loginPass');
+  const code = document.getElementById('loginCode');
+  const err = document.getElementById('loginError');
+  const btn = document.getElementById('loginSubmit');
+  if (!pass.value) { shake(pass); return; }
+  if (!/^\d{6}$/.test(code.value.trim())) { shake(code); return; }
+  btn.disabled = true; btn.textContent = 'Comprobando…'; err.textContent = '';
+  try {
+    const res = await fetch(API + '/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ password: pass.value, code: code.value.trim() })
+    });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(out.error || 'No se pudo entrar');
+    lsSet(SESSION_KEY, JSON.stringify({ token: out.token, exp: out.exp }));
+    location.reload();
+  } catch (e) {
+    err.textContent = e.message === 'Failed to fetch' ? 'Sin conexión con el servidor' : e.message;
+    code.value = '';
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+// Al volver a la pestaña, traer cambios de otros dispositivos; al salir, subir lo pendiente
+document.addEventListener('visibilitychange', () => {
+  if (!isOwner()) return;
+  if (document.visibilityState === 'visible') pullFromCloud();
+  else if (lsGet(SYNC_DIRTY_KEY) === '1') {
+    clearTimeout(syncTimer);
+    fetch(API + '/data', {
+      method: 'PUT', keepalive: true,
+      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + session.token },
+      body: JSON.stringify({ data: DB, base: Number(lsGet(SYNC_BASE_KEY) || 0) })
+    }).then(r => r.ok && r.json()).then(o => {
+      if (o && o.updatedAt) { lsSet(SYNC_BASE_KEY, String(o.updatedAt)); lsDel(SYNC_DIRTY_KEY); }
+    }).catch(() => {});
+  }
+});
+window.addEventListener('online', () => { if (isOwner()) pullFromCloud(); });
+
+/* ════════════════════════════════════════════════════════════════
+   DATE & UTILS
+   ════════════════════════════════════════════════════════════════ */
+const now = new Date();
+const todayStr = isoDate(now);
+function isoDate(d) { return d.toISOString().slice(0, 10); }
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return isoDate(d);
+}
+
+document.getElementById('headerDate').textContent =
+  now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+(function renderBrandMark() {
+  const hour = now.getHours();
+  let greeting;
+  if (hour < 6) greeting = 'Buenas noches';
+  else if (hour < 13) greeting = 'Buenos días';
+  else if (hour < 20) greeting = 'Buenas tardes';
+  else greeting = 'Buenas noches';
+
+  document.getElementById('brandMark').innerHTML =
+    `${greeting}${isOwner() ? ', Santi' : ''} 👋🏼 <span class="dot">.</span>`;
+
+  const year = now.getFullYear();
+  const startOfYear = new Date(year, 0, 1);
+  const endOfYear = new Date(year + 1, 0, 1);
+  const dayOfYear = Math.floor((now - startOfYear) / 86400000) + 1;
+  const totalDays = Math.round((endOfYear - startOfYear) / 86400000);
+  const pct = ((now - startOfYear) / (endOfYear - startOfYear)) * 100;
+
+  document.getElementById('ypFill').style.width = pct.toFixed(2) + '%';
+  document.getElementById('ypDay').textContent = `Día ${dayOfYear} de ${totalDays}`;
+  document.getElementById('ypPct').textContent = pct.toFixed(1).replace('.', ',') + '% del año';
+})();
+
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.className = 'toast', 2400);
+}
+
+function shake(el) {
+  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 400);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   EXPORT / IMPORT JSON
+   ════════════════════════════════════════════════════════════════ */
+function exportData() {
+  const payload = {
+    _meta: {
+      app: 'myspace',
+      version: 2,
+      exportedAt: new Date().toISOString()
+    },
+    data: DB
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `myspace-backup-${todayStr}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup exportado ✓');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const data = parsed.data || parsed; // soporta payload o data plano
+      if (typeof data !== 'object') throw new Error('formato inválido');
+      if (!confirm('¿Reemplazar todos los datos actuales con los del archivo?\n(Tu backup actual no se guardará automáticamente)')) return;
+      DB = withDefaults(data);
+      saveDB();
+      renderAll();
+      toast('Datos importados ✓');
+    } catch (err) {
+      toast('Error al importar: ' + err.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TODAY STRIP
+   ════════════════════════════════════════════════════════════════ */
+function renderTodayStrip() {
+  const strip = document.getElementById('todayStrip');
+  const todayActivity = DB.activity[todayStr] || {};
+  const todayHabits = DB.habits.filter(h => DB.habitData[`${h}__${todayStr}`] === 'done').length;
+  const totalHabits = DB.habits.length;
+  const lastWeight = DB.weight.length ? DB.weight[DB.weight.length - 1].val : null;
+
+  // Pulso reposo hoy (o último registrado en últimos 7 días)
+  let hrRest = todayActivity.hrRest;
+  let hrDateLabel = 'hoy';
+  if (!hrRest) {
+    for (let i = 1; i <= 7; i++) {
+      const d = addDays(todayStr, -i);
+      if (DB.activity[d] && DB.activity[d].hrRest) {
+        hrRest = DB.activity[d].hrRest;
+        hrDateLabel = `hace ${i}d`;
+        break;
+      }
+    }
+  }
+
+  // Valoración cartera
+  const pSymbols = Object.keys(DB.portfolio);
+  let pTotalValue = 0, pTotalCost = 0;
+  pSymbols.forEach(sym => {
+    const s = DB.portfolio[sym];
+    s.lots.forEach(lot => {
+      const rate = lot.exchangeRate || (s.currency === 'USD' ? DB.fxRate : 1);
+      pTotalCost += lot.shares * lot.purchasePrice * (s.currency === 'USD' ? rate : 1);
+      pTotalValue += lot.shares * (s.currentPrice || lot.purchasePrice * (s.currency === 'USD' ? rate : 1));
+    });
+  });
+  const pGain = pTotalValue - pTotalCost;
+  const pGainPct = pTotalCost > 0 ? (pGain / pTotalCost) * 100 : 0;
+  const fmtEur = n => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+  const portfolioCell = pSymbols.length > 0 ? `
+    <div class="today-cell">
+      <div class="today-label">Cartera</div>
+      <div class="today-value ${pGain >= 0 ? 'up' : 'down'}">${fmtEur(pTotalValue)}</div>
+      <div class="today-sub">${pGain >= 0 ? '+' : ''}${pGainPct.toFixed(2)}% rendimiento</div>
+    </div>` : '';
+
+  strip.innerHTML = `
+    <div class="today-cell">
+      <div class="today-label">Peso</div>
+      <div class="today-value">${lastWeight ? lastWeight.toFixed(1) : '—'}<span class="unit">kg</span></div>
+      <div class="today-sub">${DB.weight.length ? 'último registro' : 'sin datos'}</div>
+    </div>
+    <div class="today-cell">
+      <div class="today-label">Pasos hoy</div>
+      <div class="today-value ${(todayActivity.steps||0) >= DB.goals.steps ? 'up' : ''}">${(todayActivity.steps||0).toLocaleString('es-ES')}</div>
+      <div class="today-sub">objetivo ${DB.goals.steps.toLocaleString('es-ES')}</div>
+    </div>
+    ${hrRest ? `<div class="today-cell">
+      <div class="today-label">Pulso reposo</div>
+      <div class="today-value">${hrRest}<span class="unit">bpm</span></div>
+      <div class="today-sub">${hrDateLabel}</div>
+    </div>` : ''}
+    ${portfolioCell}
+    <div class="today-cell">
+      <div class="today-label">Hábitos hoy</div>
+      <div class="today-value ${totalHabits && todayHabits === totalHabits ? 'up' : ''}">${todayHabits}<span class="unit">/${totalHabits}</span></div>
+      <div class="today-sub">${totalHabits ? Math.round(todayHabits/totalHabits*100)+'% completado' : 'sin hábitos'}</div>
+    </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   WEIGHT
+   ════════════════════════════════════════════════════════════════ */
+document.getElementById('weightDate').value = todayStr;
+
+function addWeight() {
+  const date = document.getElementById('weightDate').value;
+  const val = parseFloat(document.getElementById('weightVal').value);
+  if (!date || isNaN(val) || val < 20 || val > 300) {
+    shake(document.getElementById('weightVal'));
+    return;
+  }
+  DB.weight = DB.weight.filter(d => d.date !== date);
+  DB.weight.push({ date, val });
+  DB.weight.sort((a, b) => a.date.localeCompare(b.date));
+  saveDB();
+  document.getElementById('weightVal').value = '';
+  drawWeightChart();
+  updateWeightStats();
+  renderTodayStrip();
+  toast('Peso registrado');
+}
+
+function drawWeightChart() {
+  const canvas = document.getElementById('weightChart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.parentElement.clientWidth;
+  const H = canvas.parentElement.clientHeight;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+  ctx.clearRect(0, 0, W, H);
+
+  const css = getComputedStyle(document.documentElement);
+  const C = {
+    accent: css.getPropertyValue('--accent').trim(),
+    dim: css.getPropertyValue('--text-dim').trim(),
+    grid: css.getPropertyValue('--line-soft').trim(),
+    ink: '#000'
+  };
+
+  const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - 1);
+  const cutStr = isoDate(cutoff);
+  const data = DB.weight.filter(d => d.date >= cutStr);
+
+  if (data.length < 2) {
+    ctx.fillStyle = C.dim;
+    ctx.font = '15px "Chakra Petch", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(data.length === 0 ? 'Sin registros' : 'Necesitas más de un registro', W / 2, H / 2);
+    return;
+  }
+
+  // Todo se dibuja en una rejilla de "píxeles gordos" de P×P
+  const P = 3;
+  const px = (gx, gy) => ctx.fillRect(gx * P, gy * P, P, P);
+  const pad = { l: 42, r: 12, t: 12, b: 24 };
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+  const vals = data.map(d => d.val);
+  const minV = Math.min(...vals) - 0.6;
+  const maxV = Math.max(...vals) + 0.6;
+  const range = maxV - minV;
+
+  const toX = i => pad.l + (i / (data.length - 1)) * cW;
+  const toY = v => pad.t + (1 - (v - minV) / range) * cH;
+  const g = v => Math.round(v / P);
+  const bottomG = g(pad.t + cH);
+
+  // Rejilla horizontal punteada + etiquetas Y
+  ctx.font = '12px "Chakra Petch", sans-serif';
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + (i / 4) * cH;
+    ctx.fillStyle = C.grid;
+    for (let gx = g(pad.l); gx <= g(pad.l + cW); gx += 2) px(gx, g(y));
+    ctx.fillStyle = C.dim;
+    ctx.fillText((maxV - (i / 4) * range).toFixed(1), pad.l - 6, y + 4);
+  }
+
+  // Puntos de la línea en coordenadas de rejilla (Bresenham)
+  const pts = data.map((d, i) => [g(toX(i)), g(toY(d.val))]);
+  const lineCells = [];
+  for (let k = 1; k < pts.length; k++) {
+    let [x0, y0] = pts[k - 1];
+    const [x1, y1] = pts[k];
+    const dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    const dy = -Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    while (true) {
+      lineCells.push([x0, y0]);
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+  }
+
+  // Relleno con tramado (dithering): más denso arriba, más ligero abajo
+  const topByCol = {};
+  lineCells.forEach(([x, y]) => { topByCol[x] = Math.min(topByCol[x] ?? Infinity, y); });
+  ctx.fillStyle = C.accent;
+  Object.keys(topByCol).forEach(k => {
+    const x = +k;
+    const top = topByCol[x];
+    const span = Math.max(1, bottomG - top);
+    for (let y = top + 1; y <= bottomG; y++) {
+      const t = (y - top) / span;
+      const on = t < 0.35 ? (x + y) % 2 === 0 : t < 0.7 ? (x % 2 === 0 && y % 2 === 0) : (x % 4 === 0 && y % 4 === 0);
+      if (on) { ctx.globalAlpha = 0.45; px(x, y); }
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  // Línea: sombra negra desplazada + trazo de color
+  ctx.fillStyle = C.ink;
+  lineCells.forEach(([x, y]) => px(x + 1, y + 1));
+  ctx.fillStyle = C.accent;
+  lineCells.forEach(([x, y]) => px(x, y));
+
+  // Marcadores cuadrados (solo si no hay demasiados)
+  if (data.length <= 60) {
+    pts.forEach(([x, y]) => {
+      ctx.fillStyle = C.ink;
+      ctx.fillRect((x - 1) * P - 1, (y - 1) * P - 1, 3 * P + 2, 3 * P + 2);
+      ctx.fillStyle = C.accent;
+      ctx.fillRect((x - 1) * P, (y - 1) * P, 3 * P, 3 * P);
+    });
+  }
+
+  // Etiquetas X
+  ctx.fillStyle = C.dim;
+  ctx.font = '12px "Chakra Petch", sans-serif';
+  ctx.textAlign = 'center';
+  const labelIdxs = [0, Math.floor((data.length - 1) / 2), data.length - 1];
+  labelIdxs.forEach(i => {
+    ctx.fillText(data[i].date.slice(5), Math.min(Math.max(toX(i), pad.l + 12), W - 20), pad.t + cH + 18);
+  });
+}
+
+function updateWeightStats() {
+  const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - 1);
+  const cutStr = isoDate(cutoff);
+  const data = DB.weight.filter(d => d.date >= cutStr);
+  const last = document.getElementById('statLast');
+  const min = document.getElementById('statMin');
+  const diff = document.getElementById('statDiff');
+  if (data.length === 0) {
+    last.textContent = '—'; min.textContent = '—'; diff.textContent = '—';
+    return;
+  }
+  const vals = data.map(d => d.val);
+  const lastV = vals[vals.length - 1];
+  const firstV = vals[0];
+  const change = lastV - firstV;
+  last.textContent = lastV.toFixed(1) + ' kg';
+  min.textContent = Math.min(...vals).toFixed(1) + ' kg';
+  diff.textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + ' kg';
+  diff.className = 'val ' + (change < 0 ? 'up' : change > 0 ? 'down' : '');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   WEATHER
+   ════════════════════════════════════════════════════════════════ */
+document.getElementById('cityInput').value = DB.weatherCity;
+
+async function searchWeather() {
+  const city = document.getElementById('cityInput').value.trim();
+  if (!city) return;
+  DB.weatherCity = city; saveDB();
+  await fetchWeather(city);
+}
+
+async function fetchWeather(city) {
+  const el = document.getElementById('weatherContent');
+  el.innerHTML = `<div class="loading-state"><div class="spinner"></div> Cargando ${city}…</div>`;
+  try {
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=es&format=json`);
+    const geoData = await geoRes.json();
+    if (!geoData.results || geoData.results.length === 0) throw new Error('Ciudad no encontrada');
+    const loc = geoData.results[0];
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2`);
+    const wData = await wRes.json();
+    renderWeather(loc, wData.current, wData.daily);
+    document.getElementById('weatherMeta').textContent = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    el.innerHTML = `<div class="error-state">⚠ ${e.message || 'Error'}</div>`;
+  }
+}
+
+function wmoIcon(c) {
+  if (c === 0) return '☀';
+  if (c <= 2) return '⛅';
+  if (c <= 3) return '☁';
+  if (c <= 48) return '🌫';
+  if (c <= 57) return '🌦';
+  if (c <= 67) return '🌧';
+  if (c <= 77) return '❄';
+  if (c <= 82) return '🌧';
+  if (c <= 86) return '🌨';
+  if (c <= 99) return '⛈';
+  return '·';
+}
+function wmoDesc(c) {
+  if (c === 0) return 'Despejado';
+  if (c <= 2) return 'Parcialmente nublado';
+  if (c <= 3) return 'Nublado';
+  if (c <= 48) return 'Niebla';
+  if (c <= 57) return 'Llovizna';
+  if (c <= 67) return 'Lluvia';
+  if (c <= 77) return 'Nieve';
+  if (c <= 82) return 'Lluvia intensa';
+  if (c <= 86) return 'Nieve intensa';
+  if (c <= 99) return 'Tormenta';
+  return '';
+}
+
+function renderWeather(loc, c, d) {
+  const el = document.getElementById('weatherContent');
+  const tmMax = Math.round(d.temperature_2m_max[1]);
+  const tmMin = Math.round(d.temperature_2m_min[1]);
+  const tmProb = d.precipitation_probability_max[1] ?? '—';
+
+  el.innerHTML = `
+    <div class="weather-now">
+      <div class="weather-icon-big">${wmoIcon(c.weather_code)}</div>
+      <div>
+        <div class="weather-temp">${Math.round(c.temperature_2m)}<sup>°C</sup></div>
+        <div class="weather-city">${loc.name}${loc.country_code ? ', ' + loc.country_code : ''}</div>
+        <div class="weather-desc">${wmoDesc(c.weather_code)}</div>
+      </div>
+    </div>
+    <div class="weather-details">
+      <div class="wd-item">
+        <span class="ic">🌡</span>
+        <div><div class="lbl">Sensación</div><div class="v">${Math.round(c.apparent_temperature)}°C</div></div>
+      </div>
+      <div class="wd-item">
+        <span class="ic">💧</span>
+        <div><div class="lbl">Humedad</div><div class="v">${c.relative_humidity_2m}%</div></div>
+      </div>
+      <div class="wd-item">
+        <span class="ic">💨</span>
+        <div><div class="lbl">Viento</div><div class="v">${Math.round(c.wind_speed_10m)} km/h</div></div>
+      </div>
+      <div class="wd-item">
+        <span class="ic">🌧</span>
+        <div><div class="lbl">Prob. lluvia</div><div class="v">${d.precipitation_probability_max[0] ?? '—'}%</div></div>
+      </div>
+    </div>
+    <div class="weather-tomorrow">
+      <span class="weather-icon-big" style="font-size:2.4rem">${wmoIcon(d.weather_code[1])}</span>
+      <div style="flex:1">
+        <div class="tag">Mañana</div>
+        <div style="font-size:0.92rem;color:var(--text-mid);margin-top:4px">${wmoDesc(d.weather_code[1])}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.84rem;color:var(--text);font-weight:500">${tmMax}° / <span style="color:var(--text-dim)">${tmMin}°</span></div>
+      <div style="font-family:var(--mono);font-size:0.66rem;color:var(--info);margin-left:6px">${tmProb}%🌧</div>
+    </div>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ACTIVITY (Apple Watch)
+   ════════════════════════════════════════════════════════════════ */
+let activityViewDate = todayStr;
+document.getElementById('activityDate').value = activityViewDate;
+
+function changeActivityDay(n) {
+  activityViewDate = addDays(activityViewDate, n);
+  document.getElementById('activityDate').value = activityViewDate;
+  renderActivity();
+}
+
+function saveActivity() {
+  const date = document.getElementById('activityDate').value;
+  const steps = parseInt(document.getElementById('inSteps').value) || 0;
+  const kcal = parseInt(document.getElementById('inKcal').value) || 0;
+  const exercise = parseInt(document.getElementById('inExercise').value) || 0;
+  const stand = parseInt(document.getElementById('inStand').value) || 0;
+  if (!steps && !kcal && !exercise && !stand) {
+    shake(document.getElementById('inSteps'));
+    return;
+  }
+  DB.activity[date] = { steps, kcal, exercise, stand };
+  saveDB();
+  renderActivity();
+  renderTodayStrip();
+  toast('Actividad guardada');
+}
+
+function renderActivity() {
+  const date = document.getElementById('activityDate').value;
+  activityViewDate = date;
+  const a = DB.activity[date] || { steps: 0, kcal: 0, exercise: 0, stand: 0 };
+
+  document.getElementById('actSteps').textContent = (a.steps || 0).toLocaleString('es-ES');
+  document.getElementById('actStepsGoal').textContent = `/ ${(DB.goals.steps/1000).toFixed(0)}k`;
+  document.getElementById('actKcal').textContent = a.kcal || 0;
+  document.getElementById('actExercise').textContent = a.exercise || 0;
+
+  // Heart rate (solo se muestra si hay datos importados)
+  const hrStat = document.getElementById('hrStat');
+  if (a.hrRest || a.hrMin || a.hrMax) {
+    hrStat.style.display = '';
+    document.getElementById('actHrRest').textContent = a.hrRest ? Math.round(a.hrRest) : '—';
+    const range = (a.hrMin && a.hrMax) ? `${Math.round(a.hrMin)}-${Math.round(a.hrMax)} bpm` : 'bpm';
+    document.getElementById('actHrRange').textContent = ' ' + range;
+  } else {
+    hrStat.style.display = 'none';
+  }
+
+  document.getElementById('inSteps').value = a.steps || '';
+  document.getElementById('inKcal').value = a.kcal || '';
+  document.getElementById('inExercise').value = a.exercise || '';
+  document.getElementById('inStand').value = a.stand || '';
+
+  // Barras de energía: ancho = progreso respecto al objetivo
+  const bars = [
+    ['ringMove', (a.kcal || 0) / DB.goals.calories],
+    ['ringExercise', (a.exercise || 0) / DB.goals.exerciseMin],
+    ['ringStand', (a.stand || 0) / DB.goals.stand]
+  ];
+  bars.forEach(([id, prog]) => {
+    const p = Math.min(1, prog);
+    document.getElementById(id).style.width = (p * 100) + '%';
+    document.getElementById(id + 'Pct').textContent = Math.round(prog * 100) + '%';
+  });
+}
+
+/* ── Apple Health import ── */
+function showHealthModal() {
+  document.getElementById('healthModal').classList.add('show');
+  document.getElementById('healthProgress').style.display = 'block';
+  document.getElementById('healthSummary').style.display = 'none';
+  document.getElementById('healthError').style.display = 'none';
+  document.getElementById('healthCloseBtn').disabled = true;
+  document.getElementById('healthCloseBtn').textContent = 'Importando…';
+}
+
+function hideHealthModal() {
+  document.getElementById('healthModal').classList.remove('show');
+}
+
+function updateHealthProgress(stage, pct, detail) {
+  document.getElementById('healthStage').textContent = stage;
+  document.getElementById('healthBar').style.width = Math.min(100, Math.max(0, pct)) + '%';
+  if (detail) document.getElementById('healthDetail').textContent = detail;
+}
+
+function finishHealthImport(summary) {
+  document.getElementById('healthProgress').style.display = 'none';
+  document.getElementById('healthSummary').style.display = 'block';
+  document.getElementById('healthSummary').innerHTML = summary;
+  document.getElementById('healthCloseBtn').disabled = false;
+  document.getElementById('healthCloseBtn').textContent = 'Cerrar';
+}
+
+function showHealthError(msg) {
+  document.getElementById('healthProgress').style.display = 'none';
+  document.getElementById('healthError').style.display = 'block';
+  document.getElementById('healthError').innerHTML = msg;
+  document.getElementById('healthCloseBtn').disabled = false;
+  document.getElementById('healthCloseBtn').textContent = 'Cerrar';
+}
+
+// Yield al event loop para que el modal pueda repintarse
+function nextFrame() {
+  return new Promise(r => setTimeout(r, 0));
+}
+
+async function importHealth(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+
+  showHealthModal();
+
+  try {
+    let xmlText;
+
+    if (file.name.endsWith('.zip')) {
+      updateHealthProgress('Descomprimiendo archivo…', 5, file.name + ' · ' + (file.size / 1024 / 1024).toFixed(1) + ' MB');
+      await nextFrame();
+
+      if (typeof JSZip === 'undefined') {
+        throw new Error('La librería JSZip no se ha cargado. ¿Tienes conexión a internet?');
+      }
+      const zip = await JSZip.loadAsync(file);
+      // Buscar export.xml (puede estar dentro de carpeta apple_health_export/)
+      let xmlFile = null;
+      zip.forEach((path, entry) => {
+        if (path.endsWith('export.xml') && !entry.dir) xmlFile = entry;
+      });
+      if (!xmlFile) throw new Error('No se encontró <code>export.xml</code> dentro del ZIP. ¿Es el archivo correcto de Apple Salud?');
+
+      updateHealthProgress('Extrayendo export.xml…', 15, 'Esto puede tardar con archivos grandes');
+      await nextFrame();
+      xmlText = await xmlFile.async('string');
+    } else if (file.name.endsWith('.xml')) {
+      updateHealthProgress('Leyendo XML…', 10, (file.size / 1024 / 1024).toFixed(1) + ' MB');
+      await nextFrame();
+      xmlText = await file.text();
+    } else {
+      throw new Error('Formato no soportado. Sube el <code>export.zip</code> o <code>export.xml</code> de Apple Salud.');
+    }
+
+    if (!xmlText || xmlText.length < 100) throw new Error('El archivo parece vacío.');
+
+    // Parser en streaming usando regex sobre el texto (mucho más rápido que DOMParser
+    // para archivos grandes y consume menos memoria).
+    const dayMap = {};  // YYYY-MM-DD => { steps, kcal, exercise, stand, hrSamples: [] }
+
+    function ensureDay(d) {
+      if (!dayMap[d]) dayMap[d] = { steps: 0, kcal: 0, exercise: 0, stand: 0, hrSamples: [], hrRestSamples: [] };
+      return dayMap[d];
+    }
+
+    updateHealthProgress('Analizando registros…', 25, 'Buscando datos relevantes');
+    await nextFrame();
+
+    // Regex que extrae cada <Record .../> con sus atributos. Solo Record (no clinicalRecord ni otros).
+    // Procesamos por chunks para no bloquear el UI ni inflar memoria con resultados grandes.
+    const recordRegex = /<Record\s+([^/>]+?)\/>|<Record\s+([^>]+?)>/g;
+    const attrRegex = /(\w+)="([^"]*)"/g;
+
+    const total = xmlText.length;
+    let processed = 0;
+    let count = 0;
+    let lastProgressUpdate = 0;
+
+    // Procesamos el XML en chunks usando un cursor
+    const CHUNK_SIZE = 5_000_000;  // 5MB de XML por iteración
+    let cursor = 0;
+
+    while (cursor < total) {
+      const end = Math.min(cursor + CHUNK_SIZE, total);
+      // Aseguramos cortar en límite de tag para no romper un Record a la mitad
+      let safeEnd = end;
+      if (end < total) {
+        const nextGt = xmlText.indexOf('>', end);
+        if (nextGt !== -1 && nextGt - end < 10000) safeEnd = nextGt + 1;
+      }
+      const chunk = xmlText.slice(cursor, safeEnd);
+
+      let m;
+      const regex = /<Record\s+([^/>]+?)\/>|<Record\s+([^>]+?)>/g;
+      while ((m = regex.exec(chunk)) !== null) {
+        const attrText = m[1] || m[2];
+        // Parse rápido de atributos
+        let type = '', value = 0, startDate = '';
+        attrRegex.lastIndex = 0;
+        let am;
+        while ((am = attrRegex.exec(attrText)) !== null) {
+          if (am[1] === 'type') type = am[2];
+          else if (am[1] === 'value') value = parseFloat(am[2]) || 0;
+          else if (am[1] === 'startDate') startDate = am[2];
+        }
+        if (!type || !startDate) continue;
+        const day = startDate.slice(0, 10);
+
+        if (type === 'HKQuantityTypeIdentifierStepCount') {
+          ensureDay(day).steps += value;
+        } else if (type === 'HKQuantityTypeIdentifierActiveEnergyBurned') {
+          ensureDay(day).kcal += value;
+        } else if (type === 'HKQuantityTypeIdentifierAppleExerciseTime') {
+          ensureDay(day).exercise += value;
+        } else if (type === 'HKCategoryTypeIdentifierAppleStandHour') {
+          // En Apple Health, las horas en pie son samples categóricos; contamos uno por hora
+          ensureDay(day).stand += 1;
+        } else if (type === 'HKQuantityTypeIdentifierHeartRate') {
+          if (value > 0) ensureDay(day).hrSamples.push(value);
+        } else if (type === 'HKQuantityTypeIdentifierRestingHeartRate') {
+          if (value > 0) ensureDay(day).hrRestSamples.push(value);
+        }
+        count++;
+      }
+
+      cursor = safeEnd;
+      processed = cursor;
+
+      // Actualizar progreso máximo cada 200ms
+      const now = Date.now();
+      if (now - lastProgressUpdate > 200) {
+        const pct = 25 + (processed / total) * 65;
+        updateHealthProgress(
+          'Analizando registros…',
+          pct,
+          `${count.toLocaleString('es-ES')} registros · ${(processed / 1024 / 1024).toFixed(0)}/${(total / 1024 / 1024).toFixed(0)} MB`
+        );
+        lastProgressUpdate = now;
+        await nextFrame();
+      }
+    }
+
+    updateHealthProgress('Consolidando datos por día…', 92, `${Object.keys(dayMap).length} días encontrados`);
+    await nextFrame();
+
+    // Agregar al DB respetando "solo añadir días sin datos"
+    let added = 0, skipped = 0;
+    let totalSteps = 0, totalKcal = 0, totalHrDays = 0;
+
+    Object.keys(dayMap).forEach(d => {
+      const m = dayMap[d];
+      // ¿Ya tenemos datos para este día?
+      const existing = DB.activity[d];
+      const hasExistingData = existing && (existing.steps || existing.kcal || existing.exercise || existing.stand || existing.hrRest);
+
+      if (hasExistingData) {
+        skipped++;
+        return;
+      }
+
+      const newEntry = {
+        steps: Math.round(m.steps),
+        kcal: Math.round(m.kcal),
+        exercise: Math.round(m.exercise),
+        stand: m.stand
+      };
+
+      // Heart rate stats si hay samples
+      if (m.hrSamples.length > 0) {
+        newEntry.hrMin = Math.min(...m.hrSamples);
+        newEntry.hrMax = Math.max(...m.hrSamples);
+        totalHrDays++;
+      }
+      if (m.hrRestSamples.length > 0) {
+        // Media de los samples de "Pulso en reposo" del día
+        const avgRest = m.hrRestSamples.reduce((s, v) => s + v, 0) / m.hrRestSamples.length;
+        newEntry.hrRest = Math.round(avgRest);
+      }
+
+      DB.activity[d] = newEntry;
+      totalSteps += newEntry.steps;
+      totalKcal += newEntry.kcal;
+      added++;
+    });
+
+    saveDB();
+    renderActivity();
+    renderTodayStrip();
+  
+    updateHealthProgress('Finalizado', 100, '');
+    await nextFrame();
+
+    // Resumen visual
+    const fmt = n => n.toLocaleString('es-ES');
+    finishHealthImport(`
+      <div style="font-size:0.92rem;color:var(--text);margin-bottom:14px">
+        Importación completada correctamente.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-soft);border-radius:8px;overflow:hidden;border:1px solid var(--line-soft)">
+        <div style="background:var(--bg-soft);padding:12px 14px">
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">Días añadidos</div>
+          <div style="font-family:var(--serif);font-size:1.4rem;color:var(--up)">${added}</div>
+        </div>
+        <div style="background:var(--bg-soft);padding:12px 14px">
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">Días omitidos</div>
+          <div style="font-family:var(--serif);font-size:1.4rem;color:var(--text-mid)">${skipped}</div>
+        </div>
+        <div style="background:var(--bg-soft);padding:12px 14px">
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">Pasos totales</div>
+          <div style="font-family:var(--mono);font-size:0.76rem;color:var(--text)">${fmt(totalSteps)}</div>
+        </div>
+        <div style="background:var(--bg-soft);padding:12px 14px">
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">Kcal activas</div>
+          <div style="font-family:var(--mono);font-size:0.76rem;color:var(--text)">${fmt(totalKcal)}</div>
+        </div>
+        <div style="background:var(--bg-soft);padding:12px 14px;grid-column:1/-1">
+          <div style="font-family:var(--mono);font-size:0.8rem;color:var(--text-dim);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">Días con pulso registrado</div>
+          <div style="font-family:var(--mono);font-size:0.76rem;color:var(--text)">${totalHrDays}</div>
+        </div>
+      </div>
+      ${skipped > 0 ? `<div style="margin-top:14px;font-size:1.1rem;color:var(--text-dim);line-height:1.5">Se omitieron ${skipped} días porque ya tenías datos guardados. Para reemplazarlos, bórralos primero manualmente.</div>` : ''}
+      ${added === 0 && skipped === 0 ? '<div style="margin-top:14px;font-size:0.85rem;color:var(--warn)">No se encontraron datos relevantes en el archivo.</div>' : ''}
+    `);
+    toast(`Importados ${added} días ✓`);
+  } catch (err) {
+    console.error('Health import error:', err);
+    showHealthError(`<strong>Error al importar:</strong><br>${err.message || err}`);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HABITS
+   ════════════════════════════════════════════════════════════════ */
+let habitViewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+let yearViewActive = false;
+
+function changeMonth(d) {
+  habitViewDate = new Date(habitViewDate.getFullYear(), habitViewDate.getMonth() + d, 1);
+  renderHabits();
+}
+
+function toggleYearView() {
+  yearViewActive = !yearViewActive;
+  document.getElementById('expandBtn').textContent = yearViewActive ? 'Mes' : 'Año';
+  document.getElementById('monthNavControls').style.display = yearViewActive ? 'none' : 'inline-flex';
+  renderHabits();
+}
+
+function addHabit() {
+  const name = document.getElementById('habitName').value.trim();
+  if (!name) { shake(document.getElementById('habitName')); return; }
+  if (DB.habits.find(h => h.toLowerCase() === name.toLowerCase())) return;
+  DB.habits.push(name);
+  saveDB();
+  document.getElementById('habitName').value = '';
+  renderHabits();
+  renderTodayStrip();
+}
+
+function removeHabit(name) {
+  if (!confirm(`¿Eliminar el hábito "${name}"? Los registros se mantendrán.`)) return;
+  DB.habits = DB.habits.filter(h => h !== name);
+  saveDB();
+  renderHabits();
+  renderTodayStrip();
+}
+
+function toggleCell(habit, dateStr) {
+  if (dateStr > todayStr) return;
+  const key = `${habit}__${dateStr}`;
+  if (DB.habitData[key] === 'done') delete DB.habitData[key];
+  else DB.habitData[key] = 'done';
+  saveDB();
+  renderHabits();
+  renderTodayStrip();
+}
+
+function calculateStreak(habit) {
+  let streak = 0;
+  let d = new Date();
+  while (true) {
+    const key = `${habit}__${isoDate(d)}`;
+    if (DB.habitData[key] === 'done') {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      // Si hoy no está hecho aún, no rompe la racha
+      if (streak === 0 && isoDate(d) === todayStr) {
+        d.setDate(d.getDate() - 1);
+        continue;
+      }
+      break;
+    }
+  }
+  return streak;
+}
+
+function buildMonthTable(year, month) {
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let html = `<table class="habit-table"><thead><tr><th class="habit-name-col">Hábito</th>`;
+  for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+  html += `<th class="habit-name-col" style="text-align:right;padding-right:4px">%</th></tr></thead><tbody>`;
+
+  DB.habits.forEach(habit => {
+    const streak = calculateStreak(habit);
+    html += `<tr class="habit-row"><td class="name-cell">${escapeHtml(habit)}${streak > 1 ? `<span class="streak">${streak}🔥</span>` : ''}<button class="habit-delete" onclick="removeHabit('${habit.replace(/'/g, "\\'")}')">×</button></td>`;
+    let done = 0, total = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const isToday = dStr === todayStr;
+      const isFuture = dStr > todayStr;
+      const state = DB.habitData[`${habit}__${dStr}`];
+      if (!isFuture) total++;
+      if (state === 'done') done++;
+      const classes = ['cell-box', state === 'done' ? 'done' : '', isToday ? 'today' : '', isFuture ? 'future' : ''].filter(Boolean).join(' ');
+      const click = isFuture ? '' : `onclick="toggleCell('${habit.replace(/'/g, "\\'")}','${dStr}')"`;
+      html += `<td><div class="${classes}" ${click} title="${dStr}"></div></td>`;
+    }
+    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+    html += `<td class="habit-rate"><span class="lbl-rate">%</span>${pct}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function renderHabits() {
+  const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('monthLabel').textContent = `${months[habitViewDate.getMonth()]} ${habitViewDate.getFullYear()}`;
+  const wrap = document.getElementById('habitGrid');
+  if (DB.habits.length === 0) {
+    wrap.innerHTML = '<div class="empty-state">Añade tu primer hábito para empezar el seguimiento.</div>';
+    return;
+  }
+  if (yearViewActive) {
+    const year = now.getFullYear();
+    let html = '';
+    for (let m = 0; m < 12; m++) {
+      html += `<div class="year-month-header">${months[m]} ${year}</div>`;
+      html += buildMonthTable(year, m);
+    }
+    wrap.innerHTML = html;
+  } else {
+    wrap.innerHTML = buildMonthTable(habitViewDate.getFullYear(), habitViewDate.getMonth());
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PORTFOLIO
+   ════════════════════════════════════════════════════════════════ */
+const P_COLORS = ['#41a6f6','#ffcd75','#a7f070','#ef7d57','#73eff7','#b13e53','#3b5dc9','#38b764','#94b0c2','#5d275d','#257179','#f4f4f4'];
+let pApiKey = '';
+function pLoadKey() {
+  pApiKey = (isOwner() && DB.alphaVantageKey) || lsGet('alphaVantageApiKey') || '';
+  const input = document.getElementById('apiKeyInput');
+  if (input) input.value = pApiKey;
+  if (typeof pSetKeyStatus === 'function') pSetKeyStatus(!!pApiKey);
+}
+pLoadKey();
+let pFxHistory = null;
+document.getElementById('pDate').valueAsDate = new Date();
+
+(function pInit() {
+  if (pApiKey) {
+    document.getElementById('apiKeyInput').value = pApiKey;
+    pSetKeyStatus(true);
+    pUpdateFxRate();
+  } else {
+    pSetKeyStatus(false);
+  }
+})();
+
+function pSetKeyStatus(ok) {
+  const el = document.getElementById('apikeyStatus');
+  el.textContent = ok ? '✓ guardada' : 'requerida';
+  el.style.color = ok ? 'var(--up)' : 'var(--text-dim)';
+}
+
+function pSaveKey() {
+  const v = document.getElementById('apiKeyInput').value.trim();
+  if (!v) { shake(document.getElementById('apiKeyInput')); return; }
+  pApiKey = v;
+  if (isOwner()) { DB.alphaVantageKey = pApiKey; saveDB(); }
+  else lsSet('alphaVantageApiKey', pApiKey);
+  pSetKeyStatus(true);
+  pUpdateFxRate();
+  toast('API key guardada');
+}
+
+function pShowError(msg) {
+  const el = document.getElementById('pError');
+  if (msg) { el.textContent = msg; el.style.display = 'block'; }
+  else { el.style.display = 'none'; }
+}
+
+async function pUpdateFxRate() {
+  if (!pApiKey) return;
+  try {
+    const res = await fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=EUR&apikey=${pApiKey}`);
+    const data = await res.json();
+    if (data['Realtime Currency Exchange Rate'])
+      DB.fxRate = parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
+    saveDB();
+  } catch(e) {}
+}
+
+async function pGetFxForDate(dateStr) {
+  if (!pFxHistory) {
+    try {
+      const res = await fetch(`https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=EUR&outputsize=full&apikey=${pApiKey}`);
+      const data = await res.json();
+      if (data['Time Series FX (Daily)']) pFxHistory = data['Time Series FX (Daily)'];
+    } catch(e) {}
+  }
+  if (pFxHistory) {
+    if (pFxHistory[dateStr]) return parseFloat(pFxHistory[dateStr]['4. close']);
+    const d = new Date(dateStr);
+    for (let i = 0; i < 5; i++) {
+      d.setDate(d.getDate() - 1);
+      const iso = isoDate(d);
+      if (pFxHistory[iso]) return parseFloat(pFxHistory[iso]['4. close']);
+    }
+  }
+  return DB.fxRate;
+}
+
+async function pAddLot() {
+  const symbol = (document.getElementById('pTicker').value || '').trim().toUpperCase();
+  const shares = parseFloat(document.getElementById('pShares').value);
+  const price = parseFloat(document.getElementById('pPrice').value);
+  const currency = document.getElementById('pCurrency').value;
+  const date = document.getElementById('pDate').value;
+
+  if (!symbol) { pShowError('Introduce un ticker'); shake(document.getElementById('pTicker')); return; }
+  if (!shares || shares <= 0) { pShowError('Introduce las acciones'); shake(document.getElementById('pShares')); return; }
+  if (!price || price <= 0) { pShowError('Introduce el precio'); shake(document.getElementById('pPrice')); return; }
+  if (!date) { pShowError('Introduce la fecha'); shake(document.getElementById('pDate')); return; }
+  if (!pApiKey) { pShowError('Guarda tu API key primero'); return; }
+  pShowError('');
+
+  if (!DB.portfolio[symbol]) {
+    DB.portfolio[symbol] = { symbol, currency, currentPrice: 0, currentPriceOriginal: 0, lots: [] };
+  }
+  let exchangeRate = 1;
+  if (currency === 'USD') exchangeRate = await pGetFxForDate(date);
+  DB.portfolio[symbol].lots.push({ shares, purchasePrice: price, purchaseDate: date, exchangeRate, id: Date.now() + Math.random() });
+  DB.portfolio[symbol].lots.sort((a, b) => new Date(a.purchaseDate) - new Date(b.purchaseDate));
+  DB.portfolio[symbol].currency = currency;
+  saveDB();
+
+  document.getElementById('pTicker').value = '';
+  document.getElementById('pShares').value = '';
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pDate').valueAsDate = new Date();
+  await pRefreshPrices();
+}
+
+function pDeleteLot(symbol, lotId) {
+  if (!DB.portfolio[symbol]) return;
+  DB.portfolio[symbol].lots = DB.portfolio[symbol].lots.filter(l => l.id !== lotId);
+  if (DB.portfolio[symbol].lots.length === 0) delete DB.portfolio[symbol];
+  saveDB();
+  pRenderHoldings();
+  pUpdateStats();
+  renderTodayStrip();
+}
+
+function pToggleLots(symbol) {
+  const row = document.getElementById(`lots-${symbol}`);
+  const main = document.getElementById(`main-${symbol}`);
+  if (!row) return;
+  const open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : '';
+  if (main) main.classList.toggle('expanded', !open);
+}
+
+async function pFetchPrice(symbol) {
+  if (!pApiKey) return null;
+  try {
+    const res = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${encodeURIComponent(symbol)}&apikey=${pApiKey}`);
+    const data = await res.json();
+    if (data.Note) { pShowError('Límite de API alcanzado'); return null; }
+    const q = data['Global Quote'];
+    if (q && q['05. price'] && parseFloat(q['05. price']) > 0) return parseFloat(q['05. price']);
+  } catch(e) {}
+  return null;
+}
+
+async function pRefreshPrices() {
+  const symbols = Object.keys(DB.portfolio);
+  if (symbols.length === 0) { pRenderHoldings(); pUpdateStats(); renderTodayStrip(); return; }
+  document.getElementById('refreshIcon').style.animation = 'spin 0.7s linear infinite';
+  if (pApiKey) {
+    const results = await Promise.all(symbols.map(s => pFetchPrice(s)));
+    results.forEach((price, i) => {
+      const sym = symbols[i];
+      if (price !== null && DB.portfolio[sym]) {
+        if (DB.portfolio[sym].currency === 'USD') {
+          DB.portfolio[sym].currentPriceOriginal = price;
+          DB.portfolio[sym].currentPrice = price * DB.fxRate;
+        } else {
+          DB.portfolio[sym].currentPrice = price;
+          DB.portfolio[sym].currentPriceOriginal = price;
+        }
+      }
+    });
+    saveDB();
+    const hasLive = symbols.some(s => DB.portfolio[s].currentPrice > 0);
+    document.getElementById('portfolioStatus').style.display = hasLive ? 'inline' : 'none';
+  }
+  document.getElementById('refreshIcon').style.animation = '';
+  pRenderHoldings();
+  pUpdateStats();
+  renderTodayStrip();
+}
+
+function pFmtEur(n) { return new Intl.NumberFormat('es-ES', { style:'currency', currency:'EUR', minimumFractionDigits:2 }).format(n); }
+function pFmtPct(n) { return new Intl.NumberFormat('es-ES', { style:'percent', minimumFractionDigits:2, maximumFractionDigits:2 }).format(n/100); }
+
+function pUpdateStats() {
+  const symbols = Object.keys(DB.portfolio);
+  let totalValue = 0, totalCost = 0;
+  symbols.forEach(sym => {
+    const s = DB.portfolio[sym];
+    const curEur = s.currentPrice || 0;
+    s.lots.forEach(lot => {
+      const rate = lot.exchangeRate || (s.currency === 'USD' ? DB.fxRate : 1);
+      totalCost += lot.shares * lot.purchasePrice * (s.currency === 'USD' ? rate : 1);
+      totalValue += lot.shares * (curEur || lot.purchasePrice * (s.currency === 'USD' ? rate : 1));
+    });
+  });
+  const gain = totalValue - totalCost;
+  const gainPct = totalCost > 0 ? (gain / totalCost) * 100 : 0;
+
+  document.getElementById('pTotalVal').textContent = pFmtEur(totalValue);
+  document.getElementById('pTotalCost').textContent = pFmtEur(totalCost);
+  document.getElementById('pPositions').textContent = symbols.length;
+
+  const absEl = document.getElementById('pGainAbs');
+  absEl.textContent = (gain >= 0 ? '+' : '') + pFmtEur(gain);
+  absEl.className = 'val ' + (gain > 0 ? 'up' : gain < 0 ? 'down' : '');
+
+  const pctEl = document.getElementById('pGainPct');
+  pctEl.textContent = (gainPct >= 0 ? '+' : '') + pFmtPct(gainPct);
+  pctEl.className = 'sub ' + (gainPct > 0 ? 'up' : gainPct < 0 ? 'down' : '');
+}
+
+function pRenderHoldings() {
+  const tbody = document.getElementById('holdingsBody');
+  const symbols = Object.keys(DB.portfolio);
+
+  let totalPV = 0;
+  symbols.forEach(sym => {
+    const s = DB.portfolio[sym];
+    const ts = s.lots.reduce((a, l) => a + l.shares, 0);
+    const ac = s.lots.reduce((a, l) => {
+      const rate = l.exchangeRate || (s.currency === 'USD' ? DB.fxRate : 1);
+      return a + l.shares * l.purchasePrice * (s.currency === 'USD' ? rate : 1);
+    }, 0) / (ts || 1);
+    totalPV += ts * (s.currentPrice || ac);
+  });
+
+  if (symbols.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--text-dim);padding:32px;font-family:var(--serif);font-style:italic">Añade tu primera posición para comenzar.</td></tr>`;
+    return;
+  }
+
+  let html = '';
+  const colorMap = {};
+  symbols.forEach((sym, i) => { colorMap[sym] = P_COLORS[i % P_COLORS.length]; });
+
+  symbols.forEach(sym => {
+    const s = DB.portfolio[sym];
+    const color = colorMap[sym];
+    const totalShares = s.lots.reduce((a, l) => a + l.shares, 0);
+    const totalCostEur = s.lots.reduce((a, l) => {
+      const rate = l.exchangeRate || (s.currency === 'USD' ? DB.fxRate : 1);
+      return a + l.shares * l.purchasePrice * (s.currency === 'USD' ? rate : 1);
+    }, 0);
+    const avgCostEur = totalShares > 0 ? totalCostEur / totalShares : 0;
+    const curEur = s.currentPrice || avgCostEur;
+    const isLive = s.currentPrice > 0;
+    const marketValue = totalShares * curEur;
+    const gain = marketValue - totalCostEur;
+    const ret = totalCostEur > 0 ? (gain / totalCostEur) * 100 : 0;
+    const weight = totalPV > 0 ? (marketValue / totalPV * 100) : 0;
+    const retClass = ret > 0 ? 'up' : ret < 0 ? 'down' : 'neutral';
+
+    const curDisp = isLive
+      ? (s.currency === 'USD' && s.currentPriceOriginal ? `$${s.currentPriceOriginal.toFixed(2)}` : pFmtEur(curEur))
+      : `<span style="color:var(--text-dim)">${pFmtEur(curEur)} <span style="font-size:0.95rem">(est)</span></span>`;
+    const avgOrig = totalShares > 0 ? s.lots.reduce((a, l) => a + l.shares * l.purchasePrice, 0) / totalShares : 0;
+    const avgDisp = s.currency === 'USD' ? `$${avgOrig.toFixed(2)}` : pFmtEur(avgCostEur);
+
+    html += `
+      <tr class="main-row" id="main-${sym}" onclick="pToggleLots('${sym}')">
+        <td>
+          <span class="expand-arrow">▶</span>
+          <span class="ticker-badge" style="color:${color};background:${color}1a;border-color:${color}44">${sym}</span>
+          ${s.lots.length > 1 ? `<span class="lots-badge">${s.lots.length} lotes</span>` : ''}
+        </td>
+        <td>${totalShares.toFixed(totalShares % 1 === 0 ? 0 : 4)}</td>
+        <td>${avgDisp}</td>
+        <td>${curDisp}</td>
+        <td>${pFmtEur(marketValue)}</td>
+        <td style="color:${gain >= 0 ? 'var(--up)' : 'var(--down)'}">${gain >= 0 ? '+' : ''}${pFmtEur(gain)}</td>
+        <td><span class="pill ${retClass}">${ret >= 0 ? '▲' : '▼'} ${Math.abs(ret).toFixed(2)}%</span></td>
+        <td style="color:var(--text-dim)">${weight.toFixed(1)}%</td>
+        <td onclick="event.stopPropagation()"></td>
+      </tr>`;
+
+    if (s.lots.length > 0) {
+      html += `<tr id="lots-${sym}" style="display:none"><td colspan="9" style="padding:0;background:var(--bg-soft)">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="background:var(--bg)">
+            <th style="text-align:left;padding:8px 14px 8px 38px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase">Fecha</th>
+            <th style="padding:8px 14px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;text-align:right">Acciones</th>
+            <th style="padding:8px 14px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;text-align:right">Precio</th>
+            <th style="padding:8px 14px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;text-align:right">Coste</th>
+            <th style="padding:8px 14px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;text-align:right">Valor</th>
+            <th style="padding:8px 14px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;text-align:right">G/P</th>
+            <th style="padding:8px 14px;font-family:var(--mono);font-size:0.8rem;letter-spacing:0.15em;color:var(--text-dim);text-transform:uppercase;text-align:right">%</th>
+            <th></th>
+          </tr></thead><tbody>`;
+
+      s.lots.forEach(lot => {
+        const rate = lot.exchangeRate || (s.currency === 'USD' ? DB.fxRate : 1);
+        const lc = lot.shares * lot.purchasePrice * (s.currency === 'USD' ? rate : 1);
+        const lv = lot.shares * curEur;
+        const lg = lv - lc;
+        const lr = lc > 0 ? (lg / lc) * 100 : 0;
+        const pd = s.currency === 'USD' ? `$${lot.purchasePrice.toFixed(2)}` : pFmtEur(lot.purchasePrice);
+        const dd = lot.purchaseDate ? new Date(lot.purchaseDate + 'T12:00:00').toLocaleDateString('es-ES') : '—';
+        html += `<tr style="border-top:1px solid var(--line-soft)">
+          <td style="padding:8px 14px 8px 38px;font-family:var(--mono);font-size:0.84rem;color:var(--text-dim)">${dd}</td>
+          <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:var(--text-mid)">${lot.shares.toFixed(lot.shares%1===0?0:4)}</td>
+          <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:var(--text-mid)">${pd}</td>
+          <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:var(--text-mid)">${pFmtEur(lc)}</td>
+          <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:var(--text-mid)">${pFmtEur(lv)}</td>
+          <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:${lg>=0?'var(--up)':'var(--down)'}">${lg>=0?'+':''}${pFmtEur(lg)}</td>
+          <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:${lr>=0?'var(--up)':'var(--down)'}">${lr>=0?'+':''}${lr.toFixed(2)}%</td>
+          <td style="padding:8px 14px;text-align:right">
+            <button class="del-lot-btn" onclick="pDeleteLot('${sym}',${lot.id})">Eliminar</button>
+          </td>
+        </tr>`;
+      });
+      html += `</tbody></table></td></tr>`;
+    }
+  });
+  tbody.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SHORTCUTS & MODAL
+   ════════════════════════════════════════════════════════════════ */
+function showShortcuts() { document.getElementById('shortcutsModal').classList.add('show'); }
+function hideShortcuts() { document.getElementById('shortcutsModal').classList.remove('show'); }
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'Escape') { hideShortcuts(); hideHealthModal(); hideLogin(); return; }
+  if (e.key === '?') { e.preventDefault(); showShortcuts(); return; }
+  if (e.key.toLowerCase() === 'w') { document.getElementById('weightVal').focus(); }
+  if (e.key.toLowerCase() === 'h') { document.getElementById('habitName').focus(); }
+  if (e.key.toLowerCase() === 'a') { document.getElementById('inSteps').focus(); }
+  if (e.key.toLowerCase() === 'e') { exportData(); }
+});
+
+window.addEventListener('resize', () => {
+  drawWeightChart();
+});
+
+/* ════════════════════════════════════════════════════════════════
+   TODO LIST
+   ════════════════════════════════════════════════════════════════ */
+function addTodo() {
+  const text = document.getElementById('todoInput').value.trim();
+  if (!text) { document.getElementById('todoInput').classList.add('shake'); setTimeout(() => document.getElementById('todoInput').classList.remove('shake'), 400); return; }
+  const priority = document.getElementById('todoPriority').value;
+  if (!DB.todos) DB.todos = [];
+  DB.todos.unshift({ id: Date.now(), text, priority, done: false, createdAt: Date.now() });
+  saveDB();
+  document.getElementById('todoInput').value = '';
+  renderTodos();
+}
+
+function toggleTodo(id) {
+  const item = DB.todos.find(t => t.id === id);
+  if (item) { item.done = !item.done; saveDB(); renderTodos(); }
+}
+
+function deleteTodo(id) {
+  DB.todos = DB.todos.filter(t => t.id !== id);
+  saveDB(); renderTodos();
+}
+
+function renderTodos() {
+  if (!DB.todos) DB.todos = [];
+  const list = document.getElementById('todoList');
+  const priorityOrder = { alta: 0, media: 1, baja: 2 };
+  const sorted = [...DB.todos].sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
+  });
+  const pending = DB.todos.filter(t => !t.done).length;
+  const done = DB.todos.filter(t => t.done).length;
+  document.getElementById('todoPendingN').textContent = pending;
+  document.getElementById('todoDoneN').textContent = done;
+  if (!sorted.length) {
+    list.innerHTML = '<div class="empty-state">Sin tareas. ¡Añade la primera!</div>';
+    return;
+  }
+  const badgeLabels = { alta: 'Alta', media: 'Media', baja: 'Baja' };
+  list.innerHTML = sorted.map(t => `
+    <div class="todo-item${t.done ? ' done' : ''}">
+      <div class="todo-check" onclick="toggleTodo(${t.id})">${t.done ? '✓' : ''}</div>
+      <span class="todo-text">${escapeHtml(t.text)}</span>
+      <span class="todo-badge ${t.priority}">${badgeLabels[t.priority] || t.priority}</span>
+      <button class="todo-del" onclick="deleteTodo(${t.id})">✕</button>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   FUTURE EVENTS
+   ════════════════════════════════════════════════════════════════ */
+function addEvent() {
+  const title = document.getElementById('eventTitle').value.trim();
+  const date  = document.getElementById('eventDate').value;
+  if (!title || !date) {
+    if (!title) document.getElementById('eventTitle').classList.add('shake');
+    if (!date)  document.getElementById('eventDate').classList.add('shake');
+    setTimeout(() => {
+      document.getElementById('eventTitle').classList.remove('shake');
+      document.getElementById('eventDate').classList.remove('shake');
+    }, 400);
+    return;
+  }
+  if (!DB.events) DB.events = [];
+  DB.events.push({ id: Date.now(), title, date });
+  DB.events.sort((a, b) => a.date.localeCompare(b.date));
+  saveDB();
+  document.getElementById('eventTitle').value = '';
+  document.getElementById('eventDate').value = '';
+  renderEvents();
+}
+
+function deleteEvent(id) {
+  DB.events = DB.events.filter(e => e.id !== id);
+  saveDB(); renderEvents();
+}
+
+function eventUrgency(daysLeft) {
+  if (daysLeft < 0) return 'urgent';
+  if (daysLeft <= 30) return 'urgent';
+  if (daysLeft <= 90) return 'warn';
+  if (daysLeft <= 365) return 'ok';
+  return 'far';
+}
+
+function renderEvents() {
+  if (!DB.events) DB.events = [];
+  const list = document.getElementById('eventsList');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = DB.events.filter(e => {
+    const d = new Date(e.date + 'T00:00:00'); return d >= today;
+  });
+  const past = DB.events.filter(e => {
+    const d = new Date(e.date + 'T00:00:00'); return d < today;
+  });
+  const allSorted = [...upcoming, ...past];
+  const meta = document.getElementById('eventsMeta');
+  meta.textContent = upcoming.length === 0 ? 'sin eventos próximos' : `${upcoming.length} próximo${upcoming.length !== 1 ? 's' : ''}`;
+  if (!allSorted.length) {
+    list.innerHTML = '<div class="empty-state">Sin eventos. Añade fechas importantes.</div>';
+    return;
+  }
+  list.innerHTML = allSorted.map(ev => {
+    const evDate = new Date(ev.date + 'T00:00:00');
+    const diffMs = evDate - today;
+    const daysLeft = Math.ceil(diffMs / 86400000);
+    const urgency = eventUrgency(daysLeft);
+    const daysText = daysLeft < 0 ? Math.abs(daysLeft) + ' días' : daysLeft === 0 ? '¡Hoy!' : daysLeft + ' días';
+    const dateStr = evDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    return `
+    <div class="event-item">
+      <div class="event-urgency-bar ${urgency}"></div>
+      <div class="event-countdown">
+        <div class="event-days ${urgency}">${daysLeft < 0 ? '-' : ''}${Math.abs(daysLeft) === 0 ? '0' : Math.abs(daysLeft)}</div>
+        <div class="event-days-label">${daysLeft < 0 ? 'hace' : daysLeft === 0 ? 'hoy' : 'días'}</div>
+      </div>
+      <div class="event-divider"></div>
+      <div class="event-info">
+        <div class="event-title">${escapeHtml(ev.title)}</div>
+        <div class="event-date-str">${dateStr}</div>
+      </div>
+      <button class="event-del" onclick="deleteEvent(${ev.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   COCHE — VW Golf IV (mantenimiento + repostajes)
+   ════════════════════════════════════════════════════════════════ */
+function ensureCoche() {
+  if (!DB.coche) DB.coche = { km: 0, mantenimiento: [], repostajes: [] };
+  if (typeof DB.coche.km !== 'number') DB.coche.km = 0;
+  if (!Array.isArray(DB.coche.mantenimiento)) DB.coche.mantenimiento = [];
+  if (!Array.isArray(DB.coche.repostajes)) DB.coche.repostajes = [];
+}
+
+function editCocheKm() {
+  ensureCoche();
+  const cur = DB.coche.km;
+  const v = prompt('Km actuales del coche:', cur || '');
+  if (v === null) return;
+  const n = parseInt(v, 10);
+  if (isNaN(n) || n < 0) { toast('Km inválido', 'error'); return; }
+  DB.coche.km = n;
+  saveDB();
+  renderCoche();
+  toast('Km actualizados');
+}
+
+function addMantenimiento() {
+  ensureCoche();
+  const concepto = prompt('Concepto de mantenimiento (p.e. Aceite motor):');
+  if (!concepto || !concepto.trim()) return;
+  const kmObjStr = prompt(`¿En qué km toca cambiar "${concepto.trim()}"?`, DB.coche.km ? String(DB.coche.km + 10000) : '');
+  if (kmObjStr === null) return;
+  const kmObj = parseInt(kmObjStr, 10);
+  if (isNaN(kmObj) || kmObj < 0) { toast('Km inválido', 'error'); return; }
+  DB.coche.mantenimiento.push({
+    id: Date.now(),
+    concepto: concepto.trim(),
+    kmInicio: DB.coche.km || 0,
+    kmObjetivo: kmObj,
+    historial: []
+  });
+  saveDB();
+  renderCoche();
+  toast('Concepto añadido');
+}
+
+function marcarMantenimientoHecho(id) {
+  ensureCoche();
+  const item = DB.coche.mantenimiento.find(m => m.id === id);
+  if (!item) return;
+  const kmHechoStr = prompt(`¿A qué km has hecho "${item.concepto}"?`, String(DB.coche.km || item.kmObjetivo));
+  if (kmHechoStr === null) return;
+  const kmHecho = parseInt(kmHechoStr, 10);
+  if (isNaN(kmHecho) || kmHecho < 0) { toast('Km inválido', 'error'); return; }
+  const intervalo = item.kmObjetivo - (item.kmInicio || 0);
+  const sugerido = kmHecho + (intervalo > 0 ? intervalo : 10000);
+  const nuevoObjStr = prompt(`Próximo cambio en km:`, String(sugerido));
+  if (nuevoObjStr === null) return;
+  const nuevoObj = parseInt(nuevoObjStr, 10);
+  if (isNaN(nuevoObj) || nuevoObj <= kmHecho) { toast('Km objetivo inválido', 'error'); return; }
+  if (!Array.isArray(item.historial)) item.historial = [];
+  item.historial.push({ fecha: todayStr, km: kmHecho, kmObjetivoAnterior: item.kmObjetivo });
+  item.kmInicio = kmHecho;
+  item.kmObjetivo = nuevoObj;
+  saveDB();
+  renderCoche();
+  toast('Mantenimiento registrado ✓');
+}
+
+function eliminarMantenimiento(id) {
+  ensureCoche();
+  const item = DB.coche.mantenimiento.find(m => m.id === id);
+  if (!item) return;
+  if (!confirm(`¿Eliminar "${item.concepto}" y su historial?`)) return;
+  DB.coche.mantenimiento = DB.coche.mantenimiento.filter(m => m.id !== id);
+  saveDB();
+  renderCoche();
+}
+
+function mantStatus(kmRestantes, intervalo) {
+  if (kmRestantes <= 0) return 'urgent';
+  const ref = intervalo > 0 ? intervalo : 10000;
+  const pct = kmRestantes / ref;
+  if (pct <= 0.05) return 'urgent';
+  if (pct <= 0.2) return 'warn';
+  return 'ok';
+}
+
+function addRepostaje() {
+  ensureCoche();
+  const dateEl = document.getElementById('repDate');
+  const kmEl = document.getElementById('repKm');
+  const litrosEl = document.getElementById('repLitros');
+  const precioEl = document.getElementById('repPrecio');
+  const date = dateEl.value;
+  const kmRec = parseInt(kmEl.value, 10);
+  const litros = parseFloat(litrosEl.value);
+  const precio = parseFloat(precioEl.value);
+  let bad = false;
+  if (!date) { shake(dateEl); bad = true; }
+  if (isNaN(kmRec) || kmRec < 0) { shake(kmEl); bad = true; }
+  if (isNaN(litros) || litros <= 0) { shake(litrosEl); bad = true; }
+  if (isNaN(precio) || precio <= 0) { shake(precioEl); bad = true; }
+  if (bad) return;
+  DB.coche.repostajes.push({ id: Date.now(), date, kmRec, litros, precio });
+  DB.coche.repostajes.sort((a, b) => (a.date === b.date ? a.id - b.id : a.date.localeCompare(b.date)));
+  saveDB();
+  kmEl.value = ''; litrosEl.value = ''; precioEl.value = '';
+  dateEl.value = todayStr;
+  renderCoche();
+  toast('Repostaje registrado');
+}
+
+function deleteRepostaje(id) {
+  ensureCoche();
+  DB.coche.repostajes = DB.coche.repostajes.filter(r => r.id !== id);
+  saveDB();
+  renderCoche();
+}
+
+function renderCoche() {
+  ensureCoche();
+  document.getElementById('cocheKmDisplay').textContent = (DB.coche.km || 0).toLocaleString('es-ES');
+
+  // Mantenimiento
+  const mantList = document.getElementById('mantList');
+  const kmActual = DB.coche.km || 0;
+  if (!DB.coche.mantenimiento.length) {
+    mantList.innerHTML = '<div class="empty-state">Sin conceptos. Añade el primero (p.e. aceite).</div>';
+  } else {
+    const sorted = [...DB.coche.mantenimiento].sort((a, b) => (a.kmObjetivo - kmActual) - (b.kmObjetivo - kmActual));
+    mantList.innerHTML = sorted.map(m => {
+      const kmRest = m.kmObjetivo - kmActual;
+      const intervalo = m.kmObjetivo - (m.kmInicio || 0);
+      const status = mantStatus(kmRest, intervalo);
+      const progresoKm = kmActual - (m.kmInicio || 0);
+      const pct = intervalo > 0 ? Math.min(100, Math.max(0, (progresoKm / intervalo) * 100)) : 0;
+      const restTxt = kmRest <= 0
+        ? `Vencido hace ${Math.abs(kmRest).toLocaleString('es-ES')} km`
+        : `Faltan ${kmRest.toLocaleString('es-ES')} km`;
+      const historialN = (m.historial && m.historial.length) ? m.historial.length : 0;
+      return `
+      <div class="mant-item">
+        <div class="mant-info">
+          <div class="mant-concepto">${escapeHtml(m.concepto)}</div>
+          <div class="mant-meta">
+            <span class="kmleft ${status}">${restTxt}</span>
+            <span>· objetivo ${m.kmObjetivo.toLocaleString('es-ES')} km</span>
+            ${historialN ? `<span>· ${historialN} cambio${historialN !== 1 ? 's' : ''}</span>` : ''}
+          </div>
+          <div class="mant-progress-bar"><div class="mant-progress-fill ${status}" style="width:${pct}%"></div></div>
+        </div>
+        <div class="mant-actions">
+          <button class="mant-btn" onclick="marcarMantenimientoHecho(${m.id})">Hecho</button>
+          <button class="mant-btn del" onclick="eliminarMantenimiento(${m.id})">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Repostajes — orden cronológico
+  const reps = [...DB.coche.repostajes].sort((a, b) =>
+    a.date === b.date ? a.id - b.id : a.date.localeCompare(b.date)
+  );
+  // El km recorrido ahora se introduce directamente al guardar el repostaje
+  const enriched = reps.map(r => {
+    const kmRec = (typeof r.kmRec === 'number') ? r.kmRec : null;
+    const consumo = (kmRec && kmRec > 0) ? (r.litros / kmRec * 100) : null;
+    return { ...r, kmRec, consumo };
+  });
+
+  // Stats agregadas: consumo medio, €/100km, total gastado (último año)
+  const withConsumo = enriched.filter(r => r.consumo !== null && r.kmRec > 0);
+  const consumoMedio = withConsumo.length
+    ? withConsumo.reduce((s, r) => s + r.consumo, 0) / withConsumo.length
+    : null;
+  const totalKm = withConsumo.reduce((s, r) => s + r.kmRec, 0);
+  const totalEur = withConsumo.reduce((s, r) => s + r.precio, 0);
+  const eurPor100 = totalKm > 0 ? (totalEur / totalKm * 100) : null;
+  const ultimoEurL = reps.length ? (reps[reps.length - 1].precio / reps[reps.length - 1].litros) : null;
+
+  document.getElementById('repStats').innerHTML = `
+    <div class="rep-stat">
+      <div class="lbl">Consumo medio</div>
+      <div class="val">${consumoMedio !== null ? consumoMedio.toFixed(2) : '—'}<span class="unit">L/100km</span></div>
+    </div>
+    <div class="rep-stat">
+      <div class="lbl">Coste medio</div>
+      <div class="val">${eurPor100 !== null ? eurPor100.toFixed(2) : '—'}<span class="unit">€/100km</span></div>
+    </div>
+    <div class="rep-stat">
+      <div class="lbl">Último €/L</div>
+      <div class="val">${ultimoEurL !== null ? ultimoEurL.toFixed(3) : '—'}<span class="unit">€/L</span></div>
+    </div>`;
+
+  const repList = document.getElementById('repList');
+  if (!enriched.length) {
+    repList.innerHTML = '<div class="empty-state">Sin repostajes registrados.</div>';
+  } else {
+    // Mostrar del más reciente al más antiguo
+    const display = [...enriched].reverse();
+    repList.innerHTML = display.map(r => {
+      const dt = new Date(r.date + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+      const eurL = (r.precio / r.litros).toFixed(3);
+      const consumoStr = r.consumo !== null ? r.consumo.toFixed(2) + ' L/100' : '—';
+      const kmRecStr = (r.kmRec !== null && r.kmRec > 0) ? r.kmRec.toLocaleString('es-ES') + ' km' : '—';
+      return `
+      <div class="rep-item">
+        <span class="rep-date">${dt}</span>
+        <span class="rep-val"><span class="lbl">L</span>${r.litros.toFixed(2)}</span>
+        <span class="rep-val"><span class="lbl">€</span>${r.precio.toFixed(2)} <span style="color:var(--text-dim);font-size:1.05rem">(${eurL})</span></span>
+        <span class="rep-consumo">${kmRecStr} · ${consumoStr}</span>
+        <button class="rep-del" onclick="deleteRepostaje(${r.id})">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  // Meta: avisos de mantenimiento vencido o cercano
+  const urgentes = DB.coche.mantenimiento.filter(m => {
+    const kmRest = m.kmObjetivo - kmActual;
+    const intervalo = m.kmObjetivo - (m.kmInicio || 0);
+    return mantStatus(kmRest, intervalo) === 'urgent';
+  }).length;
+  const metaEl = document.getElementById('cocheMeta');
+  if (urgentes > 0) metaEl.innerHTML = `<span style="color:var(--down)">⚠ ${urgentes} mantenimiento${urgentes !== 1 ? 's' : ''} urgente${urgentes !== 1 ? 's' : ''}</span>`;
+  else if (DB.coche.repostajes.length) metaEl.textContent = `${DB.coche.repostajes.length} repostaje${DB.coche.repostajes.length !== 1 ? 's' : ''}`;
+  else metaEl.textContent = '';
+}
+
+/* ════════════════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════════════════ */
+function renderAll() {
+  drawWeightChart();
+  updateWeightStats();
+  document.getElementById('cityInput').value = DB.weatherCity;
+  fetchWeather(DB.weatherCity);
+  renderActivity();
+  renderHabits();
+  pRenderHoldings();
+  pUpdateStats();
+  renderTodayStrip();
+  renderTodos();
+  renderEvents();
+  renderCoche();
+}
+
+// Prefill fecha de repostaje con hoy
+(function(){ const el = document.getElementById('repDate'); if (el) el.value = todayStr; })();
+
+renderAll();
+if (isOwner()) {
+  document.getElementById('authBtn').textContent = '🔓 Salir';
+  document.getElementById('authBtn').title = 'Cerrar sesión en este dispositivo';
+  setSyncStatus(lsGet(SYNC_DIRTY_KEY) === '1' ? 'pending' : 'ok');
+  pullFromCloud();
+} else {
+  setSyncStatus('local');
+}
+// Redibujar la gráfica cuando carguen las fuentes pixel
+if (document.fonts) document.fonts.ready.then(drawWeightChart);
+</script>
+</body>
+</html>

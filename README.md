@@ -51,3 +51,18 @@ Edita `src/data/projects.ts` y añade un objeto al array. El número de orden
 
 Netlify construye con `npm run build` y publica `dist/` en cada push a `main`
 (ver `netlify.toml`).
+
+## Dashboard (`/dashboard/`)
+
+`public/dashboard/index.html` es una copia del dashboard (el original vive en
+`../dashboard/dashboard.html`). Los visitantes lo usan en modo local: sus datos
+se guardan solo en su navegador. El propietario entra con contraseña + código
+de Google Authenticator y sus datos se sincronizan en Netlify Blobs.
+
+- `netlify/functions/dashboard-login.mjs` → `POST /api/dashboard/login`
+- `netlify/functions/dashboard-data.mjs` → `GET|PUT /api/dashboard/data`
+- `netlify/lib/dashboard-auth.mjs` → TOTP, tokens firmados, límite de intentos
+
+Variables de entorno necesarias en Netlify (scope Functions):
+`DASHBOARD_PASSWORD`, `DASHBOARD_TOTP_SECRET`, `DASHBOARD_SESSION_SECRET`.
+Se generan con `node scripts/dashboard-setup.mjs`.
