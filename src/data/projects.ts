@@ -15,7 +15,7 @@ export const projects: Project[] = [
   {
     name: 'Dashboard personal en pixel art',
     desc: 'Peso, tiempo, actividad, hábitos, portfolio, tareas y eventos en un solo panel. Pruébalo: tus datos se quedan en tu navegador.',
-    href: '/dashboard/',
+    href: '/dashboard/index.html',
     year: '2026',
   },
   {
