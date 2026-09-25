@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard personal · Santi Gil</title>
-<meta name="description" content="Dashboard personal en pixel art: peso, tiempo, actividad, hábitos, portfolio, tareas y eventos. Los datos se guardan en tu navegador.">
+<meta name="description" content="Dashboard personal en pixel art: peso, tiempo, actividad, hábitos, portfolio, tareas, links para luego, suscripciones y coche. Los datos se guardan en tu navegador.">
 <meta name="theme-color" content="#0c0c1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <style>
   /* ════════════════════════════════════════════════════════════════
      PIXEL ART — paleta inspirada en PICO-8, bordes duros, sin radios
@@ -425,6 +425,14 @@
   }
   .habit-row:hover .habit-delete { opacity: 1; }
   .habit-delete:hover { color: var(--down); }
+  .habit-edit {
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-family: var(--mono); font-size: 0.9rem;
+    padding: 0 4px; margin-left: 4px; opacity: 0;
+  }
+  .habit-row:hover .habit-edit { opacity: 1; }
+  .habit-edit:hover { color: var(--accent); }
+  .habit-row .habit-label { cursor: text; }
 
   .cell-box {
     width: 18px; height: 18px;
@@ -581,42 +589,84 @@
   .todo-badge.alta { background: var(--down-deep); color: var(--text); }
   .todo-badge.media { background: var(--warn); color: var(--ink); }
   .todo-badge.baja { background: var(--line); color: var(--text); }
-  .todo-del, .event-del, .rep-del {
+  .todo-del, .rep-del {
     background: none; border: none; color: var(--text-dim);
     cursor: pointer; font-family: var(--mono); font-size: 0.96rem; padding: 0 6px; opacity: 0;
   }
-  .todo-item:hover .todo-del, .event-item:hover .event-del, .rep-item:hover .rep-del { opacity: 1; }
-  .todo-del:hover, .event-del:hover, .rep-del:hover { color: var(--down); }
+  .todo-item:hover .todo-del, .rep-item:hover .rep-del { opacity: 1; }
+  .todo-del:hover, .rep-del:hover { color: var(--down); }
   .todo-stats { display: flex; gap: 14px; font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
   .todo-stats .hl { color: var(--accent); }
 
-  /* ─── EVENTS ─── */
-  .events-list { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
-  .event-item {
+  /* ─── PARA LUEGO (links) ─── */
+  .link-add-form { display: flex; gap: 8px; margin-bottom: 14px; }
+  .link-add-form input { flex: 1; min-width: 0; }
+  .links-list { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
+  .link-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    background: var(--bg-soft);
+    border: var(--px) solid var(--ink);
+  }
+  .link-item:hover { background: var(--surface-hi); }
+  .link-item.stale { opacity: 0.5; }
+  .link-item.stale:hover { opacity: 0.85; }
+  .link-item.read .link-title { text-decoration: line-through; color: var(--text-dim); }
+  .link-info { flex: 1; min-width: 0; }
+  .link-title { font-size: 1rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-sub { font-family: var(--mono); font-size: 0.84rem; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .link-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .link-btn {
+    background: var(--bg); color: var(--text-mid);
+    border: 2px solid var(--ink); cursor: pointer;
+    font-family: var(--mono); font-size: 0.84rem; padding: 2px 8px;
+    text-decoration: none; line-height: 1.4;
+  }
+  .link-btn:hover { color: var(--ink); background: var(--accent); }
+  .link-btn.ok:hover { background: var(--up); }
+  .link-btn.del:hover { color: var(--text); background: var(--down-deep); }
+  .links-toggle {
+    margin-top: 12px; background: none; border: none; cursor: pointer;
+    font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); padding: 0;
+  }
+  .links-toggle:hover { color: var(--accent); }
+  .card-meta .hl { color: var(--accent); }
+
+  /* ─── SUSCRIPCIONES Y RENOVACIONES ─── */
+  .sub-add-form { display: grid; grid-template-columns: 1fr 150px 110px 130px auto; gap: 8px; margin-bottom: 14px; }
+  .sub-totals { display: flex; gap: 18px; flex-wrap: wrap; font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); margin-bottom: 12px; }
+  .sub-totals .hl { color: var(--accent); }
+  .subs-list { display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto; padding-right: 4px; }
+  .sub-item {
     display: flex; align-items: center; gap: 14px;
     padding: 10px 12px;
     background: var(--bg-soft);
     border: var(--px) solid var(--ink);
   }
-  .event-item:hover { background: var(--surface-hi); }
-  .event-countdown { text-align: center; flex-shrink: 0; width: 64px; }
-  .event-days { font-family: var(--sans); font-weight: 700; font-size: 1.38rem; line-height: 1.2; }
-  .event-days-label { font-family: var(--mono); font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
-  .event-days.urgent { color: var(--down); }
-  .event-days.warn { color: var(--warn); }
-  .event-days.ok { color: var(--up); }
-  .event-days.far { color: var(--text-mid); }
-  .event-divider { width: 3px; height: 36px; background: repeating-linear-gradient(180deg, var(--line) 0 4px, transparent 4px 7px); flex-shrink: 0; }
-  .event-info { flex: 1; min-width: 0; }
-  .event-title { font-size: 1rem; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .event-date-str { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
-  .event-urgency-bar { width: 8px; height: 38px; flex-shrink: 0; border: 2px solid var(--ink); }
-  .event-urgency-bar.urgent { background: var(--down); animation: blink 1.2s steps(1) infinite; }
-  .event-urgency-bar.warn { background: var(--warn); }
-  .event-urgency-bar.ok { background: var(--up); }
-  .event-urgency-bar.far { background: var(--line); }
-  .event-add-form { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; margin-bottom: 14px; }
-  .event-add-form input[type="date"] { width: 160px !important; }
+  .sub-item:hover { background: var(--surface-hi); }
+  .sub-countdown { text-align: center; flex-shrink: 0; width: 64px; }
+  .sub-days { font-family: var(--sans); font-weight: 700; font-size: 1.38rem; line-height: 1.2; }
+  .sub-days-label { font-family: var(--mono); font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-top: 4px; }
+  .sub-days.urgent { color: var(--down); }
+  .sub-days.warn { color: var(--warn); }
+  .sub-days.far { color: var(--text-mid); font-size: 1rem; }
+  .sub-divider { width: 3px; height: 36px; background: repeating-linear-gradient(180deg, var(--line) 0 4px, transparent 4px 7px); flex-shrink: 0; }
+  .sub-info { flex: 1; min-width: 0; }
+  .sub-title { font-size: 1rem; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sub-date-str { font-family: var(--mono); font-size: 0.88rem; color: var(--text-dim); }
+  .sub-cost { font-family: var(--mono); font-size: 1rem; color: var(--text); text-align: right; flex-shrink: 0; }
+  .sub-cost .per { display: block; font-size: 0.76rem; color: var(--text-dim); }
+  .sub-urgency-bar { width: 8px; height: 38px; flex-shrink: 0; border: 2px solid var(--ink); }
+  .sub-urgency-bar.urgent { background: var(--down); animation: blink 1.2s steps(1) infinite; }
+  .sub-urgency-bar.warn { background: var(--warn); }
+  .sub-urgency-bar.far { background: var(--line); }
+  .sub-edit, .sub-del {
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-family: var(--mono); font-size: 0.96rem; padding: 0 4px; opacity: 0;
+  }
+  .sub-item:hover .sub-edit, .sub-item:hover .sub-del { opacity: 1; }
+  .sub-edit:hover { color: var(--accent); }
+  .sub-del:hover { color: var(--down); }
 
   /* ─── COCHE ─── */
   .coche-km-block {
@@ -775,7 +825,7 @@
 
   /* En pantallas táctiles no hay hover: botones de borrar siempre visibles */
   @media (hover: none) {
-    .todo-del, .event-del, .rep-del, .habit-delete { opacity: 1; }
+    .todo-del, .sub-del, .sub-edit, .rep-del, .habit-delete, .habit-edit { opacity: 1; }
   }
 
   /* ─── RESPONSIVE ─── */
@@ -795,9 +845,12 @@
     .stat-row .val { font-size: 0.65rem; }
     .weather-temp { font-size: 1.9rem; }
     .weather-icon-big { font-size: 3.6rem; }
-    .event-add-form { grid-template-columns: 1fr auto; }
-    .event-add-form #eventTitle { grid-column: 1 / -1; }
-    .event-add-form input[type="date"] { width: 100% !important; }
+    .sub-add-form { grid-template-columns: 1fr 1fr; }
+    .sub-add-form #subName, .sub-add-form .btn { grid-column: 1 / -1; }
+    .sub-item { gap: 10px; }
+    .sub-divider { display: none; }
+    .link-item { flex-wrap: wrap; }
+    .link-actions { width: 100%; justify-content: flex-end; }
     .rep-form { grid-template-columns: 1fr 1fr; }
     .rep-form .btn { grid-column: 1 / -1; }
     .rep-stats { grid-template-columns: 1fr; }
@@ -1081,24 +1134,47 @@
     <div class="todo-list" id="todoList"></div>
   </div>
 
-  <!-- EVENTS / REMINDERS -->
+  <!-- PARA LUEGO (links) -->
   <div class="card span-6">
     <div class="card-head">
-      <h3 class="card-title"><span class="card-title-num">07</span>Eventos futuros</h3>
-      <span class="card-meta" id="eventsMeta"></span>
+      <h3 class="card-title"><span class="card-title-num">07</span>Para luego</h3>
+      <span class="card-meta" id="linksMeta"></span>
     </div>
-    <div class="event-add-form">
-      <input type="text" id="eventTitle" placeholder="Descripción del evento…" onkeydown="if(event.key==='Enter')addEvent()">
-      <input type="date" id="eventDate" style="width:150px">
-      <button class="btn primary" onclick="addEvent()">+ Añadir</button>
+    <form class="link-add-form" onsubmit="event.preventDefault();addLink()">
+      <input type="text" id="linkInput" placeholder="Pega un link (y un título si quieres)…" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="btn primary" type="submit">+ Guardar</button>
+    </form>
+    <div class="links-list" id="linksList"></div>
+    <button class="links-toggle" id="linksToggle" onclick="toggleReadLinks()"></button>
+  </div>
+
+  <!-- SUSCRIPCIONES Y RENOVACIONES -->
+  <div class="card span-12">
+    <div class="card-head">
+      <h3 class="card-title"><span class="card-title-num">08</span>Suscripciones y renovaciones</h3>
+      <span class="card-meta" id="subsMeta"></span>
     </div>
-    <div class="events-list" id="eventsList"></div>
+    <form class="sub-add-form" onsubmit="event.preventDefault();saveSub()">
+      <input type="text" id="subName" placeholder="Dominio, streaming, seguro, ITV…">
+      <input type="date" id="subDate" title="Próxima renovación">
+      <input type="number" id="subCost" placeholder="Coste €" min="0" step="0.01">
+      <select id="subPeriod" title="Cada cuánto se renueva">
+        <option value="1">Mensual</option>
+        <option value="3">Trimestral</option>
+        <option value="12" selected>Anual</option>
+        <option value="24">Cada 2 años</option>
+        <option value="0">Una vez</option>
+      </select>
+      <button class="btn primary" type="submit" id="subSubmit">+ Añadir</button>
+    </form>
+    <div class="sub-totals" id="subTotals"></div>
+    <div class="subs-list" id="subsList"></div>
   </div>
 
   <!-- COCHE -->
   <div class="card span-12">
     <div class="card-head">
-      <h3 class="card-title"><span class="card-title-num">08</span>Coche</h3>
+      <h3 class="card-title"><span class="card-title-num">09</span>Coche</h3>
       <span class="card-meta" id="cocheMeta"></span>
     </div>
 
@@ -1208,7 +1284,8 @@ const DEFAULTS = {
   fxRate: 0.92,
   goals: { steps: 10000, calories: 1850, exerciseMin: 30, stand: 12 },
   todos: [],         // [{id, text, priority, done, createdAt}]
-  events: [],        // [{id, title, date}]
+  links: [],        // [{id, url, title, addedAt, readAt}]
+  subs: [],         // [{id, name, date, cost, period}]  period en meses (0 = una vez)
   coche: {
     km: 0,
     mantenimiento: [],   // [{id, concepto, kmObjetivo, notas, historial: [{fecha, km, kmObjetivoAnterior}]}]
@@ -1229,10 +1306,23 @@ try {
 const isOwner = () => !!session;
 const storageKey = () => isOwner() ? OWNER_KEY : ROOT_KEY;
 
+// Los tickers acaban dentro de atributos onclick/id: nada de comillas, <, >, & ni espacios
+const SAFE_TICKER = /^[^'"`<>&\\\s]{1,20}$/;
+
 function withDefaults(parsed) {
   const base = structuredClone(DEFAULTS);
   const merged = { ...base, ...parsed, goals: { ...base.goals, ...(parsed.goals||{}) }, coche: { ...base.coche, ...(parsed.coche||{}) } };
   if (merged.goals.calories === 2200) merged.goals.calories = 1850;
+  if (merged.portfolio && typeof merged.portfolio === 'object') {
+    Object.keys(merged.portfolio).forEach(sym => { if (!SAFE_TICKER.test(sym)) delete merged.portfolio[sym]; });
+  }
+  // Los antiguos "eventos futuros" pasan a ser renovaciones de una sola vez
+  if (Array.isArray(merged.events)) {
+    if (!Array.isArray(parsed.subs)) {
+      merged.subs = merged.events.map(e => ({ id: e.id, name: e.title, date: e.date, cost: 0, period: 0 }));
+    }
+    delete merged.events;
+  }
   return merged;
 }
 
@@ -1778,7 +1868,7 @@ async function searchWeather() {
 
 async function fetchWeather(city) {
   const el = document.getElementById('weatherContent');
-  el.innerHTML = `<div class="loading-state"><div class="spinner"></div> Cargando ${city}…</div>`;
+  el.innerHTML = `<div class="loading-state"><div class="spinner"></div> Cargando ${escapeHtml(city)}…</div>`;
   try {
     const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=es&format=json`);
     const geoData = await geoRes.json();
@@ -1831,7 +1921,7 @@ function renderWeather(loc, c, d) {
       <div class="weather-icon-big">${wmoIcon(c.weather_code)}</div>
       <div>
         <div class="weather-temp">${Math.round(c.temperature_2m)}<sup>°C</sup></div>
-        <div class="weather-city">${loc.name}${loc.country_code ? ', ' + loc.country_code : ''}</div>
+        <div class="weather-city">${escapeHtml(loc.name)}${loc.country_code ? ', ' + escapeHtml(loc.country_code) : ''}</div>
         <div class="weather-desc">${wmoDesc(c.weather_code)}</div>
       </div>
     </div>
@@ -2218,16 +2308,45 @@ function addHabit() {
   renderTodayStrip();
 }
 
-function removeHabit(name) {
+function renameHabit(i) {
+  const old = DB.habits[i];
+  if (old === undefined) return;
+  const v = prompt('Nuevo nombre del hábito:', old);
+  if (v === null) return;
+  const name = v.trim();
+  if (!name || name === old) return;
+  if (DB.habits.some((h, j) => j !== i && h.toLowerCase() === name.toLowerCase())) {
+    toast('Ya existe un hábito con ese nombre', 'error');
+    return;
+  }
+  // Los registros van indexados por nombre: se mueven al nuevo
+  const prefix = `${old}__`;
+  Object.keys(DB.habitData).forEach(k => {
+    if (k.startsWith(prefix) && /^\d{4}-\d{2}-\d{2}$/.test(k.slice(prefix.length))) {
+      DB.habitData[`${name}__${k.slice(prefix.length)}`] = DB.habitData[k];
+      delete DB.habitData[k];
+    }
+  });
+  DB.habits[i] = name;
+  saveDB();
+  renderHabits();
+  renderTodayStrip();
+  toast('Hábito renombrado');
+}
+
+function removeHabit(i) {
+  const name = DB.habits[i];
+  if (name === undefined) return;
   if (!confirm(`¿Eliminar el hábito "${name}"? Los registros se mantendrán.`)) return;
-  DB.habits = DB.habits.filter(h => h !== name);
+  DB.habits.splice(i, 1);
   saveDB();
   renderHabits();
   renderTodayStrip();
 }
 
-function toggleCell(habit, dateStr) {
-  if (dateStr > todayStr) return;
+function toggleCell(i, dateStr) {
+  const habit = DB.habits[i];
+  if (habit === undefined || dateStr > todayStr) return;
   const key = `${habit}__${dateStr}`;
   if (DB.habitData[key] === 'done') delete DB.habitData[key];
   else DB.habitData[key] = 'done';
@@ -2262,9 +2381,9 @@ function buildMonthTable(year, month) {
   for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
   html += `<th class="habit-name-col" style="text-align:right;padding-right:4px">%</th></tr></thead><tbody>`;
 
-  DB.habits.forEach(habit => {
+  DB.habits.forEach((habit, i) => {
     const streak = calculateStreak(habit);
-    html += `<tr class="habit-row"><td class="name-cell">${escapeHtml(habit)}${streak > 1 ? `<span class="streak">${streak}🔥</span>` : ''}<button class="habit-delete" onclick="removeHabit('${habit.replace(/'/g, "\\'")}')">×</button></td>`;
+    html += `<tr class="habit-row"><td class="name-cell"><span class="habit-label" ondblclick="renameHabit(${i})" title="Doble clic para renombrar">${escapeHtml(habit)}</span>${streak > 1 ? `<span class="streak">${streak}🔥</span>` : ''}<button class="habit-edit" onclick="renameHabit(${i})" title="Renombrar">✎</button><button class="habit-delete" onclick="removeHabit(${i})" title="Eliminar">×</button></td>`;
     let done = 0, total = 0;
     for (let d = 1; d <= daysInMonth; d++) {
       const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -2274,7 +2393,7 @@ function buildMonthTable(year, month) {
       if (!isFuture) total++;
       if (state === 'done') done++;
       const classes = ['cell-box', state === 'done' ? 'done' : '', isToday ? 'today' : '', isFuture ? 'future' : ''].filter(Boolean).join(' ');
-      const click = isFuture ? '' : `onclick="toggleCell('${habit.replace(/'/g, "\\'")}','${dStr}')"`;
+      const click = isFuture ? '' : `onclick="toggleCell(${i},'${dStr}')"`;
       html += `<td><div class="${classes}" ${click} title="${dStr}"></div></td>`;
     }
     const pct = total > 0 ? Math.round(done / total * 100) : 0;
@@ -2392,6 +2511,7 @@ async function pAddLot() {
   const date = document.getElementById('pDate').value;
 
   if (!symbol) { pShowError('Introduce un ticker'); shake(document.getElementById('pTicker')); return; }
+  if (!SAFE_TICKER.test(symbol)) { pShowError('Ticker no válido'); shake(document.getElementById('pTicker')); return; }
   if (!shares || shares <= 0) { pShowError('Introduce las acciones'); shake(document.getElementById('pShares')); return; }
   if (!price || price <= 0) { pShowError('Introduce el precio'); shake(document.getElementById('pPrice')); return; }
   if (!date) { pShowError('Introduce la fecha'); shake(document.getElementById('pDate')); return; }
@@ -2681,79 +2801,267 @@ function renderTodos() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   FUTURE EVENTS
+   PARA LUEGO — links guardados en el tren para leer en casa
    ════════════════════════════════════════════════════════════════ */
-function addEvent() {
-  const title = document.getElementById('eventTitle').value.trim();
-  const date  = document.getElementById('eventDate').value;
-  if (!title || !date) {
-    if (!title) document.getElementById('eventTitle').classList.add('shake');
-    if (!date)  document.getElementById('eventDate').classList.add('shake');
-    setTimeout(() => {
-      document.getElementById('eventTitle').classList.remove('shake');
-      document.getElementById('eventDate').classList.remove('shake');
-    }, 400);
-    return;
+const LINK_STALE_DAYS = 5;
+let showReadLinks = false;
+
+// Solo se aceptan http(s): evita guardar javascript: u otros esquemas
+function safeUrl(u) {
+  try {
+    const url = new URL(u);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
+  } catch(e) { return null; }
+}
+
+// Acepta "https://…", "título https://…" (lo que copia la hoja de compartir) o "dominio.com/…"
+function parseLinkInput(raw) {
+  const text = raw.trim();
+  const m = text.match(/https?:\/\/\S+/i);
+  let url, title;
+  if (m) {
+    url = safeUrl(m[0].replace(/[)\]}>.,;]+$/, ''));
+    title = (text.slice(0, m.index) + ' ' + text.slice(m.index + m[0].length)).replace(/\s+/g, ' ').trim();
+  } else if (/^[^\s]+\.[a-z]{2,}(\/\S*)?$/i.test(text)) {
+    url = safeUrl('https://' + text);
+    title = '';
   }
-  if (!DB.events) DB.events = [];
-  DB.events.push({ id: Date.now(), title, date });
-  DB.events.sort((a, b) => a.date.localeCompare(b.date));
+  return url ? { url, title: title.replace(/^[-–—:|·\s]+|[-–—:|·\s]+$/g, '') } : null;
+}
+
+function linkLabel(url) {
+  try {
+    const u = new URL(url);
+    const path = decodeURIComponent(u.pathname).replace(/\/$/, '');
+    return u.hostname.replace(/^www\./, '') + (path.length > 1 ? path : '');
+  } catch(e) { return url; }
+}
+
+function addLink() {
+  const input = document.getElementById('linkInput');
+  const parsed = parseLinkInput(input.value);
+  if (!parsed) { shake(input); toast('Eso no parece un link', 'error'); return; }
+  if (!Array.isArray(DB.links)) DB.links = [];
+  const dup = DB.links.find(l => l.url === parsed.url);
+  if (dup && !dup.readAt) { toast('Ese link ya está en la lista'); input.value = ''; return; }
+  if (dup) DB.links = DB.links.filter(l => l !== dup);
+  DB.links.unshift({ id: Date.now(), url: parsed.url, title: parsed.title, addedAt: Date.now(), readAt: null });
   saveDB();
-  document.getElementById('eventTitle').value = '';
-  document.getElementById('eventDate').value = '';
-  renderEvents();
+  input.value = '';
+  renderLinks();
+  toast('Guardado para luego');
 }
 
-function deleteEvent(id) {
-  DB.events = DB.events.filter(e => e.id !== id);
-  saveDB(); renderEvents();
+function openLink(id) {
+  const l = DB.links.find(x => x.id === id);
+  const url = l && safeUrl(l.url);
+  if (url) window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-function eventUrgency(daysLeft) {
-  if (daysLeft < 0) return 'urgent';
-  if (daysLeft <= 30) return 'urgent';
-  if (daysLeft <= 90) return 'warn';
-  if (daysLeft <= 365) return 'ok';
-  return 'far';
+function toggleLinkRead(id) {
+  const l = DB.links.find(x => x.id === id);
+  if (!l) return;
+  l.readAt = l.readAt ? null : Date.now();
+  saveDB(); renderLinks();
 }
 
-function renderEvents() {
-  if (!DB.events) DB.events = [];
-  const list = document.getElementById('eventsList');
-  const today = new Date(); today.setHours(0,0,0,0);
-  const upcoming = DB.events.filter(e => {
-    const d = new Date(e.date + 'T00:00:00'); return d >= today;
-  });
-  const past = DB.events.filter(e => {
-    const d = new Date(e.date + 'T00:00:00'); return d < today;
-  });
-  const allSorted = [...upcoming, ...past];
-  const meta = document.getElementById('eventsMeta');
-  meta.textContent = upcoming.length === 0 ? 'sin eventos próximos' : `${upcoming.length} próximo${upcoming.length !== 1 ? 's' : ''}`;
-  if (!allSorted.length) {
-    list.innerHTML = '<div class="empty-state">Sin eventos. Añade fechas importantes.</div>';
+function discardLink(id) {
+  DB.links = DB.links.filter(l => l.id !== id);
+  saveDB(); renderLinks();
+}
+
+function toggleReadLinks() {
+  showReadLinks = !showReadLinks;
+  renderLinks();
+}
+
+function linkAge(ts) {
+  const days = Math.floor((Date.now() - ts) / 86400000);
+  if (days <= 0) return 'hoy';
+  if (days === 1) return 'ayer';
+  return `hace ${days} días`;
+}
+
+function renderLinks() {
+  if (!Array.isArray(DB.links)) DB.links = [];
+  const list = document.getElementById('linksList');
+  const pending = DB.links.filter(l => !l.readAt).sort((a, b) => b.addedAt - a.addedAt);
+  const read = DB.links.filter(l => l.readAt).sort((a, b) => b.readAt - a.readAt);
+
+  document.getElementById('linksMeta').innerHTML = pending.length
+    ? `<span class="hl">${pending.length}</span> pendiente${pending.length !== 1 ? 's' : ''}`
+    : 'nada pendiente';
+
+  const toggle = document.getElementById('linksToggle');
+  toggle.style.display = read.length ? '' : 'none';
+  toggle.textContent = showReadLinks ? `▾ Ocultar leídos (${read.length})` : `▸ Ver leídos (${read.length})`;
+
+  const shown = showReadLinks ? [...pending, ...read] : pending;
+  if (!shown.length) {
+    list.innerHTML = '<div class="empty-state">Nada pendiente. Pega aquí lo que veas en el tren.</div>';
     return;
   }
-  list.innerHTML = allSorted.map(ev => {
-    const evDate = new Date(ev.date + 'T00:00:00');
-    const diffMs = evDate - today;
-    const daysLeft = Math.ceil(diffMs / 86400000);
-    const urgency = eventUrgency(daysLeft);
-    const daysText = daysLeft < 0 ? Math.abs(daysLeft) + ' días' : daysLeft === 0 ? '¡Hoy!' : daysLeft + ' días';
-    const dateStr = evDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+  const staleMs = LINK_STALE_DAYS * 86400000;
+  list.innerHTML = shown.map(l => {
+    const url = safeUrl(l.url);
+    if (!url) return '';
+    const stale = !l.readAt && Date.now() - l.addedAt > staleMs;
+    const cls = ['link-item', stale ? 'stale' : '', l.readAt ? 'read' : ''].filter(Boolean).join(' ');
+    const label = linkLabel(url);
     return `
-    <div class="event-item">
-      <div class="event-urgency-bar ${urgency}"></div>
-      <div class="event-countdown">
-        <div class="event-days ${urgency}">${daysLeft < 0 ? '-' : ''}${Math.abs(daysLeft) === 0 ? '0' : Math.abs(daysLeft)}</div>
-        <div class="event-days-label">${daysLeft < 0 ? 'hace' : daysLeft === 0 ? 'hoy' : 'días'}</div>
+    <div class="${cls}">
+      <div class="link-info">
+        <div class="link-title" title="${escapeHtml(url)}">${escapeHtml(l.title || label)}</div>
+        <div class="link-sub">${l.title ? escapeHtml(label) + ' · ' : ''}${linkAge(l.addedAt)}</div>
       </div>
-      <div class="event-divider"></div>
-      <div class="event-info">
-        <div class="event-title">${escapeHtml(ev.title)}</div>
-        <div class="event-date-str">${dateStr}</div>
+      <div class="link-actions">
+        <a class="link-btn" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" title="Abrir en otra pestaña">Abrir</a>
+        <button class="link-btn ok" onclick="toggleLinkRead(${Number(l.id)})" title="${l.readAt ? 'Volver a pendientes' : 'Marcar como leído'}">${l.readAt ? '↺' : '✓ Leído'}</button>
+        <button class="link-btn del" onclick="discardLink(${Number(l.id)})" title="Descartar">✕</button>
       </div>
-      <button class="event-del" onclick="deleteEvent(${ev.id})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SUSCRIPCIONES Y RENOVACIONES
+   ════════════════════════════════════════════════════════════════ */
+const SUB_PERIODS = { 1: 'mes', 3: 'trimestre', 12: 'año', 24: '2 años', 0: 'una vez' };
+let editingSubId = null;
+
+// Suma meses a una fecha ISO sin desbordar (31 ene + 1 mes → 28/29 feb)
+function addMonthsIso(iso, months) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const last = new Date(y, m - 1 + months + 1, 0).getDate();
+  const t = new Date(y, m - 1 + months, Math.min(d, last));
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+}
+
+// Las renovaciones periódicas ya pasadas saltan a su siguiente fecha
+function rollSubs() {
+  let changed = false;
+  DB.subs.forEach(s => {
+    const period = Number(s.period) || 0;
+    if (!period || !/^\d{4}-\d{2}-\d{2}$/.test(s.date)) return;
+    // Se cuenta siempre desde la fecha original para no arrastrar el recorte de fin de mes
+    const base = s.date;
+    let k = 0;
+    while (s.date < todayStr && k < 1000) { s.date = addMonthsIso(base, ++k * period); changed = true; }
+  });
+  return changed;
+}
+
+function fmtEur(n) {
+  return (Number(n) || 0).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+}
+
+function saveSub() {
+  const nameEl = document.getElementById('subName');
+  const dateEl = document.getElementById('subDate');
+  const costEl = document.getElementById('subCost');
+  const name = nameEl.value.trim();
+  const date = dateEl.value;
+  const cost = costEl.value === '' ? 0 : parseFloat(costEl.value);
+  const period = parseInt(document.getElementById('subPeriod').value, 10) || 0;
+  if (!name) shake(nameEl);
+  if (!date) shake(dateEl);
+  if (isNaN(cost) || cost < 0) shake(costEl);
+  if (!name || !date || isNaN(cost) || cost < 0) return;
+  if (!Array.isArray(DB.subs)) DB.subs = [];
+
+  const existing = editingSubId !== null && DB.subs.find(s => s.id === editingSubId);
+  if (existing) Object.assign(existing, { name, date, cost, period });
+  else DB.subs.push({ id: Date.now(), name, date, cost, period });
+  saveDB();
+  resetSubForm();
+  renderSubs();
+  toast(existing ? 'Renovación actualizada' : 'Renovación añadida');
+}
+
+function resetSubForm() {
+  editingSubId = null;
+  document.getElementById('subName').value = '';
+  document.getElementById('subDate').value = '';
+  document.getElementById('subCost').value = '';
+  document.getElementById('subPeriod').value = '12';
+  document.getElementById('subSubmit').textContent = '+ Añadir';
+}
+
+function editSub(id) {
+  const s = DB.subs.find(x => x.id === id);
+  if (!s) return;
+  editingSubId = id;
+  document.getElementById('subName').value = s.name;
+  document.getElementById('subDate').value = s.date;
+  document.getElementById('subCost').value = s.cost || '';
+  document.getElementById('subPeriod').value = String(Number(s.period) || 0);
+  document.getElementById('subSubmit').textContent = '✓ Guardar';
+  document.getElementById('subName').focus();
+}
+
+function deleteSub(id) {
+  const s = DB.subs.find(x => x.id === id);
+  if (!s || !confirm(`¿Eliminar "${s.name}"?`)) return;
+  DB.subs = DB.subs.filter(x => x.id !== id);
+  if (editingSubId === id) resetSubForm();
+  saveDB(); renderSubs();
+}
+
+function renderSubs() {
+  if (!Array.isArray(DB.subs)) DB.subs = [];
+  if (rollSubs()) saveDB();
+  const list = document.getElementById('subsList');
+  const today = new Date(todayStr + 'T00:00:00');
+  const daysTo = iso => Math.round((new Date(iso + 'T00:00:00') - today) / 86400000);
+  const sorted = [...DB.subs].sort((a, b) => a.date.localeCompare(b.date));
+
+  // Coste anual estimado de lo recurrente y lo que toca pagar en 30 días
+  const yearly = DB.subs.reduce((sum, s) => {
+    const p = Number(s.period) || 0;
+    return p ? sum + (Number(s.cost) || 0) * 12 / p : sum;
+  }, 0);
+  const soon = sorted.filter(s => { const d = daysTo(s.date); return d >= 0 && d <= 30; });
+  const soonCost = soon.reduce((sum, s) => sum + (Number(s.cost) || 0), 0);
+
+  document.getElementById('subsMeta').textContent = soon.length
+    ? `${soon.length} en 30 días`
+    : (sorted.length ? 'nada en 30 días' : '');
+  document.getElementById('subTotals').innerHTML = sorted.length ? `
+    <span>Al año <span class="hl">${fmtEur(yearly)}</span></span>
+    <span>Al mes <span class="hl">${fmtEur(yearly / 12)}</span></span>
+    <span>Próximos 30 días <span class="hl">${fmtEur(soonCost)}</span></span>` : '';
+
+  if (!sorted.length) {
+    list.innerHTML = '<div class="empty-state">Sin renovaciones. Añade el dominio, streaming, seguros, la ITV…</div>';
+    return;
+  }
+  list.innerHTML = sorted.map(s => {
+    const days = daysTo(s.date);
+    const period = Number(s.period) || 0;
+    // Cuenta atrás solo cuando quedan pocos días; si falta mucho, meses aproximados
+    let urgency, big, label;
+    if (days < 0)        { urgency = 'urgent'; big = Math.abs(days); label = 'vencida'; }
+    else if (days === 0) { urgency = 'urgent'; big = '¡Hoy!'; label = 'renueva'; }
+    else if (days <= 7)  { urgency = 'urgent'; big = days; label = days === 1 ? 'día' : 'días'; }
+    else if (days <= 30) { urgency = 'warn'; big = days; label = 'días'; }
+    else                 { urgency = 'far'; const mo = Math.round(days / 30.4); big = mo; label = mo === 1 ? 'mes' : 'meses'; }
+    const dateStr = new Date(s.date + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    const id = Number(s.id);
+    return `
+    <div class="sub-item">
+      <div class="sub-urgency-bar ${urgency}"></div>
+      <div class="sub-countdown">
+        <div class="sub-days ${urgency}">${big}</div>
+        <div class="sub-days-label">${label}</div>
+      </div>
+      <div class="sub-divider"></div>
+      <div class="sub-info">
+        <div class="sub-title">${escapeHtml(s.name)}</div>
+        <div class="sub-date-str">${dateStr}${period ? ' · cada ' + SUB_PERIODS[period] : ''}</div>
+      </div>
+      <div class="sub-cost">${s.cost ? fmtEur(s.cost) : '—'}<span class="per">${period ? '/' + SUB_PERIODS[period] : 'único'}</span></div>
+      <button class="sub-edit" onclick="editSub(${id})" title="Editar">✎</button>
+      <button class="sub-del" onclick="deleteSub(${id})" title="Eliminar">✕</button>
     </div>`;
   }).join('');
 }
@@ -2998,7 +3306,8 @@ function renderAll() {
   pUpdateStats();
   renderTodayStrip();
   renderTodos();
-  renderEvents();
+  renderLinks();
+  renderSubs();
   renderCoche();
 }
 
