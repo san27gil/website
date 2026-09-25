@@ -3,12 +3,10 @@
 // Sin dependencias: solo node:crypto.
 import { createHmac, createHash, timingSafeEqual } from 'node:crypto';
 
-export const SESSION_DAYS = 30;
+export const SESSION_DAYS = 7;
 const TOTP_STEP = 30;          // segundos por código
-const MAX_FAILS_IP = 5;        // intentos fallidos por IP…
+const MAX_FAILS_IP = 3;        // intentos fallidos por IP…
 const IP_WINDOW = 15 * 60e3;   // …en 15 minutos
-const MAX_FAILS_ALL = 20;      // intentos fallidos globales…
-const ALL_WINDOW = 60 * 60e3;  // …en 1 hora
 
 // ─── TOTP (RFC 6238) ───────────────────────────────────────────────
 const B32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -85,6 +83,8 @@ export function verifyToken(secret, token, now = Date.now()) {
   try {
     const payload = JSON.parse(Buffer.from(body, 'base64url').toString());
     if (!payload.exp || payload.exp < now) return null;
+    // También caducan por antigüedad: los tokens emitidos cuando la sesión duraba más no se alargan
+    if (!payload.iat || now - payload.iat > SESSION_DAYS * 86400e3) return null;
     return payload;
   } catch {
     return null;
@@ -98,7 +98,6 @@ export function bearer(req) {
 
 // ─── Límite de intentos (guardado en el store de Blobs) ───────────
 const failKey = ip => `auth/fails/${encodeURIComponent(ip)}`;
-const ALL_KEY = 'auth/fails/_all';
 
 async function readCounter(store, key, windowMs, now) {
   const c = await store.get(key, { type: 'json' });
@@ -106,21 +105,15 @@ async function readCounter(store, key, windowMs, now) {
   return c;
 }
 
+// Solo se bloquea por IP: un bloqueo global permitiría a cualquiera dejar fuera al propietario
 export async function isLocked(store, ip, now = Date.now()) {
-  const [byIp, all] = await Promise.all([
-    readCounter(store, failKey(ip), IP_WINDOW, now),
-    readCounter(store, ALL_KEY, ALL_WINDOW, now),
-  ]);
-  return byIp.n >= MAX_FAILS_IP || all.n >= MAX_FAILS_ALL;
+  const byIp = await readCounter(store, failKey(ip), IP_WINDOW, now);
+  return byIp.n >= MAX_FAILS_IP;
 }
 
 export async function recordFailure(store, ip, now = Date.now()) {
   const byIp = await readCounter(store, failKey(ip), IP_WINDOW, now);
-  const all = await readCounter(store, ALL_KEY, ALL_WINDOW, now);
-  await Promise.all([
-    store.setJSON(failKey(ip), { n: byIp.n + 1, first: byIp.first }),
-    store.setJSON(ALL_KEY, { n: all.n + 1, first: all.first }),
-  ]);
+  await store.setJSON(failKey(ip), { n: byIp.n + 1, first: byIp.first });
 }
 
 export async function clearFailures(store, ip) {

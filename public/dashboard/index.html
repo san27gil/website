@@ -1297,7 +1297,7 @@ function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { retur
 function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 function lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
-// Sesión del propietario (token firmado por el servidor, caduca a los 30 días)
+// Sesión del propietario (token firmado por el servidor, caduca a los 7 días)
 let session = null;
 try {
   session = JSON.parse(lsGet(SESSION_KEY) || 'null');
