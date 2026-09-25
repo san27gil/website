@@ -1297,12 +1297,16 @@ function lsGet(key) { try { return localStorage.getItem(key); } catch(e) { retur
 function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
 function lsDel(key) { try { localStorage.removeItem(key); } catch(e) {} }
 
-// Sesión del propietario (token firmado por el servidor, caduca a los 7 días)
+// Sesión del propietario: el token va en una cookie HttpOnly que esta página no puede leer.
+// Aquí solo se guarda cuándo caduca, para saber si mostrar el modo propietario.
 let session = null;
 try {
   session = JSON.parse(lsGet(SESSION_KEY) || 'null');
-  if (session && (!session.token || session.exp < Date.now())) { session = null; lsDel(SESSION_KEY); }
+  if (session && (!session.exp || session.exp < Date.now())) { session = null; lsDel(SESSION_KEY); }
+  // Formato antiguo: el token estaba en localStorage. Se borra; la API pedirá entrar de nuevo.
+  if (session && session.token) { session = { exp: session.exp }; lsSet(SESSION_KEY, JSON.stringify(session)); }
 } catch(e) { session = null; }
+const API_HEADERS = { 'content-type': 'application/json', 'x-dashboard': '1' };
 const isOwner = () => !!session;
 const storageKey = () => isOwner() ? OWNER_KEY : ROOT_KEY;
 
@@ -1389,9 +1393,10 @@ function scheduleSync() {
 async function api(path, options = {}) {
   const res = await fetch(API + path, {
     ...options,
-    headers: { 'content-type': 'application/json', authorization: 'Bearer ' + session.token, ...(options.headers || {}) }
+    credentials: 'same-origin',
+    headers: { ...API_HEADERS, ...(options.headers || {}) }
   });
-  if (res.status === 401) { endSession('Sesión caducada. Vuelve a entrar.'); throw new Error('401'); }
+  if (res.status === 401) { endSession('Sesión caducada. Vuelve a entrar.', true); throw new Error('401'); }
   return res;
 }
 
@@ -1465,9 +1470,11 @@ async function pullFromCloud() {
   }
 }
 
-function endSession(msg) {
+// keepLocal: al caducar la sesión se conservan los datos y cambios sin subir de este
+// dispositivo; se sincronizan al volver a entrar. Al salir a propósito se borran.
+function endSession(msg, keepLocal = false) {
   session = null;
-  [SESSION_KEY, OWNER_KEY, SYNC_BASE_KEY, SYNC_DIRTY_KEY].forEach(lsDel);
+  (keepLocal ? [SESSION_KEY] : [SESSION_KEY, OWNER_KEY, SYNC_BASE_KEY, SYNC_DIRTY_KEY]).forEach(lsDel);
   if (msg) alert(msg);
   location.reload();
 }
@@ -1476,7 +1483,9 @@ function endSession(msg) {
 function authButton() {
   if (!isOwner()) return showLogin();
   if (lsGet(SYNC_DIRTY_KEY) === '1' && !confirm('Hay cambios sin subir a la nube. ¿Salir igualmente?')) return;
-  endSession();
+  fetch(API + '/logout', { method: 'POST', credentials: 'same-origin', headers: API_HEADERS })
+    .catch(() => {})
+    .finally(() => endSession());
 }
 function showLogin() {
   document.getElementById('loginModal').classList.add('show');
@@ -1496,12 +1505,13 @@ async function doLogin() {
   try {
     const res = await fetch(API + '/login', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ password: pass.value, code: code.value.trim() })
     });
     const out = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(out.error || 'No se pudo entrar');
-    lsSet(SESSION_KEY, JSON.stringify({ token: out.token, exp: out.exp }));
+    lsSet(SESSION_KEY, JSON.stringify({ exp: out.exp }));
     location.reload();
   } catch (e) {
     err.textContent = e.message === 'Failed to fetch' ? 'Sin conexión con el servidor' : e.message;
@@ -1517,8 +1527,8 @@ document.addEventListener('visibilitychange', () => {
   else if (lsGet(SYNC_DIRTY_KEY) === '1') {
     clearTimeout(syncTimer);
     fetch(API + '/data', {
-      method: 'PUT', keepalive: true,
-      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + session.token },
+      method: 'PUT', keepalive: true, credentials: 'same-origin',
+      headers: API_HEADERS,
       body: JSON.stringify({ data: DB, base: Number(lsGet(SYNC_BASE_KEY) || 0) })
     }).then(r => r.ok && r.json()).then(o => {
       if (o && o.updatedAt) { lsSet(SYNC_BASE_KEY, String(o.updatedAt)); lsDel(SYNC_DIRTY_KEY); }

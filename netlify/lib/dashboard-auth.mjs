@@ -91,9 +91,31 @@ export function verifyToken(secret, token, now = Date.now()) {
   }
 }
 
-export function bearer(req) {
-  const h = req.headers.get('authorization') || '';
-  return h.startsWith('Bearer ') ? h.slice(7) : null;
+// ─── Cookie de sesión ──────────────────────────────────────────────
+// HttpOnly: el JavaScript de la página no puede leerla, así que un XSS no puede robar la sesión.
+// __Host- obliga a Secure + Path=/ sin Domain; SameSite=Strict la deja fuera de peticiones de otras webs.
+export const COOKIE_NAME = '__Host-dashboard_session';
+
+export function sessionCookie(token, maxAgeSec) {
+  return `${COOKIE_NAME}=${token}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAgeSec}`;
+}
+
+export function clearSessionCookie() {
+  return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0`;
+}
+
+export function sessionToken(req) {
+  const cookies = req.headers.get('cookie') || '';
+  for (const part of cookies.split(';')) {
+    const [name, ...rest] = part.trim().split('=');
+    if (name === COOKIE_NAME) return rest.join('=') || null;
+  }
+  return null;
+}
+
+// Cabecera propia que solo envía el dashboard: otra web no puede añadirla sin permiso CORS (que no damos)
+export function fromDashboard(req) {
+  return req.headers.get('x-dashboard') === '1';
 }
 
 // ─── Límite de intentos (guardado en el store de Blobs) ───────────
@@ -120,9 +142,9 @@ export async function clearFailures(store, ip) {
   await store.delete(failKey(ip));
 }
 
-export function json(data, status = 200) {
+export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers },
   });
 }

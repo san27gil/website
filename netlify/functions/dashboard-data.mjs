@@ -3,7 +3,7 @@
 // `base` es la versión de la nube sobre la que el cliente hizo sus cambios:
 // si la nube tiene algo más reciente, se rechaza para no pisar datos de otro dispositivo.
 import { getStore } from '@netlify/blobs';
-import { verifyToken, bearer, json } from '../lib/dashboard-auth.mjs';
+import { verifyToken, sessionToken, fromDashboard, json } from '../lib/dashboard-auth.mjs';
 
 const DATA_KEY = 'owner/data';
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -11,7 +11,8 @@ const MAX_BYTES = 5 * 1024 * 1024;
 export async function handleData(req, { store, env, now = Date.now() }) {
   const secret = env.DASHBOARD_SESSION_SECRET;
   if (!secret) return json({ error: 'Servidor no configurado' }, 500);
-  if (!verifyToken(secret, bearer(req), now)) return json({ error: 'No autorizado' }, 401);
+  if (!fromDashboard(req)) return json({ error: 'Petición no permitida' }, 403);
+  if (!verifyToken(secret, sessionToken(req), now)) return json({ error: 'No autorizado' }, 401);
 
   const current = (await store.get(DATA_KEY, { type: 'json' })) || { data: null, updatedAt: 0 };
 

@@ -28,6 +28,9 @@
   for = "/dashboard/*"
   [headers.values]
     Cache-Control = "no-cache"
+    # CSP: el dashboard aún usa código en línea (onclick, <script>), así que 'unsafe-inline'
+    # es inevitable; lo que sí se limita es adónde puede conectarse o enviar datos la página.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://www.alphavantage.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
 
 [[headers]]
   for = "/api/*"

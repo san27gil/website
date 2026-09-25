@@ -1,8 +1,8 @@
-// POST /api/dashboard/login  { password, code }  →  { token, exp }
+// POST /api/dashboard/login  { password, code }  →  { exp }  + cookie de sesión HttpOnly
 // Acceso exclusivo del propietario: contraseña + código de Google Authenticator.
 import { getStore } from '@netlify/blobs';
 import {
-  SESSION_DAYS, verifyTotp, safeEqual, signToken,
+  SESSION_DAYS, verifyTotp, safeEqual, signToken, sessionCookie,
   isLocked, recordFailure, clearFailures, json,
 } from '../lib/dashboard-auth.mjs';
 
@@ -38,7 +38,7 @@ export async function handleLogin(req, { store, env, ip, now = Date.now() }) {
 
   const exp = now + SESSION_DAYS * 86400e3;
   const token = signToken(DASHBOARD_SESSION_SECRET, { sub: 'owner', iat: now, exp });
-  return json({ token, exp });
+  return json({ exp }, 200, { 'set-cookie': sessionCookie(token, SESSION_DAYS * 86400) });
 }
 
 export default async (req, context) =>
