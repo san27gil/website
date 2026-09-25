@@ -24,6 +24,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Icono y nombre al añadir la web a la pantalla de inicio en iOS. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="santigil" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
