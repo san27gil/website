@@ -124,6 +124,7 @@
     font-weight: 200;
     letter-spacing: -0.04em;
     line-height: 0.95;
+    white-space: nowrap;
     color: var(--text);
   }
   .meta-date {
@@ -133,9 +134,12 @@
     margin-top: 10px;
   }
   .meta-date::first-letter { text-transform: uppercase; }
-  .brand { font-size: 0.95rem; color: var(--text-dim); margin-top: 4px; }
+  /* Reloj y, a su lado, fecha + progreso del año */
+  .header-main { display: flex; align-items: flex-end; gap: clamp(20px, 3vw, 40px); flex: 1 1 520px; min-width: 0; }
+  .header-info { flex: 1; min-width: 0; max-width: 560px; padding-bottom: 6px; }
+  .header-info .meta-date { margin-top: 0; }
 
-  .year-progress { margin-top: 18px; width: min(100%, 360px); }
+  .year-progress { margin-top: 14px; width: 100%; }
   .yp-meta { gap: 12px; }
   .yp-bar { height: 3px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
   .yp-fill { height: 100%; background: var(--text); border-radius: 3px; transition: width 0.6s ease; }
@@ -767,7 +771,12 @@
     body { padding: 24px 16px 48px; }
     header { align-items: flex-start; margin-bottom: 24px; }
     .header-meta { align-items: flex-start; width: 100%; }
-    header > div:first-child { width: 100%; }
+    .header-main { width: 100%; flex-basis: 100%; gap: 18px; }
+    .header-info { padding-bottom: 2px; }
+    .header-info .meta-date { font-size: 0.95rem; }
+    .year-progress { margin-top: 10px; }
+    .clock { font-size: 3.1rem; }
+    .yp-meta { font-size: 0.72rem; white-space: nowrap; gap: 8px; }
     .header-actions { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 4px; width: calc(100% + 32px); scrollbar-width: none; }
     .pill-btn { flex-shrink: 0; }
     .grid { gap: 14px; }
@@ -807,16 +816,17 @@
 
 <!-- HEADER -->
 <header>
-  <div>
+  <div class="header-main">
     <div class="clock" id="clock"></div>
+    <div class="header-info">
     <div class="meta-date" id="headerDate"></div>
-    <div class="brand" id="brandMark"></div>
     <div class="year-progress">
       <div class="yp-bar"><div class="yp-fill" id="ypFill"></div></div>
       <div class="yp-meta">
         <span id="ypDay"></span>
         <span class="yp-pct" id="ypPct"></span>
       </div>
+    </div>
     </div>
   </div>
   <div class="header-meta">
@@ -1512,21 +1522,11 @@ function tickClock() {
 }
 tickClock();
 
-(function renderBrandMark() {
-  const hour = now.getHours();
-  let greeting;
-  if (hour < 6) greeting = 'Buenas noches';
-  else if (hour < 13) greeting = 'Buenos días';
-  else if (hour < 20) greeting = 'Buenas tardes';
-  else greeting = 'Buenas noches';
-
-  document.getElementById('brandMark').innerHTML =
-    `${greeting}${isOwner() ? ', Santi' : ''}`;
-
+(function renderYearProgress() {
   const year = now.getFullYear();
   const startOfYear = new Date(year, 0, 1);
   const endOfYear = new Date(year + 1, 0, 1);
-  const dayOfYear = Math.floor((now - startOfYear) / 86400000) + 1;
+  const dayOfYear = Math.round((new Date(year, now.getMonth(), now.getDate()) - startOfYear) / 86400000) + 1;
   const totalDays = Math.round((endOfYear - startOfYear) / 86400000);
   const pct = ((now - startOfYear) / (endOfYear - startOfYear)) * 100;
 
