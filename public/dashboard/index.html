@@ -385,42 +385,38 @@
   .ag-btn:hover { background: var(--bg-soft); color: var(--text); }
   #calManage { margin-top: 8px; }
 
-  /* ─── LUZ DEL DÍA ─── */
-  .dl-head { font-weight: 300; font-size: 1.5rem; letter-spacing: -0.02em; color: var(--text); line-height: 1.25; }
-  .dl-arc { width: 100%; max-width: 300px; display: block; margin: 14px auto 6px; overflow: visible; }
-  .dl-track { fill: none; stroke: var(--line); stroke-width: 2; stroke-dasharray: 3 5; stroke-linecap: round; }
-  .dl-done { fill: none; stroke: var(--wx-sun); stroke-width: 3; stroke-linecap: round; }
-  .dl-horizon { stroke: var(--line); stroke-width: 1; }
-  .dl-sun { fill: var(--wx-sun); stroke: var(--surface); stroke-width: 3; }
-  .dl-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .dl-row .lbl, .air-pollutants .lbl { font-size: 0.76rem; color: var(--text-dim); }
-  .dl-row .v { font-size: 1.15rem; color: var(--text); margin-top: 2px; }
-  .dl-row > div:nth-child(2) { text-align: center; }
-  .dl-delta { margin-top: 14px; font-size: 0.85rem; color: var(--text-mid); }
-  .dl-delta.up::before { content: '▲ '; color: var(--up); font-size: 0.7rem; }
-  .dl-delta.down::before { content: '▼ '; color: var(--text-dim); font-size: 0.7rem; }
+  /* ─── TIEMPO: secciones de luz del día y aire ─── */
+  .wx-section:empty { display: none; }
+  .wx-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
+  .wx-sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .wx-sec-title { font-size: 0.76rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+  .wx-sec-summary { font-size: 0.85rem; color: var(--text-mid); text-align: right; display: inline-flex; align-items: center; gap: 6px; }
+  .wx-sec-summary strong { font-weight: 600; color: var(--text); }
+  .wx-sec-error { font-size: 0.8rem; color: var(--text-dim); }
 
-  /* ─── CALIDAD DEL AIRE ─── */
-  .air-now { display: flex; align-items: center; gap: 16px; }
-  .air-aqi { font-weight: 200; font-size: 3.4rem; letter-spacing: -0.04em; line-height: 0.9; color: var(--text); }
-  .air-label { font-size: 1.05rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
-  .air-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .air-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
-  .air-scale { position: relative; display: flex; gap: 2px; margin: 18px 0 18px; height: 6px; }
+  .dl-bar { position: relative; height: 6px; border-radius: 6px; background: var(--bg-soft); margin: 4px 0 8px; }
+  .dl-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, color-mix(in srgb, var(--wx-sun) 45%, transparent), var(--wx-sun)); }
+  .dl-bar.night .dl-fill { background: var(--line); }
+  .dl-sun { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--wx-sun); box-shadow: 0 0 0 3px var(--surface); }
+  .dl-row { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; color: var(--text-mid); }
+  .dl-mid { text-align: center; color: var(--text); }
+  .dl-delta { font-size: 0.75rem; color: var(--text-dim); margin-left: 4px; }
+
+  .air-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .air-scale { position: relative; display: flex; gap: 2px; height: 6px; margin: 4px 0 10px; }
   .air-scale span { flex: 1; border-radius: 3px; opacity: 0.8; }
   .air-scale span:last-of-type { flex: 0.2; }
   .air-scale i { position: absolute; top: -4px; width: 4px; height: 14px; margin-left: -2px; border-radius: 2px; background: var(--text); box-shadow: 0 0 0 2px var(--surface); }
-  .air-pollutants { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .air-pollutants .v { font-size: 1.15rem; color: var(--text); margin-top: 2px; }
-  .air-unit { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
-  .pollen { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
-  .pollen-title { font-size: 0.76rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .pollen-item { display: flex; justify-content: space-between; font-size: 0.92rem; color: var(--text); padding: 4px 0; }
-  .pollen-lvl { font-size: 0.78rem; padding: 1px 9px; border-radius: 999px; }
+  .air-pollutants { font-size: 0.8rem; color: var(--text-mid); }
+  .air-pollutants span { color: var(--text-dim); }
+  .pollen { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; font-size: 0.85rem; color: var(--text); }
+  .pollen-title { font-size: 0.8rem; color: var(--text-dim); }
+  .pollen-item { display: inline-flex; align-items: center; gap: 5px; }
+  .pollen-lvl { font-size: 0.72rem; padding: 1px 8px; border-radius: 999px; }
   .pollen-lvl.lo { background: color-mix(in srgb, var(--up) 14%, transparent); color: var(--up); }
   .pollen-lvl.mid { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
   .pollen-lvl.hi { background: color-mix(in srgb, var(--down) 14%, transparent); color: var(--down); }
-  .air-none { font-size: 0.88rem; color: var(--text-dim); }
+  .air-none { font-size: 0.85rem; color: var(--text-dim); }
 
   /* ─── ACTIVITY ─── */
   .date-picker-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -986,6 +982,8 @@
     <div id="weatherContent">
       <div class="loading-state"><div class="spinner"></div> Cargando…</div>
     </div>
+    <div class="wx-section" id="daylightContent"></div>
+    <div class="wx-section" id="airContent"></div>
   </div>
 
   <!-- CALENDARIO -->
@@ -1011,24 +1009,6 @@
     <div class="agenda" id="agenda"></div>
     <button class="links-toggle" id="calManageToggle" onclick="toggleCalManage()"></button>
     <div class="agenda" id="calManage" hidden></div>
-  </div>
-
-  <!-- LUZ DEL DÍA -->
-  <div class="card" data-card="daylight">
-    <div class="card-head">
-      <h3 class="card-title">Luz del día</h3>
-      <span class="card-meta" id="daylightMeta"></span>
-    </div>
-    <div id="daylightContent"></div>
-  </div>
-
-  <!-- CALIDAD DEL AIRE -->
-  <div class="card" data-card="air">
-    <div class="card-head">
-      <h3 class="card-title">Calidad del aire</h3>
-      <span class="card-meta" id="airMeta"></span>
-    </div>
-    <div id="airContent"></div>
   </div>
 
   <!-- ACTIVITY (Apple Watch) -->
@@ -1984,7 +1964,7 @@ async function searchWeather() {
 }
 
 // La ciudad del tiempo es la ubicación de todas las tarjetas que la usan
-const LOCATION_CARDS = { weather: c => fetchWeather(c), daylight: c => fetchDaylight(c), air: c => fetchAir(c) };
+const LOCATION_CARDS = { weather: c => { fetchWeather(c); fetchDaylight(c); fetchAir(c); } };
 function refreshLocationCards(only) {
   Object.entries(LOCATION_CARDS).forEach(([id, load]) => {
     if (cardOn(id) && (!only || only.includes(id))) load(DB.weatherCity);
@@ -2162,7 +2142,7 @@ function fmtDur(min) {
 
 async function fetchDaylight(city) {
   const el = document.getElementById('daylightContent');
-  el.innerHTML = '<div class="loading-state"><div class="spinner"></div> Cargando…</div>';
+  el.innerHTML = '';
   try {
     const loc = await geocode(city);
     const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=is_day&daily=sunrise,sunset,daylight_duration&timezone=auto&past_days=1&forecast_days=2`);
@@ -2170,7 +2150,7 @@ async function fetchDaylight(city) {
     if (!d.daily || !d.current) throw new Error('No se pudo cargar');
     renderDaylight(loc, d.current.time, d.daily);
   } catch (e) {
-    el.innerHTML = `<div class="error-state">${escapeHtml(e.message || 'Error')}</div>`;
+    el.innerHTML = `<div class="wx-sec-error">Luz del día: ${escapeHtml(e.message || 'sin datos')}</div>`;
   }
 }
 
@@ -2187,30 +2167,23 @@ function renderDaylight(loc, nowTime, d) {
   else if (p > 1) headline = `Mañana amanece a las ${fmtHm(d.sunrise[2])}`;
   else headline = `Quedan ${fmtDur(set - now)} de luz`;
 
-  // Arco del sol: semicírculo de amanecer a atardecer
-  const cx = 100, cy = 96, r = 84;
-  const pc = Math.min(1, Math.max(0, p));
-  const ang = Math.PI * (1 - pc);
-  const sx = cx + r * Math.cos(ang), sy = cy - r * Math.sin(ang);
+  // Barra del día: de amanecer a atardecer, con el sol en la hora actual
+  const pc = Math.min(1, Math.max(0, p)) * 100;
   const isDay = p >= 0 && p <= 1;
-  const arc = `<svg class="dl-arc" viewBox="0 0 200 104" aria-hidden="true">
-      <path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}" class="dl-track"/>
-      ${pc > 0 ? `<path d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${sx.toFixed(1)} ${sy.toFixed(1)}" class="dl-done"/>` : ''}
-      <line x1="4" y1="${cy}" x2="196" y2="${cy}" class="dl-horizon"/>
-      ${isDay ? `<circle cx="${sx.toFixed(1)}" cy="${sy.toFixed(1)}" r="7" class="dl-sun"/>`
-              : `<g transform="translate(86 44) scale(1.15)" class="wx">${WX_SVG.moon}</g>`}
-    </svg>`;
-
-  document.getElementById('daylightMeta').textContent = loc.name;
   document.getElementById('daylightContent').innerHTML = `
-    <div class="dl-head">${headline}</div>
-    ${arc}
-    <div class="dl-row">
-      <div><div class="lbl">Amanecer</div><div class="v">${fmtHm(d.sunrise[1])}</div></div>
-      <div><div class="lbl">Duración</div><div class="v">${fmtDur(d.daylight_duration[1] / 60)}</div></div>
-      <div style="text-align:right"><div class="lbl">Atardecer</div><div class="v">${fmtHm(d.sunset[1])}</div></div>
+    <div class="wx-sec-head">
+      <span class="wx-sec-title">Luz del día</span>
+      <span class="wx-sec-summary">${headline}</span>
     </div>
-    <div class="dl-delta ${delta >= 0 ? 'up' : 'down'}">${deltaTxt}</div>`;
+    <div class="dl-bar${isDay ? '' : ' night'}">
+      <div class="dl-fill" style="width:${pc}%"></div>
+      ${isDay ? `<span class="dl-sun" style="left:${pc}%"></span>` : ''}
+    </div>
+    <div class="dl-row">
+      <span>↑ ${fmtHm(d.sunrise[1])}</span>
+      <span class="dl-mid">${fmtDur(d.daylight_duration[1] / 60)} <span class="dl-delta ${delta >= 0 ? 'up' : 'down'}">${deltaTxt.replace(' respecto a ayer', ' vs. ayer')}</span></span>
+      <span>↓ ${fmtHm(d.sunset[1])}</span>
+    </div>`;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -2236,7 +2209,7 @@ const POLLEN = [
 
 async function fetchAir(city) {
   const el = document.getElementById('airContent');
-  el.innerHTML = '<div class="loading-state"><div class="spinner"></div> Cargando…</div>';
+  el.innerHTML = '';
   try {
     const loc = await geocode(city);
     const vars = ['european_aqi', 'pm2_5', 'pm10', 'nitrogen_dioxide', 'ozone', ...POLLEN.map(p => p[0])].join(',');
@@ -2245,7 +2218,7 @@ async function fetchAir(city) {
     if (!d.current || d.current.european_aqi == null) throw new Error('Sin datos de calidad del aire');
     renderAir(loc, d.current);
   } catch (e) {
-    el.innerHTML = `<div class="error-state">${escapeHtml(e.message || 'Error')}</div>`;
+    el.innerHTML = `<div class="wx-sec-error">Calidad del aire: ${escapeHtml(e.message || 'sin datos')}</div>`;
   }
 }
 
@@ -2257,42 +2230,29 @@ function renderAir(loc, c) {
 
   const pollen = POLLEN.filter(([k]) => c[k] != null);
   let pollenHtml;
-  if (!pollen.length) pollenHtml = '<div class="air-none">Sin datos de polen para esta zona</div>';
+  if (!pollen.length) pollenHtml = '<span class="air-none">sin datos en esta zona</span>';
   else {
     const active = pollen.filter(([k]) => c[k] >= 1).sort((a, b) => c[b[0]] - c[a[0]]).slice(0, 3);
     pollenHtml = active.length
       ? active.map(([k, name, lo, hi]) => {
           const v = c[k];
           const [txt, cls] = v < lo ? ['bajo', 'lo'] : v < hi ? ['medio', 'mid'] : ['alto', 'hi'];
-          return `<div class="pollen-item"><span>${name}</span><span class="pollen-lvl ${cls}">${txt}</span></div>`;
+          return `<span class="pollen-item">${name} <span class="pollen-lvl ${cls}">${txt}</span></span>`;
         }).join('')
-      : '<div class="air-none">Sin polen en el aire ahora mismo</div>';
+      : '<span class="air-none">nada ahora mismo</span>';
   }
 
-  document.getElementById('airMeta').textContent = loc.name;
   document.getElementById('airContent').innerHTML = `
-    <div class="air-now">
-      <div class="air-aqi">${aqi}</div>
-      <div>
-        <div class="air-label"><span class="air-dot" style="background:${lvl.color}"></span>${lvl.label}</div>
-        <div class="air-sub">Índice europeo de calidad del aire</div>
-      </div>
+    <div class="wx-sec-head">
+      <span class="wx-sec-title">Aire</span>
+      <span class="wx-sec-summary"><span class="air-dot" style="background:${lvl.color}"></span>${lvl.label} · <strong>${aqi}</strong></span>
     </div>
-    <div class="air-scale" role="img" aria-label="Índice ${aqi}: ${lvl.label}">
+    <div class="air-scale" role="img" aria-label="Índice europeo ${aqi}: ${lvl.label}">
       ${AQI_LEVELS.map(l => `<span style="background:${l.color}"></span>`).join('')}
       <i style="left:${marker}%"></i>
     </div>
-    <div class="air-pollutants">
-      <div><div class="lbl">PM2.5</div><div class="v">${val(c.pm2_5)}</div></div>
-      <div><div class="lbl">PM10</div><div class="v">${val(c.pm10)}</div></div>
-      <div><div class="lbl">NO₂</div><div class="v">${val(c.nitrogen_dioxide)}</div></div>
-      <div><div class="lbl">O₃</div><div class="v">${val(c.ozone)}</div></div>
-    </div>
-    <div class="air-unit">µg/m³</div>
-    <div class="pollen">
-      <div class="pollen-title">Polen</div>
-      ${pollenHtml}
-    </div>`;
+    <div class="air-pollutants">PM2.5 ${val(c.pm2_5)} · PM10 ${val(c.pm10)} · NO₂ ${val(c.nitrogen_dioxide)} · O₃ ${val(c.ozone)} <span>µg/m³</span></div>
+    <div class="pollen"><span class="pollen-title">Polen</span>${pollenHtml}</div>`;
 }
 
 function escapeHtml(s) {
@@ -3896,9 +3856,7 @@ function renderCalendar() {
 const CARDS = [
   { id: 'summary',   name: 'Resumen de hoy', desc: 'Peso, pasos, pulso, cartera y hábitos de un vistazo' },
   { id: 'calendar',  name: 'Calendario',     desc: 'Tus eventos de la semana; pueden repetirse' },
-  { id: 'weather',   name: 'Tiempo',         desc: 'Temperatura y probabilidad de lluvia hora a hora' },
-  { id: 'daylight',  name: 'Luz del día',    desc: 'Amanecer, atardecer y cuánta luz queda' },
-  { id: 'air',       name: 'Calidad del aire', desc: 'Índice de contaminación y polen' },
+  { id: 'weather',   name: 'Tiempo',         desc: 'Lluvia hora a hora, luz del día y calidad del aire' },
   { id: 'habits',    name: 'Hábitos',        desc: 'Calendario mensual con rachas' },
   { id: 'todos',     name: 'Tareas',         desc: 'Lista de pendientes con prioridad' },
   { id: 'links',     name: 'Para luego',     desc: 'Links guardados para leer más tarde' },
