@@ -57,10 +57,9 @@
     --wx-bolt: #f59e0b;
     /* Colores de los eventos del calendario */
     --ev-rutina: var(--accent);
-    --ev-personal: var(--up);
     --ev-importante: var(--warn);
     --ev-urgente: var(--down);
-    --ev-sub: #8b5cf6;
+    --ev-sub: var(--up);
 
     --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --pixel: var(--font);
@@ -102,7 +101,6 @@
       --wx-cloud-dark: #2a2e36;
       --wx-cloud-dark-line: #8b95a6;
       --wx-rain: #60a5fa;
-      --ev-sub: #b197fc;
       --shadow: none;
     }
   }
@@ -384,7 +382,6 @@
   .ag-item.past { opacity: 0.45; }
   .ag-time { font-size: 0.85rem; color: var(--text-mid); width: 78px; flex-shrink: 0; }
   .ag-title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.95rem; color: var(--text); overflow-wrap: anywhere; }
-  .ag-rep { color: var(--text-dim); font-size: 0.8rem; margin-left: 6px; }
   .ag-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ev-sub) 16%, transparent); color: var(--ev-sub); white-space: nowrap; }
   .ag-cost { color: var(--text-dim); font-size: 0.85rem; }
   .ag-rule { flex-basis: 100%; padding-left: 16px; font-size: 0.8rem; color: var(--text-dim); margin-top: 1px; }
@@ -658,7 +655,11 @@
   .card-meta .hl { color: var(--text); }
 
   /* Suscripciones */
-  .sub-add-form { display: grid; grid-template-columns: 1fr 150px 110px 130px auto; gap: 8px; margin-bottom: 14px; }
+  .sub-add-form { display: grid; grid-template-columns: 1fr 150px 110px auto auto; gap: 8px; margin-bottom: 14px; }
+  .sub-period { display: flex; gap: 6px; min-width: 0; }
+  .sub-period select { flex: 1; min-width: 0; }
+  .sub-period input { width: 76px; }
+  .sub-period input[hidden] { display: none; }
   .sub-totals { display: flex; gap: 22px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; }
   .sub-totals .hl { color: var(--text); font-weight: 500; }
   .sub-item { gap: 14px; }
@@ -1225,13 +1226,21 @@
       <input type="text" id="subName" placeholder="Dominio, streaming, seguro, ITV…">
       <input type="date" id="subDate" title="Próxima renovación">
       <input type="number" id="subCost" placeholder="Coste €" min="0" step="0.01">
-      <select id="subPeriod" title="Cada cuánto se renueva">
-        <option value="1">Mensual</option>
-        <option value="3">Trimestral</option>
-        <option value="12" selected>Anual</option>
-        <option value="24">Cada 2 años</option>
-        <option value="0">Una vez</option>
-      </select>
+      <div class="sub-period">
+        <select id="subPeriod" title="Cada cuánto se renueva" onchange="subPeriodChanged()">
+          <option value="1">Mensual</option>
+          <option value="2">Cada 2 meses</option>
+          <option value="3">Trimestral</option>
+          <option value="4">Cada 4 meses</option>
+          <option value="6">Semestral</option>
+          <option value="12" selected>Anual</option>
+          <option value="24">Cada 2 años</option>
+          <option value="36">Cada 3 años</option>
+          <option value="0">Una vez</option>
+          <option value="custom">Otro…</option>
+        </select>
+        <input type="number" id="subPeriodCustom" placeholder="meses" min="1" max="120" step="1" title="Cada cuántos meses" hidden>
+      </div>
       <button class="btn primary" type="submit" id="subSubmit">+ Añadir</button>
     </form>
     <div class="sub-totals" id="subTotals"></div>
@@ -3094,7 +3103,9 @@ function renderLinks() {
 /* ════════════════════════════════════════════════════════════════
    SUSCRIPCIONES Y RENOVACIONES
    ════════════════════════════════════════════════════════════════ */
-const SUB_PERIODS = { 1: 'mes', 3: 'trimestre', 12: 'año', 24: '2 años', 0: 'una vez' };
+// Periodo en meses → texto para «cada …» y «/…»
+const SUB_PERIOD_NAMES = { 1: 'mes', 3: 'trimestre', 6: 'semestre', 12: 'año' };
+const periodText = p => SUB_PERIOD_NAMES[p] || (p % 12 === 0 ? `${p / 12} años` : `${p} meses`);
 let editingSubId = null;
 
 // Suma meses a una fecha ISO sin desbordar (31 ene + 1 mes → 28/29 feb)
@@ -3130,7 +3141,10 @@ function saveSub() {
   const name = nameEl.value.trim();
   const date = dateEl.value;
   const cost = costEl.value === '' ? 0 : parseFloat(costEl.value);
-  const period = parseInt(document.getElementById('subPeriod').value, 10) || 0;
+  const periodSel = document.getElementById('subPeriod').value;
+  const customEl = document.getElementById('subPeriodCustom');
+  const period = periodSel === 'custom' ? parseInt(customEl.value, 10) : parseInt(periodSel, 10) || 0;
+  if (periodSel === 'custom' && !(period >= 1 && period <= 120)) { shake(customEl); return; }
   if (!name) shake(nameEl);
   if (!date) shake(dateEl);
   if (isNaN(cost) || cost < 0) shake(costEl);
@@ -3151,8 +3165,23 @@ function resetSubForm() {
   document.getElementById('subName').value = '';
   document.getElementById('subDate').value = '';
   document.getElementById('subCost').value = '';
-  document.getElementById('subPeriod').value = '12';
+  setSubPeriod(12);
   document.getElementById('subSubmit').textContent = '+ Añadir';
+}
+
+// Los periodos que no están en la lista se muestran como «Otro…» con su número de meses
+function setSubPeriod(p) {
+  const sel = document.getElementById('subPeriod');
+  const listed = [...sel.options].some(o => o.value === String(p));
+  sel.value = listed ? String(p) : 'custom';
+  document.getElementById('subPeriodCustom').value = listed ? '' : p;
+  subPeriodChanged();
+}
+function subPeriodChanged() {
+  const custom = document.getElementById('subPeriod').value === 'custom';
+  const input = document.getElementById('subPeriodCustom');
+  input.hidden = !custom;
+  if (custom && !input.value) input.focus();
 }
 
 function editSub(id) {
@@ -3162,7 +3191,7 @@ function editSub(id) {
   document.getElementById('subName').value = s.name;
   document.getElementById('subDate').value = s.date;
   document.getElementById('subCost').value = s.cost || '';
-  document.getElementById('subPeriod').value = String(Number(s.period) || 0);
+  setSubPeriod(Number(s.period) || 0);
   document.getElementById('subSubmit').textContent = '✓ Guardar';
   document.getElementById('subName').focus();
 }
@@ -3226,9 +3255,9 @@ function renderSubs() {
       <div class="sub-divider"></div>
       <div class="sub-info">
         <div class="sub-title">${escapeHtml(s.name)}</div>
-        <div class="sub-date-str">${dateStr}${period ? ' · cada ' + SUB_PERIODS[period] : ''}</div>
+        <div class="sub-date-str">${dateStr}${period ? ' · cada ' + periodText(period) : ''}</div>
       </div>
-      <div class="sub-cost">${s.cost ? fmtEur(s.cost) : '—'}<span class="per">${period ? '/' + SUB_PERIODS[period] : 'único'}</span></div>
+      <div class="sub-cost">${s.cost ? fmtEur(s.cost) : '—'}<span class="per">${period ? '/' + periodText(period) : 'único'}</span></div>
       <button class="sub-edit" onclick="editSub(${id})" title="Editar">✎</button>
       <button class="sub-del" onclick="deleteSub(${id})" title="Eliminar">✕</button>
     </div>`;
@@ -3478,13 +3507,12 @@ let evColorSel = null;                             // tipo elegido en el formula
 // Tipos de evento: el color del punto en el calendario y en la agenda
 const EV_TYPES = [
   { id: 'rutina',     label: 'Rutina' },
-  { id: 'personal',   label: 'Personal' },
   { id: 'importante', label: 'Importante' },
   { id: 'urgente',    label: 'Urgente' }
 ];
 const EV_SUB = { id: 'sub', label: 'Suscripción' };
-// Sin tipo elegido: lo que se repite es rutina y lo puntual, personal (también para eventos antiguos)
-const autoType = repeat => repeat && repeat !== 'none' ? 'rutina' : 'personal';
+// Sin tipo elegido (o con el antiguo «personal»): lo que se repite es rutina y lo puntual, importante
+const autoType = repeat => repeat && repeat !== 'none' ? 'rutina' : 'importante';
 const evType = ev => ev.sub ? 'sub' : (EV_TYPES.some(t => t.id === ev.color) ? ev.color : autoType(ev.repeat));
 const evDot = type => `<span class="ev-dot" style="background:var(--ev-${type})"></span>`;
 
@@ -3722,7 +3750,7 @@ function agendaItem(ev, date, nowHm) {
   const recurring = ev.repeat && ev.repeat !== 'none';
   return `<div class="ag-item${past ? ' past' : ''}">
     <span class="ag-time">${ev.time || 'Todo el día'}</span>
-    <span class="ag-title">${evDot(evType(ev))}${escapeHtml(ev.title)}${recurring ? '<span class="ag-rep" title="Se repite">↻</span>' : ''}</span>
+    <span class="ag-title">${evDot(evType(ev))}${escapeHtml(ev.title)}</span>
     <button class="ag-btn" onclick="editEvent(${id})" title="Editar">✎</button>
     ${recurring
       ? `<button class="ag-btn" onclick="skipOccurrence(${id},'${date}')" title="Quitar solo este día">Saltar</button>`
