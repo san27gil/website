@@ -360,7 +360,10 @@
   .cal-legend .ev-dot { width: 6px; height: 6px; }
   .cal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; padding: 14px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--bg-soft) 55%, transparent); }
   .cal-form[hidden] { display: none; }
-  .cal-form #evTitle, .cal-form select, .cal-form .ev-days, .cal-form .ev-colors, .cal-form .cal-form-btns { grid-column: 1 / -1; }
+  .cal-form #evTitle, .cal-form select, .cal-form .ev-days, .cal-form .ev-colors, .cal-form .cal-form-btns, .cal-form .ev-nodate { grid-column: 1 / -1; }
+  .cal-form [hidden] { display: none !important; }
+  .ev-nodate { justify-self: start; background: none; border: none; padding: 0 2px; font: inherit; font-size: 0.82rem; color: var(--text-mid); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
+  .ev-nodate:hover { color: var(--text); }
   .cal-form input, .cal-form select { width: 100%; }
   .cal-form-btns { display: flex; gap: 8px; }
   .cal-form-btns .btn.primary { flex: 1; }
@@ -397,6 +400,24 @@
   .ag-item:hover .ag-btn, .ag-btn:focus-visible { opacity: 1; }
   .ag-btn:hover { background: var(--bg-soft); color: var(--text); }
   #calManage { margin-top: 8px; }
+  .ev-check {
+    width: 20px; height: 20px; padding: 0;
+    border: 1.5px solid var(--line); border-radius: 50%;
+    background: none; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; line-height: 1; color: var(--on-solid);
+  }
+  .ev-check:hover { border-color: var(--accent); }
+  .ev-check-sp { width: 20px; flex-shrink: 0; }
+  .ag-item.done .ev-check { background: var(--up); border-color: var(--up); }
+  .ag-item.done .ag-title { text-decoration: line-through; color: var(--text-dim); }
+  .ag-item.done { opacity: 0.6; }
+  .ag-when { font-size: 0.8rem; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
+  .ag-when.late { color: var(--down); }
+  .ag-soon { margin-bottom: 14px; padding: 4px 12px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--bg-soft) 70%, transparent); }
+  .ag-soon .ag-day { padding-top: 10px; }
+  #calUndated { margin-top: 14px; }
+  #calUndated:empty { display: none; }
 
   /* ─── TIEMPO: sol y aire en una fila ─── */
   .wx-extra { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 24px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
@@ -441,12 +462,29 @@
   .activity-form > .btn { grid-column: 1 / -1; }
 
   /* ─── HABITS ─── */
-  .habit-table-wrap { overflow-x: auto; }
+  /* La tarjeta elige formato según su propio ancho: tabla si cabe, calendario por hábito si no */
+  .card[data-card="habits"] { container-type: inline-size; }
   .habit-table { width: 100%; border-collapse: separate; border-spacing: 2px; }
   .habit-table th { font-size: 0.7rem; color: var(--text-dim); padding: 2px 0; font-weight: 400; text-align: center; }
   .habit-name-col { text-align: left !important; min-width: 110px; }
   .habit-row td { padding: 0; vertical-align: middle; }
-  .habit-row .name-cell { font-size: 0.95rem; color: var(--text); padding-right: 8px; white-space: nowrap; }
+  .habit-row .name-cell { font-size: 0.95rem; color: var(--text); padding-right: 8px; max-width: 240px; overflow-wrap: anywhere; }
+  .habit-table th.habit-rate-col { text-align: right; padding-right: 4px; width: 44px; }
+  .habit-table.week th { font-size: 0.72rem; line-height: 1.3; }
+  .habit-table.week th:not(.habit-name-col):not(.habit-rate-col) { width: 42px; }
+  .habit-table.week th b { display: block; font-weight: 500; font-size: 0.85rem; color: var(--text-mid); }
+  .habit-table.week th.is-today b { color: var(--text); }
+  .habit-table.week .cell-box { width: 30px; height: 30px; border-radius: 8px; }
+  .habit-table.week .habit-row td { padding: 3px 0; }
+
+  .habit-views { display: inline-flex; background: var(--bg-soft); border-radius: 999px; padding: 3px; gap: 2px; }
+  .habit-views button {
+    background: none; border: none; border-radius: 999px;
+    color: var(--text-mid); font: inherit; font-size: 0.8rem;
+    padding: 4px 11px; cursor: pointer;
+  }
+  .habit-views button:hover { color: var(--text); }
+  .habit-views button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
   .streak {
     font-size: 0.75rem;
     color: var(--warn);
@@ -484,9 +522,9 @@
   /* Versión móvil: cada hábito con su calendario de 7 columnas */
   .habit-mobile { display: none; flex-direction: column; gap: 22px; }
   .hm-head { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-  .hm-name { font-size: 1rem; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hm-name { font-size: 1rem; color: var(--text); flex: 1; min-width: 0; overflow-wrap: anywhere; }
   .hm-rate { font-size: 0.85rem; color: var(--text-mid); }
-  .hm-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .hm-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; max-width: 460px; }
   .hm-wd { font-size: 0.68rem; color: var(--text-dim); text-align: center; padding-bottom: 2px; }
   .hm-day {
     aspect-ratio: 1.25; border: none; border-radius: 9px;
@@ -500,6 +538,15 @@
   .hm-day.done.today { color: var(--on-solid); }
   .hm-day.future { opacity: 0.35; cursor: default; }
   .hm-day.blank { visibility: hidden; }
+  @container (max-width: 720px) {
+    .habit-table.month { display: none; }
+    .habit-mobile.month { display: flex; }
+  }
+  @container (max-width: 420px) {
+    .habit-table.week { display: none; }
+    .habit-mobile.week { display: flex; gap: 16px; }
+    .habit-mobile.week .hm-head { margin-bottom: 6px; }
+  }
 
   .month-nav { display: inline-flex; align-items: center; gap: 2px; }
   .month-nav button {
@@ -632,44 +679,20 @@
 
   .refresh-icon { display: inline-block; }
 
-  /* ─── LISTAS (tareas, links, suscripciones, coche) ─── */
-  .todo-input-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-  .todo-input-row #todoInput { flex: 1 1 100%; }
-  .todo-input-row .todo-priority-select { flex: 1; }
-  .todo-priority-select { width: 120px; cursor: pointer; }
-  .todo-list, .links-list, .subs-list { display: flex; flex-direction: column; max-height: 420px; overflow-y: auto; }
-  .todo-item, .link-item, .sub-item, .mant-item {
+  /* ─── LISTAS (links, suscripciones, coche) ─── */
+  .links-list, .subs-list { display: flex; flex-direction: column; max-height: 420px; overflow-y: auto; }
+  .link-item, .sub-item, .mant-item {
     display: flex; align-items: center; gap: 12px;
     padding: 11px 4px;
     border-bottom: 1px solid var(--line-soft);
   }
-  .todo-item:last-child, .link-item:last-child, .sub-item:last-child, .mant-item:last-child { border-bottom: none; }
-  .todo-item.done { opacity: 0.5; }
-  .todo-check {
-    width: 20px; height: 20px;
-    border: 1.5px solid var(--line);
-    border-radius: 50%;
-    background: none;
-    cursor: pointer; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem; line-height: 1; color: var(--on-solid);
-  }
-  .todo-check:hover { border-color: var(--accent); }
-  .todo-item.done .todo-check { background: var(--up); border-color: var(--up); }
-  .todo-text { flex: 1; font-size: 0.95rem; color: var(--text); line-height: 1.35; min-width: 0; overflow-wrap: anywhere; }
-  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-dim); }
-  .todo-badge { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; flex-shrink: 0; }
-  .todo-badge.alta { background: color-mix(in srgb, var(--down) 14%, transparent); color: var(--down); }
-  .todo-badge.media { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
-  .todo-badge.baja { background: var(--bg-soft); color: var(--text-dim); }
-  .todo-del, .rep-del {
+  .link-item:last-child, .sub-item:last-child, .mant-item:last-child { border-bottom: none; }
+  .rep-del {
     background: none; border: none; color: var(--text-dim);
     cursor: pointer; font-size: 0.9rem; padding: 0 6px; opacity: 0;
   }
-  .todo-item:hover .todo-del, .rep-item:hover .rep-del { opacity: 1; }
-  .todo-del:hover, .rep-del:hover { color: var(--down); }
-  .todo-stats { display: flex; gap: 14px; font-size: 0.85rem; color: var(--text-dim); }
-  .todo-stats .hl { color: var(--text); }
+  .rep-item:hover .rep-del { opacity: 1; }
+  .rep-del:hover { color: var(--down); }
 
   /* Para luego */
   .link-add-form { display: flex; gap: 8px; margin-bottom: 14px; }
@@ -892,7 +915,7 @@
 
   /* En pantallas táctiles no hay hover: botones de editar/borrar siempre visibles */
   @media (hover: none) {
-    .todo-del, .sub-del, .sub-edit, .rep-del, .habit-delete, .habit-edit, .ag-btn { opacity: 1; }
+    .sub-del, .sub-edit, .rep-del, .habit-delete, .habit-edit, .ag-btn { opacity: 1; }
   }
 
   /* ─── RESPONSIVE ─── */
@@ -920,9 +943,9 @@
     .weather-temp { font-size: 3.4rem; }
     .weather-icon-big { width: 52px; height: 52px; }
     .rain-val { font-size: 0.6rem; }
-    .habit-table-wrap .habit-table { display: none; }
-    .habit-mobile { display: flex; }
-    .habit-card-head { width: 100%; justify-content: space-between; }
+    .habit-card-head { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    .habit-card-head .month-label { min-width: 84px; }
+    .habit-views button { padding: 4px 9px; }
     .sub-add-form { grid-template-columns: 1fr 1fr; }
     .sub-add-form #subName, .sub-add-form .btn { grid-column: 1 / -1; }
     .sub-item { gap: 10px; }
@@ -937,8 +960,6 @@
     .portfolio-add input[type="text"], .portfolio-add input[type="number"], .portfolio-add input[type="date"], .portfolio-add select { flex: 1 1 40%; width: auto; }
     .portfolio-add .btn { flex: 1 1 100%; }
     .input-row input[type="date"] { flex: 1 1 100% !important; }
-    .todo-input-row #todoInput { flex-basis: 100%; }
-    .todo-priority-select { flex: 1; }
     .btn { white-space: normal; }
     .cp-desc { display: none; }
   }
@@ -1038,8 +1059,9 @@
     <div class="mcal" id="miniCal"></div>
     <form class="cal-form" id="calForm" hidden onsubmit="event.preventDefault();saveEvent()">
       <input type="text" id="evTitle" placeholder="Clase de tenis, dentista…" autocomplete="off">
-      <input type="date" id="evDate" onchange="evDateChanged()" title="Fecha (o primer día si se repite)">
+      <input type="date" id="evDate" onchange="evDateChanged()" title="Fecha (o primer día si se repite). Vacía: sin fecha">
       <input type="time" id="evTime" title="Hora (opcional)">
+      <button type="button" class="ev-nodate" id="evNoDate" onclick="setNoDate(!evNoDate)" aria-pressed="false">Sin fecha</button>
       <select id="evRepeat" onchange="renderEvDays();renderEvColors()" title="Repetición">
         <option value="none">No se repite</option>
         <option value="daily">Cada día</option>
@@ -1055,6 +1077,7 @@
       </div>
     </form>
     <div class="agenda" id="agenda"></div>
+    <div class="agenda" id="calUndated"></div>
     <button class="links-toggle" id="calManageToggle" onclick="toggleCalManage()"></button>
     <div class="agenda" id="calManage" hidden></div>
   </div>
@@ -1131,11 +1154,15 @@
       <h3 class="card-title">Hábitos</h3>
       <div class="habit-card-head" style="display:flex;gap:8px;align-items:center">
         <div class="month-nav" id="monthNavControls">
-          <button onclick="changeMonth(-1)">‹</button>
+          <button onclick="changeHabitPeriod(-1)">‹</button>
           <span class="month-label" id="monthLabel"></span>
-          <button onclick="changeMonth(1)">›</button>
+          <button onclick="changeHabitPeriod(1)">›</button>
         </div>
-        <button class="btn ghost" id="expandBtn" style="padding:5px 12px" onclick="toggleYearView()">Año</button>
+        <div class="habit-views" role="group" aria-label="Vista">
+          <button data-view="week" onclick="setHabitView('week')">Semana</button>
+          <button data-view="month" onclick="setHabitView('month')">Mes</button>
+          <button data-view="year" onclick="setHabitView('year')">Año</button>
+        </div>
       </div>
     </div>
     <div class="input-row">
@@ -1243,26 +1270,6 @@
     </div>
   </div>
 
-  <!-- TODO LIST -->
-  <div class="card" data-card="todos">
-    <div class="card-head">
-      <h3 class="card-title">Tareas</h3>
-      <div class="todo-stats">
-        <span id="todoPending"><span class="hl" id="todoPendingN">0</span> pendientes</span>
-        <span id="todoDoneCount"><span class="hl" id="todoDoneN">0</span> hechas</span>
-      </div>
-    </div>
-    <div class="todo-input-row">
-      <input type="text" id="todoInput" placeholder="Nueva tarea…" onkeydown="if(event.key==='Enter')addTodo()">
-      <select class="todo-priority-select" id="todoPriority">
-        <option value="alta">🔴 Alta</option>
-        <option value="media" selected>🟡 Media</option>
-        <option value="baja">⚪ Baja</option>
-      </select>
-      <button class="btn primary" onclick="addTodo()">+ Añadir</button>
-    </div>
-    <div class="todo-list" id="todoList"></div>
-  </div>
 
   <!-- PARA LUEGO (links) -->
   <div class="card" data-card="links">
@@ -1437,10 +1444,11 @@ const DEFAULTS = {
   portfolio: {},
   fxRate: 0.92,
   goals: { steps: 10000, calories: 1850, exerciseMin: 30, stand: 12 },
-  todos: [],         // [{id, text, priority, done, createdAt}]
+  todos: [],         // obsoleto: las tareas pasaron al calendario (ver migrateCalendar); se conserva por si acaso
   links: [],        // [{id, url, title, addedAt, readAt}]
   subs: [],         // [{id, name, date, cost, period}]  period en meses (0 = una vez)
-  calendar: [],     // [{id, title, date, time, repeat: none|daily|weekly|monthly|yearly, days: [0-6], skip: [fechas]}]
+  calendar: [],     // [{id, title, date ('' = sin fecha), time, repeat: none|daily|weekly|monthly|yearly, days: [0-6], skip: [fechas], color, done, doneAt}]
+  inboxSeen: [],    // ids del buzón de Siri ya añadidos (para no duplicar si falla el borrado)
   coche: {
     km: 0,
     mantenimiento: [],   // [{id, concepto, kmObjetivo, notas, historial: [{fecha, km, kmObjetivoAnterior}]}]
@@ -1482,7 +1490,30 @@ function withDefaults(parsed) {
     }
     delete merged.events;
   }
-  return sanitizeData(merged);
+  return migrateCalendar(sanitizeData(merged));
+}
+
+// Las tareas viven ahora en el calendario: las pendientes pasan como eventos sin fecha
+const TODO_TO_TYPE = { alta: 'urgente', media: 'importante', baja: 'rutina' };
+let dataMigrated = false;   // si se migró algo al cargar, se guarda para que no se repita
+function migrateCalendar(d) {
+  if (d.todosMigrated && d.remindersFrom) return d;
+  dataMigrated = true;
+  const used = new Set(d.calendar.map(e => e.id));
+  if (!d.todosMigrated) d.todos.filter(t => !t.done && String(t.text || '').trim()).forEach(t => {
+    let id = t.id;
+    while (used.has(id)) id++;
+    used.add(id);
+    d.calendar.push({ id, title: String(t.text).trim(), date: '', time: '', repeat: 'none', days: [], skip: [], color: TODO_TO_TYPE[t.priority] || 'importante' });
+  });
+  d.todosMigrated = true;
+  // Antes de los avisos, todo lo puntual se guardaba como «importante»: lo ya pasado se da por
+  // hecho para que no aparezca de golpe como atrasado
+  if (!d.remindersFrom) {
+    d.remindersFrom = isoDate(new Date());
+    d.calendar.forEach(e => { if (e.date && e.date < d.remindersFrom && e.repeat === 'none') { e.done = true; e.doneAt = ''; } });
+  }
+  return d;
 }
 
 // Los datos pueden venir de un archivo importado: los ids acaban dentro de onclick,
@@ -1497,6 +1528,11 @@ function sanitizeData(d) {
   d.links = arr(d.links);
   d.subs = arr(d.subs);
   d.calendar = arr(d.calendar);
+  d.calendar.forEach(e => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(e.date)) { e.date = ''; e.repeat = 'none'; }
+    if (e.doneAt && !/^\d{4}-\d{2}-\d{2}$/.test(e.doneAt)) e.doneAt = '';
+  });
+  d.inboxSeen = Array.isArray(d.inboxSeen) ? d.inboxSeen.map(String).slice(-200) : [];
   [d.todos, d.links, d.subs, d.calendar].forEach(fixIds);
   if (!d.coche || typeof d.coche !== 'object') d.coche = structuredClone(DEFAULTS.coche);
   d.coche.mantenimiento = arr(d.coche.mantenimiento);
@@ -1590,6 +1626,7 @@ function applyCloud(remote) {
   lsDel(SYNC_DIRTY_KEY);
   pLoadKey();
   renderAll();
+  if (dataMigrated) { dataMigrated = false; saveDB(); }
 }
 
 async function pushToCloud(force = false) {
@@ -1653,6 +1690,71 @@ async function pullFromCloud() {
   }
 }
 
+/* ─── Buzón de Siri: lo dictado se guarda en el servidor y se añade aquí al abrir ─── */
+const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Añade un elemento del buzón a DB; devuelve un texto corto para el aviso o '' si no se pudo
+function applyInboxItem(it) {
+  if (it.type === 'event') {
+    const title = String(it.title || '').trim().slice(0, 300);
+    if (!title) return '';
+    const date = ISO_RE.test(it.date) ? it.date : '';
+    const time = date && /^\d{2}:\d{2}$/.test(it.time) ? it.time : '';
+    const color = EV_TYPES.some(t => t.id === it.color) ? it.color : autoType();
+    let id = Date.now();
+    while (DB.calendar.some(e => e.id === id)) id++;
+    DB.calendar.push({ id, title, date, time, repeat: 'none', days: [], skip: [], color });
+    return title;
+  }
+  if (it.type === 'link') {
+    const url = safeUrl(String(it.url || ''));
+    if (!url) return '';
+    storeLink({ url, title: String(it.title || '').slice(0, 300) });
+    return 'link guardado';
+  }
+  if (it.type === 'weight') {
+    const val = Number(it.val);
+    if (!ISO_RE.test(it.date) || !(val >= 20 && val <= 300)) return '';
+    DB.weight = DB.weight.filter(w => w.date !== it.date);
+    DB.weight.push({ date: it.date, val });
+    DB.weight.sort((a, b) => a.date.localeCompare(b.date));
+    return `peso ${String(val).replace('.', ',')} kg`;
+  }
+  if (it.type === 'habit') {
+    if (!DB.habits.includes(it.habit) || !ISO_RE.test(it.date)) return '';
+    DB.habitData[`${it.habit}__${it.date}`] = 'done';
+    return `${it.habit} hecho`;
+  }
+  return '';
+}
+
+async function pullInbox() {
+  if (!isOwner()) return;
+  try {
+    const res = await api('/inbox');
+    if (!res.ok) return;
+    const { items } = await res.json();
+    if (!Array.isArray(items) || !items.length) return;
+    const seen = new Set(DB.inboxSeen);
+    const added = [];
+    items.forEach(it => {
+      const id = String(it && it.id);
+      if (seen.has(id)) return;
+      const label = applyInboxItem(it);
+      if (label) added.push(label);
+      DB.inboxSeen.push(id);
+    });
+    DB.inboxSeen = DB.inboxSeen.slice(-200);
+    if (added.length) {
+      saveDB();
+      renderAll();
+      toast(added.length === 1 ? `Desde Siri: ${added[0]}` : `Desde Siri: ${added.length} cosas nuevas`);
+    }
+    // Si esto falla, inboxSeen evita duplicarlos la próxima vez
+    await api('/inbox', { method: 'DELETE', body: JSON.stringify({ ids: items.map(i => i && i.id) }) });
+  } catch (e) {}
+}
+
 // keepLocal: al caducar la sesión se conservan los datos y cambios sin subir de este
 // dispositivo; se sincronizan al volver a entrar. Al salir a propósito se borran.
 function endSession(msg, keepLocal = false) {
@@ -1667,9 +1769,14 @@ function endSession(msg, keepLocal = false) {
 /* ─── Login / logout ─── */
 // El botón de entrar solo se muestra con /dashboard/#acceso. Es solo para no enseñarlo a los
 // visitantes: la protección real es la contraseña + el código de verificación del servidor.
+// Abierto como app (añadida a la pantalla de inicio o al Dock) siempre se muestra: la app
+// arranca sin #acceso y en iOS tiene su propio almacenamiento, así que hay que entrar desde ella.
 const ACCESS_HASH = '#acceso';
+const isInstalledApp = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 function checkAccessHash() {
-  if (isOwner() || location.hash !== ACCESS_HASH) return;
+  if (isOwner()) return;
+  if (isInstalledApp()) document.getElementById('authBtn').hidden = false;
+  if (location.hash !== ACCESS_HASH) return;
   document.getElementById('authBtn').hidden = false;
   showLogin();
 }
@@ -1717,7 +1824,7 @@ async function doLogin() {
 // Al volver a la pestaña, traer cambios de otros dispositivos; al salir, subir lo pendiente
 document.addEventListener('visibilitychange', () => {
   if (!isOwner()) return;
-  if (document.visibilityState === 'visible') pullFromCloud();
+  if (document.visibilityState === 'visible') pullFromCloud().then(pullInbox);
   else if (lsGet(SYNC_DIRTY_KEY) === '1') {
     clearTimeout(syncTimer);
     fetch(API + '/data', {
@@ -1729,7 +1836,7 @@ document.addEventListener('visibilitychange', () => {
     }).catch(() => {});
   }
 });
-window.addEventListener('online', () => { if (isOwner()) pullFromCloud(); });
+window.addEventListener('online', () => { if (isOwner()) pullFromCloud().then(pullInbox); });
 
 /* ════════════════════════════════════════════════════════════════
    DATE & UTILS
@@ -2530,19 +2637,29 @@ async function importHealth(event) {
 /* ════════════════════════════════════════════════════════════════
    HABITS
    ════════════════════════════════════════════════════════════════ */
-let habitViewDate = new Date(now.getFullYear(), now.getMonth(), 1);
-let yearViewActive = false;
+// Vista semana / mes / año. Se recuerda por dispositivo (en el móvil suele interesar la semana).
+const HABIT_VIEW_KEY = 'habitView';
+let habitView = ['week', 'month', 'year'].includes(lsGet(HABIT_VIEW_KEY)) ? lsGet(HABIT_VIEW_KEY) : 'week';
+// Cualquier día dentro del periodo que se está viendo
+let habitViewDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-function changeMonth(d) {
-  habitViewDate = new Date(habitViewDate.getFullYear(), habitViewDate.getMonth() + d, 1);
+function setHabitView(v) {
+  habitView = v;
+  lsSet(HABIT_VIEW_KEY, v);
   renderHabits();
 }
 
-function toggleYearView() {
-  yearViewActive = !yearViewActive;
-  document.getElementById('expandBtn').textContent = yearViewActive ? 'Mes' : 'Año';
-  document.getElementById('monthNavControls').style.display = yearViewActive ? 'none' : 'inline-flex';
+function changeHabitPeriod(d) {
+  const y = habitViewDate.getFullYear(), m = habitViewDate.getMonth();
+  if (habitView === 'week') habitViewDate = new Date(y, m, habitViewDate.getDate() + 7 * d);
+  else if (habitView === 'month') habitViewDate = new Date(y, m + d, 1);
+  else habitViewDate = new Date(y + d, 0, 1);
   renderHabits();
+}
+
+// Lunes de la semana que contiene la fecha
+function weekStart(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - (d.getDay() + 6) % 7);
 }
 
 function addHabit() {
@@ -2619,61 +2736,69 @@ function calculateStreak(habit) {
   return streak;
 }
 
-function buildMonthTable(year, month) {
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  let html = `<table class="habit-table"><thead><tr><th class="habit-name-col">Hábito</th>`;
-  for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
-  html += `<th class="habit-name-col" style="text-align:right;padding-right:4px">%</th></tr></thead><tbody>`;
+const HABIT_WD = ['D','L','M','X','J','V','S'];
+
+// Días (YYYY-MM-DD) desde start, n días seguidos
+function habitDays(start, n) {
+  return Array.from({ length: n }, (_, k) => isoDate(new Date(start.getFullYear(), start.getMonth(), start.getDate() + k)));
+}
+
+// kind: 'week' | 'month'. Se generan las dos versiones (tabla y calendario) y el CSS
+// enseña una u otra según el ancho de la tarjeta, sin barra de desplazamiento.
+function buildHabitPeriod(days, kind) {
+  const week = kind === 'week';
+  let html = `<table class="habit-table ${kind}"><thead><tr><th class="habit-name-col">Hábito</th>`;
+  days.forEach(dStr => {
+    const d = +dStr.slice(8);
+    const wd = HABIT_WD[new Date(dStr + 'T12:00:00').getDay()];
+    html += week ? `<th class="${dStr === todayStr ? 'is-today' : ''}">${wd}<b>${d}</b></th>` : `<th>${d}</th>`;
+  });
+  html += `<th class="habit-rate-col">%</th></tr></thead><tbody>`;
 
   DB.habits.forEach((habit, i) => {
     const streak = calculateStreak(habit);
     html += `<tr class="habit-row"><td class="name-cell"><span class="habit-label" ondblclick="renameHabit(${i})" title="Doble clic para renombrar">${escapeHtml(habit)}</span>${streak > 1 ? `<span class="streak">${streak} días</span>` : ''}<button class="habit-edit" onclick="renameHabit(${i})" title="Renombrar">✎</button><button class="habit-delete" onclick="removeHabit(${i})" title="Eliminar">×</button></td>`;
-    let done = 0, total = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const isToday = dStr === todayStr;
+    days.forEach(dStr => {
       const isFuture = dStr > todayStr;
-      const state = DB.habitData[`${habit}__${dStr}`];
-      if (!isFuture) total++;
-      if (state === 'done') done++;
-      const classes = ['cell-box', state === 'done' ? 'done' : '', isToday ? 'today' : '', isFuture ? 'future' : ''].filter(Boolean).join(' ');
+      const done = DB.habitData[`${habit}__${dStr}`] === 'done';
+      const classes = ['cell-box', done ? 'done' : '', dStr === todayStr ? 'today' : '', isFuture ? 'future' : ''].filter(Boolean).join(' ');
       const click = isFuture ? '' : `onclick="toggleCell(${i},'${dStr}')"`;
       html += `<td><div class="${classes}" ${click} title="${dStr}"></div></td>`;
-    }
-    const pct = total > 0 ? Math.round(done / total * 100) : 0;
-    html += `<td class="habit-rate">${pct}%</td></tr>`;
+    });
+    html += `<td class="habit-rate">${habitPct(habit, days)}%</td></tr>`;
   });
   html += '</tbody></table>';
-  return html + buildMonthMobile(year, month);
+  return html + buildHabitMobile(days, kind);
 }
 
-// Móvil: un calendario de 7 columnas (lunes primero) por hábito, con casillas grandes para el dedo
-function buildMonthMobile(year, month) {
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const offset = (new Date(year, month, 1).getDay() + 6) % 7;
+function habitPct(habit, days) {
+  const past = days.filter(dStr => dStr <= todayStr);
+  const done = past.filter(dStr => DB.habitData[`${habit}__${dStr}`] === 'done').length;
+  return past.length ? Math.round(done / past.length * 100) : 0;
+}
+
+// Formato estrecho: un calendario de 7 columnas (lunes primero) por hábito, con casillas grandes para el dedo
+function buildHabitMobile(days, kind) {
+  const offset = (new Date(days[0] + 'T12:00:00').getDay() + 6) % 7;
   const head = ['L','M','X','J','V','S','D'].map(d => `<span class="hm-wd">${d}</span>`).join('');
-  let html = '<div class="habit-mobile">';
+  let html = `<div class="habit-mobile ${kind}">`;
   DB.habits.forEach((habit, i) => {
     const streak = calculateStreak(habit);
     let cells = '<span class="hm-day blank"></span>'.repeat(offset);
-    let done = 0, total = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    days.forEach(dStr => {
+      const d = +dStr.slice(8);
       const isFuture = dStr > todayStr;
       const isDone = DB.habitData[`${habit}__${dStr}`] === 'done';
-      if (!isFuture) total++;
-      if (isDone) done++;
       const cls = ['hm-day', isDone ? 'done' : '', dStr === todayStr ? 'today' : '', isFuture ? 'future' : ''].filter(Boolean).join(' ');
       cells += isFuture
         ? `<span class="${cls}">${d}</span>`
-        : `<button class="${cls}" onclick="toggleCell(${i},'${dStr}')" aria-pressed="${isDone}" aria-label="${escapeHtml(habit)}, ${d}">${d}</button>`;
-    }
-    const pct = total > 0 ? Math.round(done / total * 100) : 0;
+        : `<button class="${cls}" onclick="toggleCell(${i},'${dStr}')" aria-pressed="${isDone}" aria-label="${escapeHtml(habit)}, ${dStr}">${d}</button>`;
+    });
     html += `<div class="hm-item">
       <div class="hm-head">
         <span class="hm-name">${escapeHtml(habit)}</span>
         ${streak > 1 ? `<span class="streak">${streak} días</span>` : ''}
-        <span class="hm-rate">${pct}%</span>
+        <span class="hm-rate">${habitPct(habit, days)}%</span>
         <button class="habit-edit" onclick="renameHabit(${i})" title="Renombrar">✎</button>
         <button class="habit-delete" onclick="removeHabit(${i})" title="Eliminar">×</button>
       </div>
@@ -2685,23 +2810,35 @@ function buildMonthMobile(year, month) {
 
 function renderHabits() {
   const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  document.getElementById('monthLabel').textContent = `${months[habitViewDate.getMonth()]} ${habitViewDate.getFullYear()}`;
-  const wrap = document.getElementById('habitGrid');
-  if (DB.habits.length === 0) {
-    wrap.innerHTML = '<div class="empty-state">Añade tu primer hábito para empezar el seguimiento.</div>';
-    return;
-  }
-  if (yearViewActive) {
-    const year = now.getFullYear();
-    let html = '';
-    for (let m = 0; m < 12; m++) {
-      html += `<div class="year-month-header">${months[m]} ${year}</div>`;
-      html += buildMonthTable(year, m);
-    }
-    wrap.innerHTML = html;
+  const short = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const y = habitViewDate.getFullYear(), m = habitViewDate.getMonth();
+  const label = document.getElementById('monthLabel');
+  document.querySelectorAll('.habit-views button').forEach(b => b.classList.toggle('active', b.dataset.view === habitView));
+
+  let html;
+  if (habitView === 'week') {
+    const start = weekStart(habitViewDate);
+    const end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+    label.textContent = start.getMonth() === end.getMonth()
+      ? `${start.getDate()}–${end.getDate()} ${short[end.getMonth()]}`
+      : `${start.getDate()} ${short[start.getMonth()]}–${end.getDate()} ${short[end.getMonth()]}`;
+    html = buildHabitPeriod(habitDays(start, 7), 'week');
+  } else if (habitView === 'month') {
+    label.textContent = `${months[m]} ${y}`;
+    html = buildHabitPeriod(habitDays(new Date(y, m, 1), new Date(y, m + 1, 0).getDate()), 'month');
   } else {
-    wrap.innerHTML = buildMonthTable(habitViewDate.getFullYear(), habitViewDate.getMonth());
+    label.textContent = String(y);
+    html = '';
+    for (let mm = 0; mm < 12; mm++) {
+      html += `<div class="year-month-header">${months[mm]} ${y}</div>`;
+      html += buildHabitPeriod(habitDays(new Date(y, mm, 1), new Date(y, mm + 1, 0).getDate()), 'month');
+    }
   }
+
+  const wrap = document.getElementById('habitGrid');
+  wrap.innerHTML = DB.habits.length
+    ? html
+    : '<div class="empty-state">Añade tu primer hábito para empezar el seguimiento.</div>';
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -3255,59 +3392,6 @@ window.addEventListener('resize', () => {
 });
 
 /* ════════════════════════════════════════════════════════════════
-   TODO LIST
-   ════════════════════════════════════════════════════════════════ */
-function addTodo() {
-  const text = document.getElementById('todoInput').value.trim();
-  if (!text) { document.getElementById('todoInput').classList.add('shake'); setTimeout(() => document.getElementById('todoInput').classList.remove('shake'), 400); return; }
-  const priority = document.getElementById('todoPriority').value;
-  if (!DB.todos) DB.todos = [];
-  DB.todos.unshift({ id: Date.now(), text, priority, done: false, createdAt: Date.now() });
-  saveDB();
-  document.getElementById('todoInput').value = '';
-  renderTodos();
-}
-
-function toggleTodo(id) {
-  const item = DB.todos.find(t => t.id === id);
-  if (item) { item.done = !item.done; saveDB(); renderTodos(); }
-}
-
-function deleteTodo(id) {
-  DB.todos = DB.todos.filter(t => t.id !== id);
-  saveDB(); renderTodos();
-}
-
-function renderTodos() {
-  if (!DB.todos) DB.todos = [];
-  const list = document.getElementById('todoList');
-  const priorityOrder = { alta: 0, media: 1, baja: 2 };
-  const sorted = [...DB.todos].sort((a, b) => {
-    if (a.done !== b.done) return a.done ? 1 : -1;
-    return (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1);
-  });
-  const pending = DB.todos.filter(t => !t.done).length;
-  const done = DB.todos.filter(t => t.done).length;
-  document.getElementById('todoPendingN').textContent = pending;
-  document.getElementById('todoDoneN').textContent = done;
-  if (!sorted.length) {
-    list.innerHTML = '<div class="empty-state">Sin tareas. ¡Añade la primera!</div>';
-    return;
-  }
-  const badgeLabels = { alta: 'Alta', media: 'Media', baja: 'Baja' };
-  list.innerHTML = sorted.map(t => {
-    const prio = badgeLabels[t.priority] ? t.priority : 'media';
-    return `
-    <div class="todo-item${t.done ? ' done' : ''}">
-      <div class="todo-check" onclick="toggleTodo(${Number(t.id)})">${t.done ? '✓' : ''}</div>
-      <span class="todo-text">${escapeHtml(t.text)}</span>
-      <span class="todo-badge ${prio}">${badgeLabels[prio]}</span>
-      <button class="todo-del" onclick="deleteTodo(${Number(t.id)})">✕</button>
-    </div>`;
-  }).join('');
-}
-
-/* ════════════════════════════════════════════════════════════════
    PARA LUEGO — links guardados en el tren para leer en casa
    ════════════════════════════════════════════════════════════════ */
 const LINK_STALE_DAYS = 5;
@@ -3348,15 +3432,24 @@ function addLink() {
   const input = document.getElementById('linkInput');
   const parsed = parseLinkInput(input.value);
   if (!parsed) { shake(input); toast('Eso no parece un link', 'error'); return; }
-  if (!Array.isArray(DB.links)) DB.links = [];
-  const dup = DB.links.find(l => l.url === parsed.url);
-  if (dup && !dup.readAt) { toast('Ese link ya está en la lista'); input.value = ''; return; }
-  if (dup) DB.links = DB.links.filter(l => l !== dup);
-  DB.links.unshift({ id: Date.now(), url: parsed.url, title: parsed.title, addedAt: Date.now(), readAt: null });
-  saveDB();
+  const added = storeLink(parsed);
   input.value = '';
+  if (!added) { toast('Ese link ya está en la lista'); return; }
+  saveDB();
   renderLinks();
   toast('Guardado para luego');
+}
+
+// false si ya estaba pendiente de leer; si estaba leído, vuelve arriba como nuevo
+function storeLink({ url, title }) {
+  if (!Array.isArray(DB.links)) DB.links = [];
+  const dup = DB.links.find(l => l.url === url);
+  if (dup && !dup.readAt) return false;
+  if (dup) DB.links = DB.links.filter(l => l !== dup);
+  let id = Date.now();
+  while (DB.links.some(l => l.id === id)) id++;
+  DB.links.unshift({ id, url, title, addedAt: Date.now(), readAt: null });
+  return true;
 }
 
 function openLink(id) {
@@ -3834,21 +3927,23 @@ let calMonth = todayStr.slice(0, 8) + '01';        // mes que se ve en el calend
 let calSel = null;                                 // día pulsado: la agenda muestra solo ese día
 let evColorSel = null;                             // tipo elegido en el formulario (null = automático)
 
-// Tipos de evento: el color del punto en el calendario y en la agenda
+// Tipos de evento: el color del punto en el calendario y en la agenda.
+// El id 'rutina' se mantiene por compatibilidad con los datos guardados; se muestra como «Evento».
 const EV_TYPES = [
-  { id: 'rutina',     label: 'Rutina' },
+  { id: 'rutina',     label: 'Evento' },
   { id: 'importante', label: 'Importante' },
   { id: 'urgente',    label: 'Urgente' }
 ];
 const EV_SUB = { id: 'sub', label: 'Suscripción' };
-// Sin tipo elegido (o con el antiguo «personal»): lo que se repite es rutina y lo puntual, importante
-const autoType = repeat => repeat && repeat !== 'none' ? 'rutina' : 'importante';
+// Sin tipo elegido (o con el antiguo «personal»): evento normal. Importante y urgente se eligen a mano.
+const autoType = () => 'rutina';
 const evType = ev => ev.sub ? 'sub' : (EV_TYPES.some(t => t.id === ev.color) ? ev.color : autoType(ev.repeat));
 const evDot = type => `<span class="ev-dot" style="background:var(--ev-${type})"></span>`;
 
 const dow = iso => new Date(iso + 'T12:00:00').getDay();
 
 function occursOn(ev, iso) {
+  if (!ev.date) return false;
   if (iso < ev.date || (ev.skip || []).includes(iso)) return false;
   switch (ev.repeat) {
     case 'daily':   return true;
@@ -3900,7 +3995,8 @@ function ruleText(ev) {
     }
     case 'monthly': return `Cada mes, el día ${Number(ev.date.slice(8))}` + t;
     case 'yearly':  return 'Cada año, el ' + new Date(ev.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long' }) + t;
-    default:        return new Date(ev.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '') + t;
+    default:        if (!ev.date) return 'Sin fecha';
+                    return new Date(ev.date + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).replace('.', '') + t;
   }
 }
 
@@ -3931,10 +4027,13 @@ function saveEvent() {
   const time = document.getElementById('evTime').value;
   const repeat = document.getElementById('evRepeat').value;
   if (!title) shake(titleEl);
-  if (!date) shake(dateEl);
-  if (!title || !date) return;
+  // Sin fecha solo vale para lo que no se repite (un pendiente)
+  if (!date && (repeat !== 'none' || !evNoDate)) shake(dateEl);
+  if (!title || (!date && (repeat !== 'none' || !evNoDate))) return;
   if (repeat === 'weekly' && !evDaysSel.length) { shake(document.getElementById('evDays')); return; }
-  const data = { title, date, time, repeat, days: repeat === 'weekly' ? [...evDaysSel] : [], color: evColorSel || autoType(repeat) };
+  const data = evNoDate
+    ? { title, date: '', time: '', repeat: 'none', days: [], color: evColorSel || autoType() }
+    : { title, date, time, repeat, days: repeat === 'weekly' ? [...evDaysSel] : [], color: evColorSel || autoType(repeat) };
 
   const existing = editingEventId !== null && DB.calendar.find(e => e.id === editingEventId);
   if (existing) Object.assign(existing, data);
@@ -3949,6 +4048,7 @@ function resetEventForm() {
   editingEventId = null;
   evDaysSel = [];
   evColorSel = null;
+  setNoDate(false);
   document.getElementById('evTitle').value = '';
   document.getElementById('evDate').value = calSel || todayStr;
   document.getElementById('evTime').value = '';
@@ -3965,6 +4065,27 @@ function renderEvColors() {
   ).join('');
 }
 function pickEvColor(id) { evColorSel = id; renderEvColors(); }
+
+// «Sin fecha»: un pendiente que no va en ningún día concreto
+let evNoDate = false;
+function setNoDate(on) {
+  evNoDate = on;
+  ['evDate', 'evTime', 'evRepeat'].forEach(id => { document.getElementById(id).hidden = on; });
+  if (on) { document.getElementById('evRepeat').value = 'none'; renderEvDays(); }
+  else if (!document.getElementById('evDate').value) document.getElementById('evDate').value = calSel || todayStr;
+  const btn = document.getElementById('evNoDate');
+  btn.textContent = on ? 'Ponerle fecha' : 'Sin fecha';
+  btn.setAttribute('aria-pressed', on);
+}
+
+function toggleEventDone(id) {
+  const ev = DB.calendar.find(e => e.id === id);
+  if (!ev) return;
+  ev.done = !ev.done;
+  ev.doneAt = ev.done ? todayStr : '';
+  saveDB();
+  renderCalendar();
+}
 
 function setEventFormOpen(open) {
   document.getElementById('calForm').hidden = !open;
@@ -3992,6 +4113,7 @@ function editEvent(id) {
   document.getElementById('evDate').value = ev.date;
   document.getElementById('evTime').value = ev.time || '';
   document.getElementById('evRepeat').value = ev.repeat || 'none';
+  setNoDate(!ev.date);
   evDaysSel = [...(ev.days || [])];
   evColorSel = evType(ev);
   renderEvDays();
@@ -4078,7 +4200,8 @@ function agendaItem(ev, date, nowHm) {
   }
   const past = date < todayStr || (date === todayStr && ev.time && ev.time < nowHm);
   const recurring = ev.repeat && ev.repeat !== 'none';
-  return `<div class="ag-item${past ? ' past' : ''}">
+  return `<div class="ag-item${ev.done ? ' done' : past ? ' past' : ''}">
+    ${recurring ? '<span class="ev-check-sp"></span>' : evCheck(ev)}
     <span class="ag-time">${ev.time || 'Todo el día'}</span>
     <span class="ag-title">${evDot(evType(ev))}${escapeHtml(ev.title)}</span>
     <button class="ag-btn" onclick="editEvent(${id})" title="Editar">✎</button>
@@ -4088,25 +4211,67 @@ function agendaItem(ev, date, nowHm) {
   </div>`;
 }
 
+const evCheck = ev => `<button class="ev-check" onclick="toggleEventDone(${Number(ev.id)})" title="${ev.done ? 'Marcar como pendiente' : 'Marcar como hecho'}" aria-pressed="${!!ev.done}">${ev.done ? '✓' : ''}</button>`;
+
+// Lo urgente avisa antes que lo importante. Lo que se pasa de fecha sin hacer sigue avisando.
+const LEAD_DAYS = { urgente: 14, importante: 7 };
+const TYPE_RANK = { urgente: 0, importante: 1, rutina: 2 };
+const visibleDone = ev => !ev.done || ev.doneAt === todayStr;   // lo hecho hoy se ve tachado
+
+function upcomingReminders() {
+  return DB.calendar
+    .filter(ev => ev.date && ev.repeat === 'none' && LEAD_DAYS[evType(ev)] && visibleDone(ev) &&
+      ev.date <= addDays(todayStr, LEAD_DAYS[evType(ev)]))
+    .sort((a, b) => a.date.localeCompare(b.date) || TYPE_RANK[evType(a)] - TYPE_RANK[evType(b)] || (a.time || '').localeCompare(b.time || ''));
+}
+
+function whenLabel(ev) {
+  const days = Math.round((new Date(ev.date + 'T12:00:00') - new Date(todayStr + 'T12:00:00')) / 86400000);
+  const t = ev.time ? ` · ${ev.time}` : '';
+  if (days < 0) return `<span class="ag-when${ev.done ? '' : ' late'}">${days === -1 ? 'Ayer' : `Hace ${-days} días`}</span>`;
+  if (days === 0) return `<span class="ag-when">Hoy${t}</span>`;
+  if (days === 1) return `<span class="ag-when">Mañana${t}</span>`;
+  return `<span class="ag-when" title="${dayLabel(ev.date)}">En ${days} días</span>`;
+}
+
+function reminderItem(ev, withWhen) {
+  const id = Number(ev.id);
+  return `<div class="ag-item${ev.done ? ' done' : ''}">
+    ${evCheck(ev)}
+    <span class="ag-title">${evDot(evType(ev))}${escapeHtml(ev.title)}</span>
+    ${withWhen ? whenLabel(ev) : ''}
+    <button class="ag-btn" onclick="editEvent(${id})" title="Editar">✎</button>
+    ${withWhen ? '' : `<button class="ag-btn" onclick="deleteEvent(${id})" title="Borrar">✕</button>`}
+  </div>`;
+}
+
 function renderCalendar() {
   if (!Array.isArray(DB.calendar)) DB.calendar = [];
   renderMiniCal();
-  const occ = occurrences(todayStr, CAL_DAYS_AHEAD);
+  const soon = upcomingReminders();
+  const soonIds = new Set(soon.map(ev => ev.id));
+  // Lo que ya sale en «Se acerca» no se repite en la lista de días
+  const occ = occurrences(todayStr, CAL_DAYS_AHEAD).filter(o => !soonIds.has(o.ev.id) || o.ev.sub);
   const nowHm = new Date().toTimeString().slice(0, 5);
-  const todayCount = occ.filter(o => o.date === todayStr).length;
-  document.getElementById('calMeta').innerHTML = todayCount
-    ? `<span class="hl">${todayCount}</span> hoy`
-    : (occ.length ? 'nada hoy' : '');
+  const todayCount = occ.filter(o => o.date === todayStr).length + soon.filter(ev => ev.date === todayStr).length;
+  const late = soon.filter(ev => ev.date < todayStr && !ev.done).length;
+  document.getElementById('calMeta').innerHTML = [
+    todayCount ? `<span class="hl">${todayCount}</span> hoy` : (occ.length || soon.length ? 'nada hoy' : ''),
+    late ? `<span style="color:var(--down)">${late} atrasado${late !== 1 ? 's' : ''}</span>` : ''
+  ].filter(Boolean).join(' · ');
 
   const agenda = document.getElementById('agenda');
   if (calSel) {
     const dayOcc = occurrences(calSel, 1);
     agenda.innerHTML = `<div class="ag-day${calSel === todayStr ? ' today' : ''}">${dayLabel(calSel)}</div>` +
       (dayOcc.length ? dayOcc.map(o => agendaItem(o.ev, o.date, nowHm)).join('') : '<div class="empty-state">Nada este día.</div>');
-  } else if (!occ.length) {
+  } else if (!occ.length && !soon.length) {
     agenda.innerHTML = `<div class="empty-state">Nada en los próximos ${CAL_DAYS_AHEAD} días.</div>`;
   } else {
-    let html = '', lastDate = '';
+    let html = soon.length
+      ? `<div class="ag-soon"><div class="ag-day">Se acerca</div>${soon.map(ev => reminderItem(ev, true)).join('')}</div>`
+      : '';
+    let lastDate = '';
     occ.forEach(({ ev, date }) => {
       if (date !== lastDate) { html += `<div class="ag-day${date === todayStr ? ' today' : ''}">${dayLabel(date)}</div>`; lastDate = date; }
       html += agendaItem(ev, date, nowHm);
@@ -4114,13 +4279,20 @@ function renderCalendar() {
     agenda.innerHTML = html;
   }
 
+  const undated = DB.calendar.filter(ev => !ev.date && visibleDone(ev))
+    .sort((a, b) => (!!a.done - !!b.done) || TYPE_RANK[evType(a)] - TYPE_RANK[evType(b)]);
+  document.getElementById('calUndated').innerHTML = undated.length
+    ? `<div class="ag-day">Sin fecha</div>${undated.map(ev => reminderItem(ev, false)).join('')}`
+    : '';
+
+  const total = DB.calendar.filter(visibleDone).length;
   const toggle = document.getElementById('calManageToggle');
-  toggle.style.display = DB.calendar.length ? '' : 'none';
-  toggle.textContent = showCalManage ? `▾ Ocultar eventos (${DB.calendar.length})` : `▸ Todos los eventos (${DB.calendar.length})`;
+  toggle.style.display = total ? '' : 'none';
+  toggle.textContent = showCalManage ? `▾ Ocultar eventos (${total})` : `▸ Todos los eventos (${total})`;
   const manage = document.getElementById('calManage');
   manage.hidden = !showCalManage;
   if (showCalManage) {
-    const sorted = [...DB.calendar].sort((a, b) =>
+    const sorted = DB.calendar.filter(visibleDone).sort((a, b) =>
       ((a.repeat === 'none') - (b.repeat === 'none')) || a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
     manage.innerHTML = sorted.map(ev => `
       <div class="ag-item">
@@ -4135,10 +4307,9 @@ function renderCalendar() {
    TARJETAS — cuáles se muestran y en qué orden (DB.layout)
    ════════════════════════════════════════════════════════════════ */
 const CARDS = [
-  { id: 'calendar',  name: 'Calendario',     desc: 'Tus eventos de la semana; pueden repetirse' },
+  { id: 'calendar',  name: 'Calendario',     desc: 'Eventos y pendientes; avisa antes de lo urgente' },
   { id: 'weather',   name: 'Tiempo',         desc: 'Lluvia hora a hora, amanecer y calidad del aire' },
   { id: 'habits',    name: 'Hábitos',        desc: 'Calendario mensual con rachas' },
-  { id: 'todos',     name: 'Tareas',         desc: 'Lista de pendientes con prioridad' },
   { id: 'links',     name: 'Para luego',     desc: 'Links guardados para leer más tarde' },
   { id: 'weight',    name: 'Peso corporal',  desc: 'Registro y gráfica de 12 meses' },
   { id: 'activity',  name: 'Actividad',      desc: 'Pasos, calorías y ejercicio; importa de Apple Salud' },
@@ -4147,7 +4318,7 @@ const CARDS = [
   { id: 'coche',     name: 'Coche',          desc: 'Mantenimiento y consumo' }
 ];
 const CARD_IDS = CARDS.map(c => c.id);
-const FIRST_RUN_CARDS = ['calendar', 'weather', 'habits', 'todos', 'links'];
+const FIRST_RUN_CARDS = ['calendar', 'weather', 'habits', 'links'];
 
 // Sin layout guardado se muestra todo (p. ej. quien ya usaba el dashboard antes de esto)
 function layout() {
@@ -4156,7 +4327,7 @@ function layout() {
 const cardOn = id => layout().includes(id);
 
 function hasAnyData() {
-  return DB.weight.length || DB.habits.length || DB.todos.length || DB.links.length || DB.subs.length || DB.calendar.length ||
+  return DB.weight.length || DB.habits.length || DB.links.length || DB.subs.length || DB.calendar.length ||
     Object.keys(DB.activity).length || Object.keys(DB.portfolio).length ||
     (DB.coche && (DB.coche.km || DB.coche.repostajes.length || DB.coche.mantenimiento.length));
 }
@@ -4249,7 +4420,6 @@ function renderAll() {
   renderHabits();
   pRenderHoldings();
   pUpdateStats();
-  renderTodos();
   renderLinks();
   renderSubs();
   renderCoche();
@@ -4261,12 +4431,13 @@ renderEvColors();
 (function(){ const el = document.getElementById('repDate'); if (el) el.value = todayStr; })();
 
 renderAll();
+if (dataMigrated) { dataMigrated = false; saveDB(); }
 if (isOwner()) {
   document.getElementById('authBtn').textContent = 'Salir';
   document.getElementById('authBtn').title = 'Cerrar sesión en este dispositivo';
   document.getElementById('authBtn').hidden = false;
   setSyncStatus(lsGet(SYNC_DIRTY_KEY) === '1' ? 'pending' : 'ok');
-  pullFromCloud();
+  pullFromCloud().then(pullInbox);
 } else {
   setSyncStatus('local');
   checkAccessHash();
