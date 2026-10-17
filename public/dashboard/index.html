@@ -540,6 +540,44 @@
   .apikey-row .lbl { font-size: 0.85rem; color: var(--text-dim); }
   .apikey-row input { flex: 1; min-width: 180px; font-size: 0.88rem; background: var(--surface); }
   .apikey-status { font-size: 0.85rem; }
+  .apikey-row[hidden] { display: none; }
+  #apiKeyToggle { padding: 6px 12px; font-size: 0.85rem; }
+  #apiKeyToggle.missing { color: var(--warn); }
+
+  /* Evolución diaria y métricas de riesgo */
+  #pHistToggle { margin: -6px 0 14px; }
+  .p-hist { margin-bottom: 22px; }
+  .p-hist[hidden] { display: none; }
+  .p-hist-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .p-range { display: inline-flex; gap: 2px; background: var(--bg-soft); border-radius: 999px; padding: 3px; }
+  .p-range button { border: none; background: none; color: var(--text-mid); font: inherit; font-size: 0.8rem; padding: 4px 12px; border-radius: 999px; cursor: pointer; }
+  .p-range button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+  .p-hist-note { font-size: 0.8rem; color: var(--text-dim); }
+  .p-chart { position: relative; height: 200px; }
+  .p-chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .p-chart .p-line { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .p-chart .p-area { fill: var(--accent-soft); stroke: none; }
+  .p-chart .p-cost { fill: none; stroke: var(--text-dim); stroke-width: 1.2; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+  .p-chart .p-grid { stroke: var(--line-soft); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .p-axis { position: absolute; font-size: 0.7rem; color: var(--text-dim); pointer-events: none; white-space: nowrap; }
+  .p-cursor { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); pointer-events: none; display: none; }
+  .p-cursor i { position: absolute; left: -4px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+  .p-tip {
+    position: absolute; top: -6px; transform: translate(-50%, -100%); pointer-events: none; display: none; z-index: 2;
+    background: var(--text); color: var(--surface); font-size: 0.75rem; padding: 5px 9px; border-radius: 8px; white-space: nowrap;
+  }
+  .p-chart-msg { height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 0.88rem; color: var(--text-dim); border: 1px dashed var(--line); border-radius: var(--radius-sm); padding: 0 20px; }
+  .p-legend { display: flex; gap: 16px; font-size: 0.75rem; color: var(--text-dim); margin-top: 26px; }
+  .p-legend:empty { display: none; }
+  .p-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .p-legend i { display: inline-block; width: 14px; height: 0; border-top: 2px solid var(--accent); }
+  .p-legend i.cost { border-top: 1.5px dashed var(--text-dim); }
+  .p-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
+  .p-metrics .lbl { font-size: 0.76rem; color: var(--text-dim); margin-bottom: 3px; }
+  .p-metrics .val { font-weight: 300; font-size: 1.3rem; letter-spacing: -0.02em; color: var(--text); }
+  .p-metrics .val.up { color: var(--up); }
+  .p-metrics .val.down { color: var(--down); }
+  .p-metrics .hint { font-size: 0.74rem; color: var(--text-dim); margin-top: 2px; }
 
   .portfolio-add { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
   .portfolio-add input[type="text"] { width: 110px; text-transform: uppercase; }
@@ -870,6 +908,8 @@
     .grid { gap: 14px; }
     .card { padding: 20px 18px 22px; border-radius: 18px; }
     .portfolio-top { grid-template-columns: 1fr 1fr; }
+    .p-metrics { grid-template-columns: 1fr 1fr; }
+    .p-chart { height: 170px; }
     .stat-row .val, .ring-stat .value, .rep-stat .val { font-size: 1.25rem; }
     .weather-temp { font-size: 3.4rem; }
     .weather-icon-big { width: 52px; height: 52px; }
@@ -1113,13 +1153,14 @@
       <h3 class="card-title">Portfolio</h3>
       <div style="display:flex;gap:10px;align-items:center;margin-left:auto">
         <span id="portfolioStatus" style="font-family:var(--mono);font-size:0.84rem;color:var(--up);display:none">● en vivo</span>
+        <button class="btn ghost" id="apiKeyToggle" onclick="pToggleKeyRow()" aria-expanded="false" aria-controls="apikeyRow" title="API key de Alpha Vantage">API</button>
         <button class="btn" onclick="pRefreshPrices()" style="display:inline-flex;align-items:center;gap:6px">
           <span class="refresh-icon" id="refreshIcon">↻</span> Actualizar
         </button>
       </div>
     </div>
 
-    <div class="apikey-row" id="apikeyRow">
+    <div class="apikey-row" id="apikeyRow" hidden>
       <span class="lbl">Alpha Vantage API key</span>
       <input type="text" id="apiKeyInput" placeholder="Pega tu API key y guarda">
       <button class="btn primary" style="padding:7px 14px" onclick="pSaveKey()">Guardar</button>
@@ -1157,6 +1198,21 @@
         <div class="lbl">Posiciones</div>
         <div class="val" id="pPositions">0</div>
       </div>
+    </div>
+
+    <button class="links-toggle" id="pHistToggle" onclick="pToggleHistory()" aria-expanded="false" aria-controls="pHist">▸ Evolución y riesgo</button>
+    <div class="p-hist" id="pHist" hidden>
+      <div class="p-hist-head">
+        <div class="p-range" role="group" aria-label="Periodo">
+          <button type="button" data-days="21" onclick="pSetRange(21)">1M</button>
+          <button type="button" data-days="63" onclick="pSetRange(63)">3M</button>
+          <button type="button" data-days="0" onclick="pSetRange(0)">Todo</button>
+        </div>
+        <span class="p-hist-note" id="pHistNote"></span>
+      </div>
+      <div class="p-chart" id="pChart"></div>
+      <div class="p-legend" id="pLegend"></div>
+      <div class="p-metrics" id="pMetrics"></div>
     </div>
 
     <div class="stocks-wrap">
@@ -2628,10 +2684,22 @@ document.getElementById('pDate').valueAsDate = new Date();
   }
 })();
 
+// La fila de la API key solo se ve si falta la key o si se abre con el botón «API»
 function pSetKeyStatus(ok) {
   const el = document.getElementById('apikeyStatus');
   el.textContent = ok ? '✓ guardada' : 'requerida';
   el.style.color = ok ? 'var(--up)' : 'var(--text-dim)';
+  document.getElementById('apiKeyToggle').classList.toggle('missing', !ok);
+  pShowKeyRow(!ok);
+}
+function pShowKeyRow(show) {
+  document.getElementById('apikeyRow').hidden = !show;
+  document.getElementById('apiKeyToggle').setAttribute('aria-expanded', show);
+}
+function pToggleKeyRow() {
+  const show = document.getElementById('apikeyRow').hidden;
+  pShowKeyRow(show);
+  if (show) document.getElementById('apiKeyInput').focus();
 }
 
 function pSaveKey() {
@@ -2642,6 +2710,7 @@ function pSaveKey() {
   else lsSet('alphaVantageApiKey', pApiKey);
   pSetKeyStatus(true);
   pUpdateFxRate();
+  pHistCache = null;
   toast('API key guardada');
 }
 
@@ -2721,6 +2790,7 @@ function pDeleteLot(symbol, lotId) {
   saveDB();
   pRenderHoldings();
   pUpdateStats();
+  pRenderHistory();
 }
 
 function pToggleLots(symbol) {
@@ -2769,6 +2839,7 @@ async function pRefreshPrices() {
   document.getElementById('refreshIcon').style.animation = '';
   pRenderHoldings();
   pUpdateStats();
+  if (!document.getElementById('pHist').hidden) pLoadHistory();
 }
 
 function pFmtEur(n) { return new Intl.NumberFormat('es-ES', { style:'currency', currency:'EUR', minimumFractionDigits:2 }).format(n); }
@@ -2905,6 +2976,217 @@ function pRenderHoldings() {
     }
   });
   tbody.innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   PORTFOLIO — evolución diaria y métricas de riesgo
+   Cierres diarios de Alpha Vantage (≈100 sesiones en el plan gratuito).
+   Se guardan en este navegador y se piden como mucho una vez al día,
+   porque el plan gratuito solo da ~25 peticiones diarias.
+   ════════════════════════════════════════════════════════════════ */
+const P_BENCH = 'SPY';            // referencia para la beta: S&P 500
+const P_HIST_KEY = 'pHistoryCache';
+let pHistCache = null;            // { day, closes: {SYM: {fecha: cierre}}, fx: {fecha: USD→EUR} }
+let pHistRange = 63;
+let pHistLoading = false;
+
+function pToggleHistory() {
+  const box = document.getElementById('pHist');
+  box.hidden = !box.hidden;
+  const btn = document.getElementById('pHistToggle');
+  btn.setAttribute('aria-expanded', !box.hidden);
+  btn.textContent = (box.hidden ? '▸' : '▾') + ' Evolución y riesgo';
+  if (!box.hidden) pLoadHistory();
+}
+function pSetRange(days) { pHistRange = days; pRenderHistory(); }
+
+const pSleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function pFetchDaily(symbol) {
+  const res = await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${encodeURIComponent(symbol)}&outputsize=compact&apikey=${pApiKey}`);
+  const data = await res.json();
+  if (data.Note || data.Information) throw new Error('Límite diario de la API alcanzado; prueba mañana');
+  const ts = data['Time Series (Daily)'];
+  if (!ts) return null;
+  const out = {};
+  Object.keys(ts).forEach(d => { out[d] = parseFloat(ts[d]['4. close']); });
+  return out;
+}
+
+async function pLoadHistory(force = false) {
+  const symbols = Object.keys(DB.portfolio);
+  if (!pHistCache) { try { pHistCache = JSON.parse(lsGet(P_HIST_KEY) || 'null'); } catch (e) { pHistCache = null; } }
+  const need = [...symbols, P_BENCH];
+  const fresh = pHistCache && pHistCache.day === todayStr && need.every(s => pHistCache.closes[s]);
+  if ((fresh && !force) || pHistLoading) { pRenderHistory(); return; }
+  if (!pApiKey) { pRenderHistory('Guarda tu API key para ver la evolución.'); return; }
+  if (!symbols.length) { pRenderHistory(); return; }
+
+  pHistLoading = true;
+  const cache = pHistCache && pHistCache.day === todayStr ? pHistCache : { day: todayStr, closes: {}, fx: {} };
+  let error = '';
+  try {
+    for (const sym of need.filter(s => !cache.closes[s])) {
+      pRenderHistory(`Descargando cotizaciones de ${sym}…`);
+      const closes = await pFetchDaily(sym);
+      if (closes) cache.closes[sym] = closes;
+      await pSleep(1200);          // el plan gratuito no admite ráfagas
+    }
+    // USD→EUR para las posiciones en dólares y para el S&P 500
+    if (!Object.keys(cache.fx).length) {
+      if (!pFxHistory) await pGetFxForDate(todayStr);
+      if (pFxHistory) Object.keys(pFxHistory).slice(0, 160).forEach(d => { cache.fx[d] = parseFloat(pFxHistory[d]['4. close']); });
+    }
+  } catch (e) { error = e.message; }
+  pHistCache = cache;
+  lsSet(P_HIST_KEY, JSON.stringify(cache));
+  pHistLoading = false;
+  pRenderHistory(error && !symbols.some(s => cache.closes[s]) ? error : '', error);
+}
+
+// Serie diaria de la cartera en €: valor, dinero invertido y rentabilidad del día
+// (la rentabilidad del día usa las acciones del día anterior, así las compras no cuentan como ganancia)
+function pBuildSeries() {
+  const symbols = Object.keys(DB.portfolio).filter(s => pHistCache.closes[s]);
+  const bench = pHistCache.closes[P_BENCH] || {};
+  const dates = [...new Set(symbols.flatMap(s => Object.keys(pHistCache.closes[s])))].sort();
+  const last = {}, lastFx = { v: DB.fxRate || 1 };
+  const fxDates = Object.keys(pHistCache.fx).sort();
+  let fi = 0;
+  const rows = [];
+  let lastBench = null;
+  dates.forEach(d => {
+    while (fi < fxDates.length && fxDates[fi] <= d) lastFx.v = pHistCache.fx[fxDates[fi++]];
+    symbols.forEach(s => { if (pHistCache.closes[s][d] != null) last[s] = pHistCache.closes[s][d]; });
+    const px = s => last[s] == null ? null : last[s] * (DB.portfolio[s].currency === 'USD' ? lastFx.v : 1);
+    const held = s => DB.portfolio[s].lots.filter(l => l.purchaseDate <= d).reduce((a, l) => a + l.shares, 0);
+    let value = 0, cost = 0;
+    symbols.forEach(s => {
+      const p = px(s); if (p == null) return;
+      value += held(s) * p;
+      DB.portfolio[s].lots.filter(l => l.purchaseDate <= d).forEach(l => {
+        const rate = l.exchangeRate || (DB.portfolio[s].currency === 'USD' ? DB.fxRate : 1);
+        cost += l.shares * l.purchasePrice * (DB.portfolio[s].currency === 'USD' ? rate : 1);
+      });
+    });
+    if (bench[d] != null) lastBench = bench[d] * lastFx.v;
+    rows.push({ d, value, cost, px: Object.fromEntries(symbols.map(s => [s, px(s)])), bench: lastBench });
+  });
+  // Rentabilidad diaria con las posiciones del día anterior
+  for (let i = 1; i < rows.length; i++) {
+    const prev = rows[i - 1], cur = rows[i];
+    let a = 0, b = 0;
+    symbols.forEach(s => {
+      const sh = DB.portfolio[s].lots.filter(l => l.purchaseDate <= prev.d).reduce((x, l) => x + l.shares, 0);
+      if (sh && prev.px[s] != null && cur.px[s] != null) { a += sh * cur.px[s]; b += sh * prev.px[s]; }
+    });
+    cur.ret = b > 0 ? a / b - 1 : null;
+    cur.bret = prev.bench && cur.bench ? cur.bench / prev.bench - 1 : null;
+  }
+  return rows.filter(r => r.value > 0);
+}
+
+function pMetrics(rows) {
+  const rets = rows.slice(1).map(r => r.ret).filter(r => r != null);
+  const pairs = rows.slice(1).filter(r => r.ret != null && r.bret != null);
+  const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const twr = rets.reduce((acc, r) => acc * (1 + r), 1) - 1;
+  let vol = null, beta = null, maxDD = 0;
+  if (rets.length > 5) {
+    const m = mean(rets);
+    vol = Math.sqrt(rets.reduce((a, r) => a + (r - m) ** 2, 0) / (rets.length - 1)) * Math.sqrt(252);
+  }
+  if (pairs.length > 10) {
+    const mp = mean(pairs.map(r => r.ret)), mb = mean(pairs.map(r => r.bret));
+    const cov = pairs.reduce((a, r) => a + (r.ret - mp) * (r.bret - mb), 0);
+    const varB = pairs.reduce((a, r) => a + (r.bret - mb) ** 2, 0);
+    beta = varB > 0 ? cov / varB : null;
+  }
+  // Máxima caída sobre el índice de rentabilidad (sin contar aportaciones)
+  let idx = 1, peak = 1;
+  rets.forEach(r => { idx *= 1 + r; peak = Math.max(peak, idx); maxDD = Math.min(maxDD, idx / peak - 1); });
+  const lastRow = rows[rows.length - 1];
+  return { day: lastRow && lastRow.ret != null ? lastRow.ret : null, twr: rets.length ? twr : null, vol, beta, maxDD: rets.length ? maxDD : null };
+}
+
+function pRenderHistory(msg = '', warn = '') {
+  const box = document.getElementById('pHist');
+  if (!box || box.hidden) return;
+  document.querySelectorAll('.p-range button').forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.days) === pHistRange));
+  const chart = document.getElementById('pChart');
+  const metricsEl = document.getElementById('pMetrics');
+  const note = document.getElementById('pHistNote');
+  const empty = text => {
+    chart.innerHTML = `<div class="p-chart-msg">${escapeHtml(text)}</div>`;
+    chart.onmousemove = chart.onmouseleave = null;
+    metricsEl.innerHTML = document.getElementById('pLegend').innerHTML = note.textContent = '';
+  };
+  if (msg) return empty(msg);
+  if (!Object.keys(DB.portfolio).length) return empty('Añade una posición para ver su evolución.');
+  if (!pHistCache) return empty('Sin datos todavía.');
+
+  const all = pBuildSeries();
+  const rows = pHistRange ? all.slice(-(pHistRange + 1)) : all;
+  if (rows.length < 2) return empty('Aún no hay suficientes días con cotización.');
+
+  const missing = Object.keys(DB.portfolio).filter(s => !pHistCache.closes[s]);
+  note.textContent = warn || (missing.length ? `Sin histórico: ${missing.join(', ')}` : `Cierres diarios · actualizado hoy`);
+
+  // Gráfica (SVG escalado; el texto va en HTML para que no se deforme)
+  const W = 1000, H = 200;
+  const vals = rows.flatMap(r => [r.value, r.cost]);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi - lo) * 0.08 || hi * 0.02 || 1;
+  lo -= pad; hi += pad;
+  const x = i => i / (rows.length - 1) * W;
+  const y = v => H - (v - lo) / (hi - lo) * H;
+  const line = rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(r.value).toFixed(1)}`).join('');
+  const cost = rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(r.cost).toFixed(1)}`).join('');
+  const grid = [0.25, 0.5, 0.75].map(f => `<line class="p-grid" x1="0" x2="${W}" y1="${H * f}" y2="${H * f}"/>`).join('');
+  const fmtK = v => v >= 10000 ? Math.round(v / 1000) + ' k€' : Math.round(v).toLocaleString('es-ES') + ' €';
+  const fmtD = d => new Date(d + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }).replace('.', '');
+  chart.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Valor de la cartera del ${fmtD(rows[0].d)} al ${fmtD(rows[rows.length - 1].d)}">
+      ${grid}
+      <path class="p-area" d="${line}L${W},${H}L0,${H}Z"/>
+      <path class="p-cost" d="${cost}"/>
+      <path class="p-line" d="${line}"/>
+    </svg>
+    <span class="p-axis" style="top:0;right:0">${fmtK(hi - pad)}</span>
+    <span class="p-axis" style="bottom:0;right:0">${fmtK(lo + pad)}</span>
+    <span class="p-axis" style="bottom:-18px;left:0">${fmtD(rows[0].d)}</span>
+    <span class="p-axis" style="bottom:-18px;right:0">${fmtD(rows[rows.length - 1].d)}</span>
+    <div class="p-cursor"><i></i></div>
+    <div class="p-tip"></div>`;
+  document.getElementById('pLegend').innerHTML = '<span><i></i>Valor</span><span><i class="cost"></i>Invertido</span>';
+
+  const cursor = chart.querySelector('.p-cursor'), tip = chart.querySelector('.p-tip');
+  chart.onmousemove = e => {
+    const rect = chart.getBoundingClientRect();
+    const i = Math.round(Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width)) * (rows.length - 1));
+    const r = rows[i], left = x(i) / W * rect.width, top = y(r.value) / H * rect.height;
+    cursor.style.display = tip.style.display = 'block';
+    cursor.style.left = left + 'px';
+    cursor.querySelector('i').style.top = (top - 4) + 'px';
+    tip.style.left = Math.min(rect.width - 70, Math.max(70, left)) + 'px';
+    tip.style.top = (top - 8) + 'px';
+    const day = r.ret != null ? ` · ${r.ret >= 0 ? '+' : ''}${(r.ret * 100).toFixed(2)}%` : '';
+    tip.textContent = `${fmtD(r.d)} · ${pFmtEur(r.value)}${day}`;
+  };
+  chart.onmouseleave = () => { cursor.style.display = tip.style.display = 'none'; };
+
+  // Métricas del periodo elegido
+  const m = pMetrics(rows);
+  const pct = (v, sign = true) => v == null ? '—' : (sign && v > 0 ? '+' : '') + (v * 100).toFixed(2).replace('.', ',') + '%';
+  const cls = v => v == null ? '' : v > 0 ? 'up' : v < 0 ? 'down' : '';
+  const betaHint = m.beta == null ? '' : m.beta > 1.1 ? 'más movida que el mercado' : m.beta < 0.9 ? 'más tranquila que el mercado' : 'se mueve como el mercado';
+  metricsEl.innerHTML = [
+    ['Último día', `<div class="val ${cls(m.day)}">${pct(m.day)}</div><div class="hint">${fmtD(rows[rows.length - 1].d)}</div>`],
+    ['Rentabilidad', `<div class="val ${cls(m.twr)}">${pct(m.twr)}</div><div class="hint">del periodo, sin aportaciones</div>`],
+    ['Beta', `<div class="val">${m.beta == null ? '—' : m.beta.toFixed(2).replace('.', ',')}</div><div class="hint">${betaHint || 'frente al S&P 500'}</div>`],
+    ['Volatilidad', `<div class="val">${pct(m.vol, false)}</div><div class="hint">anualizada</div>`],
+    ['Máx. caída', `<div class="val ${m.maxDD ? 'down' : ''}">${pct(m.maxDD)}</div><div class="hint">desde un máximo</div>`]
+  ].map(([l, v]) => `<div title="${l}"><div class="lbl">${l}</div>${v}</div>`).join('');
 }
 
 /* ════════════════════════════════════════════════════════════════
