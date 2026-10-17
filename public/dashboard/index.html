@@ -55,6 +55,12 @@
     --wx-rain: #3b82f6;
     --wx-snow: #7cc4f2;
     --wx-bolt: #f59e0b;
+    /* Colores de los eventos del calendario */
+    --ev-rutina: var(--accent);
+    --ev-personal: var(--up);
+    --ev-importante: var(--warn);
+    --ev-urgente: var(--down);
+    --ev-sub: #8b5cf6;
 
     --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --pixel: var(--font);
@@ -96,6 +102,7 @@
       --wx-cloud-dark: #2a2e36;
       --wx-cloud-dark-line: #8b95a6;
       --wx-rain: #60a5fa;
+      --ev-sub: #b197fc;
       --shadow: none;
     }
   }
@@ -317,23 +324,49 @@
   .weather-tomorrow .tag { font-size: 0.76rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
 
   /* ─── CALENDARIO ─── */
-  .mcal { margin-bottom: 18px; }
-  .mcal-month { font-size: 0.95rem; color: var(--text); margin-bottom: 8px; }
+  .cal-head-r { display: flex; align-items: center; gap: 10px; }
+  .cal-add {
+    width: 32px; height: 32px; border: none; border-radius: 999px; cursor: pointer;
+    background: var(--bg-soft); color: var(--text); font-size: 1.25rem; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center; transition: transform 0.15s, background 0.15s;
+  }
+  .cal-add:hover { background: var(--surface-hi); }
+  .cal-add[aria-expanded="true"] { transform: rotate(45deg); }
+  .mcal { margin-bottom: 16px; }
+  .mcal-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .mcal-month { font-size: 0.95rem; color: var(--text); }
   .mcal-month::first-letter { text-transform: uppercase; }
+  .month-nav .mcal-today { width: auto; height: 26px; padding: 0 10px; font-size: 0.8rem; margin-right: 4px; }
   .mcal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
   .mcal-dow { font-size: 0.7rem; color: var(--text-dim); padding-bottom: 4px; }
   .mcal-day {
-    position: relative; height: 32px; border: none; border-radius: 10px; background: none; cursor: pointer;
+    position: relative; height: 38px; border: none; border-radius: 10px; background: none; cursor: pointer; padding: 0 0 8px;
     font: inherit; font-size: 0.85rem; color: var(--text-mid); font-variant-numeric: tabular-nums;
   }
   .mcal-day:hover { background: var(--bg-soft); color: var(--text); }
-  .mcal-day.past { color: var(--text-dim); opacity: 0.6; }
-  .mcal-day.today { background: var(--accent); color: var(--on-solid); font-weight: 600; opacity: 1; }
-  .mcal-day.has::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
-  .mcal-day.today.has::after { background: var(--on-solid); }
-  .cal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-  .cal-form #evTitle, .cal-form select, .cal-form .ev-days, .cal-form .btn { grid-column: 1 / -1; }
+  .mcal-day.past { color: var(--text-dim); }
+  .mcal-day.today { background: var(--accent); color: var(--on-solid); font-weight: 600; }
+  .mcal-day.sel { box-shadow: inset 0 0 0 1.5px var(--text); color: var(--text); }
+  .mcal-day.today.sel { box-shadow: inset 0 0 0 2px var(--surface), 0 0 0 1.5px var(--accent); color: var(--on-solid); }
+  .mcal-dots { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; justify-content: center; gap: 2px; }
+  .mcal-dots i { width: 5px; height: 5px; border-radius: 50%; }
+  .mcal-day.today .mcal-dots i { box-shadow: 0 0 0 1px var(--on-solid); }
+  .ev-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 10px; font-size: 0.75rem; color: var(--text-dim); }
+  .cal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .cal-legend .ev-dot { width: 6px; height: 6px; }
+  .cal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; padding: 14px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--bg-soft) 55%, transparent); }
+  .cal-form[hidden] { display: none; }
+  .cal-form #evTitle, .cal-form select, .cal-form .ev-days, .cal-form .ev-colors, .cal-form .cal-form-btns { grid-column: 1 / -1; }
   .cal-form input, .cal-form select { width: 100%; }
+  .cal-form-btns { display: flex; gap: 8px; }
+  .cal-form-btns .btn.primary { flex: 1; }
+  .ev-colors { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ev-color {
+    display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); color: var(--text-mid); font: inherit; font-size: 0.8rem; padding: 5px 11px; cursor: pointer;
+  }
+  .ev-color[aria-pressed="true"] { border-color: currentColor; color: var(--text); box-shadow: inset 0 0 0 1px currentColor; }
   .ev-days { display: flex; gap: 6px; }
   .ev-days[hidden] { display: none; }
   .ev-day {
@@ -350,11 +383,11 @@
   .ag-item:last-child { border-bottom: none; }
   .ag-item.past { opacity: 0.45; }
   .ag-time { font-size: 0.85rem; color: var(--text-mid); width: 78px; flex-shrink: 0; }
-  .ag-title { flex: 1; min-width: 0; font-size: 0.95rem; color: var(--text); overflow-wrap: anywhere; }
+  .ag-title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.95rem; color: var(--text); overflow-wrap: anywhere; }
   .ag-rep { color: var(--text-dim); font-size: 0.8rem; margin-left: 6px; }
-  .ag-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); white-space: nowrap; }
+  .ag-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ev-sub) 16%, transparent); color: var(--ev-sub); white-space: nowrap; }
   .ag-cost { color: var(--text-dim); font-size: 0.85rem; }
-  .ag-rule { display: block; font-size: 0.8rem; color: var(--text-dim); margin-top: 1px; }
+  .ag-rule { flex-basis: 100%; padding-left: 16px; font-size: 0.8rem; color: var(--text-dim); margin-top: 1px; }
   .ag-btn {
     background: none; border: none; color: var(--text-dim); cursor: pointer;
     font-size: 0.8rem; padding: 3px 8px; border-radius: 8px; opacity: 0; flex-shrink: 0;
@@ -950,14 +983,17 @@
   <div class="card" data-card="calendar">
     <div class="card-head">
       <h3 class="card-title">Calendario</h3>
-      <span class="card-meta" id="calMeta"></span>
+      <div class="cal-head-r">
+        <span class="card-meta" id="calMeta"></span>
+        <button class="cal-add" id="calAddBtn" onclick="toggleEventForm()" aria-expanded="false" aria-controls="calForm" title="Nuevo evento">+</button>
+      </div>
     </div>
     <div class="mcal" id="miniCal"></div>
-    <form class="cal-form" onsubmit="event.preventDefault();saveEvent()">
+    <form class="cal-form" id="calForm" hidden onsubmit="event.preventDefault();saveEvent()">
       <input type="text" id="evTitle" placeholder="Clase de tenis, dentista…" autocomplete="off">
       <input type="date" id="evDate" onchange="evDateChanged()" title="Fecha (o primer día si se repite)">
       <input type="time" id="evTime" title="Hora (opcional)">
-      <select id="evRepeat" onchange="renderEvDays()" title="Repetición">
+      <select id="evRepeat" onchange="renderEvDays();renderEvColors()" title="Repetición">
         <option value="none">No se repite</option>
         <option value="daily">Cada día</option>
         <option value="weekly">Cada semana</option>
@@ -965,7 +1001,11 @@
         <option value="yearly">Cada año</option>
       </select>
       <div class="ev-days" id="evDays" hidden></div>
-      <button class="btn primary" type="submit" id="evSubmit">+ Añadir</button>
+      <div class="ev-colors" id="evColors" role="group" aria-label="Tipo de evento"></div>
+      <div class="cal-form-btns">
+        <button class="btn primary" type="submit" id="evSubmit">Añadir</button>
+        <button class="btn ghost" type="button" onclick="closeEventForm()">Cancelar</button>
+      </div>
     </form>
     <div class="agenda" id="agenda"></div>
     <button class="links-toggle" id="calManageToggle" onclick="toggleCalManage()"></button>
@@ -3431,6 +3471,22 @@ const CAL_DAYS_AHEAD = 7;
 let editingEventId = null;
 let evDaysSel = [];
 let showCalManage = false;
+let calMonth = todayStr.slice(0, 8) + '01';        // mes que se ve en el calendario
+let calSel = null;                                 // día pulsado: la agenda muestra solo ese día
+let evColorSel = null;                             // tipo elegido en el formulario (null = automático)
+
+// Tipos de evento: el color del punto en el calendario y en la agenda
+const EV_TYPES = [
+  { id: 'rutina',     label: 'Rutina' },
+  { id: 'personal',   label: 'Personal' },
+  { id: 'importante', label: 'Importante' },
+  { id: 'urgente',    label: 'Urgente' }
+];
+const EV_SUB = { id: 'sub', label: 'Suscripción' };
+// Sin tipo elegido: lo que se repite es rutina y lo puntual, personal (también para eventos antiguos)
+const autoType = repeat => repeat && repeat !== 'none' ? 'rutina' : 'personal';
+const evType = ev => ev.sub ? 'sub' : (EV_TYPES.some(t => t.id === ev.color) ? ev.color : autoType(ev.repeat));
+const evDot = type => `<span class="ev-dot" style="background:var(--ev-${type})"></span>`;
 
 const dow = iso => new Date(iso + 'T12:00:00').getDay();
 
@@ -3520,13 +3576,13 @@ function saveEvent() {
   if (!date) shake(dateEl);
   if (!title || !date) return;
   if (repeat === 'weekly' && !evDaysSel.length) { shake(document.getElementById('evDays')); return; }
-  const data = { title, date, time, repeat, days: repeat === 'weekly' ? [...evDaysSel] : [] };
+  const data = { title, date, time, repeat, days: repeat === 'weekly' ? [...evDaysSel] : [], color: evColorSel || autoType(repeat) };
 
   const existing = editingEventId !== null && DB.calendar.find(e => e.id === editingEventId);
   if (existing) Object.assign(existing, data);
   else DB.calendar.push({ id: Date.now(), skip: [], ...data });
   saveDB();
-  resetEventForm();
+  closeEventForm();
   renderCalendar();
   toast(existing ? 'Evento actualizado' : 'Evento añadido');
 }
@@ -3534,12 +3590,40 @@ function saveEvent() {
 function resetEventForm() {
   editingEventId = null;
   evDaysSel = [];
+  evColorSel = null;
   document.getElementById('evTitle').value = '';
-  document.getElementById('evDate').value = todayStr;
+  document.getElementById('evDate').value = calSel || todayStr;
   document.getElementById('evTime').value = '';
   document.getElementById('evRepeat').value = 'none';
-  document.getElementById('evSubmit').textContent = '+ Añadir';
+  document.getElementById('evSubmit').textContent = 'Añadir';
   renderEvDays();
+  renderEvColors();
+}
+
+function renderEvColors() {
+  const cur = evColorSel || autoType(document.getElementById('evRepeat').value);
+  document.getElementById('evColors').innerHTML = EV_TYPES.map(t =>
+    `<button type="button" class="ev-color" style="color:var(--ev-${t.id})" aria-pressed="${t.id === cur}" onclick="pickEvColor('${t.id}')">${evDot(t.id)}<span style="color:var(--text-mid)">${t.label}</span></button>`
+  ).join('');
+}
+function pickEvColor(id) { evColorSel = id; renderEvColors(); }
+
+function setEventFormOpen(open) {
+  document.getElementById('calForm').hidden = !open;
+  document.getElementById('calAddBtn').setAttribute('aria-expanded', open);
+  document.getElementById('calAddBtn').title = open ? 'Cerrar' : 'Nuevo evento';
+}
+function openEventForm() {
+  resetEventForm();
+  setEventFormOpen(true);
+  document.getElementById('evTitle').focus();
+}
+function closeEventForm() {
+  resetEventForm();
+  setEventFormOpen(false);
+}
+function toggleEventForm() {
+  if (document.getElementById('calForm').hidden) openEventForm(); else closeEventForm();
 }
 
 function editEvent(id) {
@@ -3551,8 +3635,12 @@ function editEvent(id) {
   document.getElementById('evTime').value = ev.time || '';
   document.getElementById('evRepeat').value = ev.repeat || 'none';
   evDaysSel = [...(ev.days || [])];
+  evColorSel = evType(ev);
   renderEvDays();
-  document.getElementById('evSubmit').textContent = '✓ Guardar';
+  renderEvColors();
+  document.getElementById('evSubmit').textContent = 'Guardar';
+  setEventFormOpen(true);
+  document.getElementById('calForm').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   document.getElementById('evTitle').focus();
 }
 
@@ -3561,7 +3649,7 @@ function deleteEvent(id) {
   if (!ev) return;
   if (ev.repeat !== 'none' && !confirm(`¿Borrar "${ev.title}" y todas sus repeticiones?`)) return;
   DB.calendar = DB.calendar.filter(e => e.id !== id);
-  if (editingEventId === id) resetEventForm();
+  if (editingEventId === id) closeEventForm();
   saveDB();
   renderCalendar();
 }
@@ -3583,27 +3671,63 @@ function editSubFromCalendar(id) {
 
 function toggleCalManage() { showCalManage = !showCalManage; renderCalendar(); }
 
-// Mes actual, lunes primero; un punto en los días con algo apuntado. Pulsar un día lo pone en el formulario
+// Calendario mensual, lunes primero; un punto por cada tipo de evento que haya ese día
+const DOT_ORDER = [...EV_TYPES.map(t => t.id), 'sub'];
 function renderMiniCal() {
-  const first = todayStr.slice(0, 8) + '01';
-  const d0 = new Date(first + 'T12:00:00');
+  const d0 = new Date(calMonth + 'T12:00:00');
   const days = new Date(d0.getFullYear(), d0.getMonth() + 1, 0).getDate();
-  const busy = new Set(occurrences(first, days).map(o => o.date));
+  const types = {};
+  occurrences(calMonth, days).forEach(o => (types[o.date] = types[o.date] || new Set()).add(evType(o.ev)));
   const lead = (d0.getDay() + 6) % 7;
   let cells = WEEK.map(d => `<span class="mcal-dow">${DOW_SHORT[d]}</span>`).join('') + '<span></span>'.repeat(lead);
   for (let i = 0; i < days; i++) {
-    const iso = addDays(first, i);
-    const cls = [iso === todayStr ? 'today' : iso < todayStr ? 'past' : '', busy.has(iso) ? 'has' : ''].filter(Boolean).join(' ');
-    cells += `<button type="button" class="mcal-day ${cls}" onclick="pickCalDay('${iso}')" aria-label="${dayLabel(iso)}"${iso === todayStr ? ' aria-current="date"' : ''}>${i + 1}</button>`;
+    const iso = addDays(calMonth, i);
+    const cls = [iso === todayStr ? 'today' : iso < todayStr ? 'past' : '', iso === calSel ? 'sel' : ''].filter(Boolean).join(' ');
+    const dots = types[iso] ? DOT_ORDER.filter(t => types[iso].has(t)).map(t => `<i style="background:var(--ev-${t})"></i>`).join('') : '';
+    cells += `<button type="button" class="mcal-day ${cls}" onclick="pickCalDay('${iso}')" aria-label="${dayLabel(iso)}"${iso === todayStr ? ' aria-current="date"' : ''} aria-pressed="${iso === calSel}">${i + 1}${dots ? `<span class="mcal-dots">${dots}</span>` : ''}</button>`;
   }
+  const offToday = calMonth !== todayStr.slice(0, 8) + '01' || calSel;
   document.getElementById('miniCal').innerHTML = `
-    <div class="mcal-month">${d0.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</div>
-    <div class="mcal-grid">${cells}</div>`;
+    <div class="mcal-top">
+      <span class="mcal-month">${d0.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
+      <div class="month-nav">
+        ${offToday ? '<button type="button" class="mcal-today" onclick="calGoToday()">Hoy</button>' : ''}
+        <button type="button" onclick="calShiftMonth(-1)" aria-label="Mes anterior">‹</button>
+        <button type="button" onclick="calShiftMonth(1)" aria-label="Mes siguiente">›</button>
+      </div>
+    </div>
+    <div class="mcal-grid">${cells}</div>
+    <div class="cal-legend">${[...EV_TYPES, EV_SUB].map(t => `<span>${evDot(t.id)}${t.label}</span>`).join('')}</div>`;
 }
+function calShiftMonth(n) { calMonth = addMonthsIso(calMonth, n); renderMiniCal(); }
+function calGoToday() { calMonth = todayStr.slice(0, 8) + '01'; calSel = null; renderCalendar(); }
+// Pulsar un día muestra sus eventos; pulsarlo otra vez vuelve a los próximos días
 function pickCalDay(iso) {
-  document.getElementById('evDate').value = iso;
-  evDateChanged();
-  document.getElementById('evTitle').focus();
+  calSel = calSel === iso ? null : iso;
+  if (calSel && document.getElementById('calForm').hidden) document.getElementById('evDate').value = calSel;
+  renderCalendar();
+}
+
+function agendaItem(ev, date, nowHm) {
+  const id = Number(ev.id);
+  if (ev.sub) {
+    const cost = Number(ev.sub.cost) ? '· ' + fmtEur(ev.sub.cost) : '';
+    return `<div class="ag-item">
+      <span class="ag-time"><span class="ag-tag">Renovación</span></span>
+      <span class="ag-title">${evDot('sub')}${escapeHtml(ev.title)}<span class="ag-cost">${cost}</span></span>
+      ${cardOn('subs') ? `<button class="ag-btn" onclick="editSubFromCalendar(${id})" title="Editar en Suscripciones">✎</button>` : ''}
+    </div>`;
+  }
+  const past = date < todayStr || (date === todayStr && ev.time && ev.time < nowHm);
+  const recurring = ev.repeat && ev.repeat !== 'none';
+  return `<div class="ag-item${past ? ' past' : ''}">
+    <span class="ag-time">${ev.time || 'Todo el día'}</span>
+    <span class="ag-title">${evDot(evType(ev))}${escapeHtml(ev.title)}${recurring ? '<span class="ag-rep" title="Se repite">↻</span>' : ''}</span>
+    <button class="ag-btn" onclick="editEvent(${id})" title="Editar">✎</button>
+    ${recurring
+      ? `<button class="ag-btn" onclick="skipOccurrence(${id},'${date}')" title="Quitar solo este día">Saltar</button>`
+      : `<button class="ag-btn" onclick="deleteEvent(${id})" title="Borrar">✕</button>`}
+  </div>`;
 }
 
 function renderCalendar() {
@@ -3617,31 +3741,17 @@ function renderCalendar() {
     : (occ.length ? 'nada hoy' : '');
 
   const agenda = document.getElementById('agenda');
-  if (!occ.length) {
+  if (calSel) {
+    const dayOcc = occurrences(calSel, 1);
+    agenda.innerHTML = `<div class="ag-day${calSel === todayStr ? ' today' : ''}">${dayLabel(calSel)}</div>` +
+      (dayOcc.length ? dayOcc.map(o => agendaItem(o.ev, o.date, nowHm)).join('') : '<div class="empty-state">Nada este día.</div>');
+  } else if (!occ.length) {
     agenda.innerHTML = `<div class="empty-state">Nada en los próximos ${CAL_DAYS_AHEAD} días.</div>`;
   } else {
     let html = '', lastDate = '';
     occ.forEach(({ ev, date }) => {
       if (date !== lastDate) { html += `<div class="ag-day${date === todayStr ? ' today' : ''}">${dayLabel(date)}</div>`; lastDate = date; }
-      const id = Number(ev.id);
-      if (ev.sub) {
-        const cost = Number(ev.sub.cost) ? ' · ' + fmtEur(ev.sub.cost) : '';
-        html += `<div class="ag-item">
-          <span class="ag-time"><span class="ag-tag">Renovación</span></span>
-          <span class="ag-title">${escapeHtml(ev.title)}<span class="ag-cost">${cost}</span></span>
-          ${cardOn('subs') ? `<button class="ag-btn" onclick="editSubFromCalendar(${id})" title="Editar en Suscripciones">✎</button>` : ''}
-        </div>`;
-        return;
-      }
-      const past = date === todayStr && ev.time && ev.time < nowHm;
-      const recurring = ev.repeat && ev.repeat !== 'none';
-      html += `<div class="ag-item${past ? ' past' : ''}">
-        <span class="ag-time">${ev.time || 'Todo el día'}</span>
-        <span class="ag-title">${escapeHtml(ev.title)}${recurring ? '<span class="ag-rep" title="Se repite">↻</span>' : ''}</span>
-        ${recurring
-          ? `<button class="ag-btn" onclick="skipOccurrence(${id},'${date}')" title="Quitar solo este día">Saltar</button>`
-          : `<button class="ag-btn" onclick="deleteEvent(${id})" title="Borrar">✕</button>`}
-      </div>`;
+      html += agendaItem(ev, date, nowHm);
     });
     agenda.innerHTML = html;
   }
@@ -3656,7 +3766,7 @@ function renderCalendar() {
       ((a.repeat === 'none') - (b.repeat === 'none')) || a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
     manage.innerHTML = sorted.map(ev => `
       <div class="ag-item">
-        <span class="ag-title">${escapeHtml(ev.title)}<span class="ag-rule">${ruleText(ev)}</span></span>
+        <span class="ag-title">${evDot(evType(ev))}${escapeHtml(ev.title)}<span class="ag-rule">${ruleText(ev)}</span></span>
         <button class="ag-btn" onclick="editEvent(${Number(ev.id)})" title="Editar">✎</button>
         <button class="ag-btn" onclick="deleteEvent(${Number(ev.id)})" title="Borrar">✕</button>
       </div>`).join('');
@@ -3788,6 +3898,7 @@ function renderAll() {
 }
 
 document.getElementById('evDate').value = todayStr;
+renderEvColors();
 // Prefill fecha de repostaje con hoy
 (function(){ const el = document.getElementById('repDate'); if (el) el.value = todayStr; })();
 
