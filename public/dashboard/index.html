@@ -1363,7 +1363,7 @@
     <p class="modal-note">Solo para el propietario. No hace falta entrar para usar el dashboard: como visitante, tus datos se guardan únicamente en este navegador.</p>
     <form class="login-form" onsubmit="event.preventDefault();doLogin()">
       <input type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password">
-      <input type="text" id="loginCode" placeholder="Código 2FA (6 dígitos)" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      <input type="text" id="loginCode" placeholder="Código de verificación" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
       <div class="login-error" id="loginError"></div>
       <div class="login-actions">
         <button class="btn ghost" type="button" onclick="hideLogin()">Cancelar</button>
@@ -1477,7 +1477,35 @@ function withDefaults(parsed) {
     }
     delete merged.events;
   }
-  return merged;
+  return sanitizeData(merged);
+}
+
+// Los datos pueden venir de un archivo importado: los ids acaban dentro de onclick,
+// así que se fuerzan a número, y los valores que van en clases CSS, a una lista cerrada
+const TODO_PRIORITIES = ['alta', 'media', 'baja'];
+function sanitizeData(d) {
+  const arr = v => Array.isArray(v) ? v.filter(x => x && typeof x === 'object') : [];
+  let seq = Date.now();
+  const fixIds = list => list.forEach(x => { const n = Number(x.id); x.id = Number.isFinite(n) ? n : seq++; });
+  d.todos = arr(d.todos);
+  d.todos.forEach(t => { if (!TODO_PRIORITIES.includes(t.priority)) t.priority = 'media'; });
+  d.links = arr(d.links);
+  d.subs = arr(d.subs);
+  d.calendar = arr(d.calendar);
+  [d.todos, d.links, d.subs, d.calendar].forEach(fixIds);
+  if (!d.coche || typeof d.coche !== 'object') d.coche = structuredClone(DEFAULTS.coche);
+  d.coche.mantenimiento = arr(d.coche.mantenimiento);
+  d.coche.repostajes = arr(d.coche.repostajes);
+  fixIds(d.coche.mantenimiento);
+  fixIds(d.coche.repostajes);
+  if (!d.portfolio || typeof d.portfolio !== 'object' || Array.isArray(d.portfolio)) d.portfolio = {};
+  Object.values(d.portfolio).forEach(s => {
+    if (!s || typeof s !== 'object') return;
+    s.lots = arr(s.lots);
+    fixIds(s.lots);
+  });
+  Object.keys(d.portfolio).forEach(k => { if (!d.portfolio[k] || typeof d.portfolio[k] !== 'object') delete d.portfolio[k]; });
+  return d;
 }
 
 let DB = loadDB();
@@ -2969,7 +2997,7 @@ function pRenderHoldings() {
           <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:${lg>=0?'var(--up)':'var(--down)'}">${lg>=0?'+':''}${pFmtEur(lg)}</td>
           <td style="padding:8px 14px;font-family:var(--mono);font-size:0.84rem;text-align:right;color:${lr>=0?'var(--up)':'var(--down)'}">${lr>=0?'+':''}${lr.toFixed(2)}%</td>
           <td style="padding:8px 14px;text-align:right">
-            <button class="del-lot-btn" onclick="pDeleteLot('${sym}',${lot.id})">Eliminar</button>
+            <button class="del-lot-btn" onclick="pDeleteLot('${sym}',${Number(lot.id)})">Eliminar</button>
           </td>
         </tr>`;
       });
@@ -3251,13 +3279,16 @@ function renderTodos() {
     return;
   }
   const badgeLabels = { alta: 'Alta', media: 'Media', baja: 'Baja' };
-  list.innerHTML = sorted.map(t => `
+  list.innerHTML = sorted.map(t => {
+    const prio = badgeLabels[t.priority] ? t.priority : 'media';
+    return `
     <div class="todo-item${t.done ? ' done' : ''}">
-      <div class="todo-check" onclick="toggleTodo(${t.id})">${t.done ? '✓' : ''}</div>
+      <div class="todo-check" onclick="toggleTodo(${Number(t.id)})">${t.done ? '✓' : ''}</div>
       <span class="todo-text">${escapeHtml(t.text)}</span>
-      <span class="todo-badge ${t.priority}">${badgeLabels[t.priority] || t.priority}</span>
-      <button class="todo-del" onclick="deleteTodo(${t.id})">✕</button>
-    </div>`).join('');
+      <span class="todo-badge ${prio}">${badgeLabels[prio]}</span>
+      <button class="todo-del" onclick="deleteTodo(${Number(t.id)})">✕</button>
+    </div>`;
+  }).join('');
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -3697,8 +3728,8 @@ function renderCoche() {
           <div class="mant-progress-bar"><div class="mant-progress-fill ${status}" style="width:${pct}%"></div></div>
         </div>
         <div class="mant-actions">
-          <button class="mant-btn" onclick="marcarMantenimientoHecho(${m.id})">Hecho</button>
-          <button class="mant-btn del" onclick="eliminarMantenimiento(${m.id})">✕</button>
+          <button class="mant-btn" onclick="marcarMantenimientoHecho(${Number(m.id)})">Hecho</button>
+          <button class="mant-btn del" onclick="eliminarMantenimiento(${Number(m.id)})">✕</button>
         </div>
       </div>`;
     }).join('');
@@ -3756,7 +3787,7 @@ function renderCoche() {
         <span class="rep-val"><span class="lbl">L</span>${r.litros.toFixed(2)}</span>
         <span class="rep-val"><span class="lbl">€</span>${r.precio.toFixed(2)} <span style="color:var(--text-dim);font-size:1.05rem">(${eurL})</span></span>
         <span class="rep-consumo">${kmRecStr} · ${consumoStr}</span>
-        <button class="rep-del" onclick="deleteRepostaje(${r.id})">✕</button>
+        <button class="rep-del" onclick="deleteRepostaje(${Number(r.id)})">✕</button>
       </div>`;
     }).join('');
   }
