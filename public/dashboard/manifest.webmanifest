@@ -1,0 +1,15 @@
+{
+  "name": "Dashboard personal",
+  "short_name": "Dashboard",
+  "id": "/dashboard/",
+  "start_url": "/dashboard/",
+  "scope": "/dashboard/",
+  "display": "standalone",
+  "background_color": "#f2f0eb",
+  "theme_color": "#f2f0eb",
+  "icons": [
+    { "src": "/apple-touch-icon.png?v=2", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png?v=2", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg?v=2", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

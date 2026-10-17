@@ -9,9 +9,13 @@
 <meta name="theme-color" content="#0f1012" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="/dashboard/icon.svg" type="image/svg+xml">
-<!-- Icono y nombre al añadir el dashboard a la pantalla de inicio del iPhone -->
-<link rel="apple-touch-icon" href="/dashboard/apple-touch-icon.png">
+<link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
+<!-- Icono y nombre al añadir el dashboard a la pantalla de inicio (iPhone) o al Dock (Safari en Mac).
+     Es el mismo icono que el resto de santigil.es (public/favicon.svg y apple-touch-icon.png).
+     El ?v= obliga a Safari a no reutilizar el icono antiguo que tiene en caché;
+     si se cambia el icono, sube el número aquí, en el manifest y en src/layouts/Base.astro. -->
+<link rel="manifest" href="/dashboard/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
 <meta name="apple-mobile-web-app-title" content="Dashboard">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
