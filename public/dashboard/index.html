@@ -159,7 +159,7 @@
   }
   .meta-date::first-letter { text-transform: uppercase; }
   /* Reloj y, a su lado, fecha + progreso del año */
-  .header-main { display: flex; align-items: flex-end; gap: clamp(20px, 3vw, 40px); flex: 1 1 520px; min-width: 0; }
+  .header-main { display: flex; align-items: flex-end; gap: clamp(20px, 3vw, 40px); flex: 1 1 440px; min-width: 0; }
   .header-info { flex: 1; min-width: 0; max-width: 560px; padding-bottom: 6px; }
   .header-info .meta-date { margin-top: 0; }
 
@@ -866,7 +866,8 @@
   .cp-move button:disabled { opacity: 0.25; cursor: default; }
   .cp-actions { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 
-  .sync-status { font-size: 0.8rem; color: var(--text-dim); }
+  .sync-status { font-size: 0.8rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 6px; }
+  .sync-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.8; }
   .sync-status.ok { color: var(--up); }
   .sync-status.pending { color: var(--warn); }
   .sync-status.offline, .sync-status.error { color: var(--down); }
@@ -957,14 +958,14 @@
   </div>
   <div class="header-meta">
     <div class="header-actions">
-      <button class="pill-btn strong" onclick="showCardPicker()" title="Elegir y ordenar tarjetas">Tarjetas</button>
+      <button class="pill-btn strong" onclick="showCardPicker()" title="Elegir qué tarjetas ver y en qué orden">Editar tarjetas</button>
       <button class="pill-btn" onclick="exportData()" title="Exportar todos los datos">Exportar</button>
       <button class="pill-btn" onclick="document.getElementById('importFile').click()" title="Importar JSON">Importar</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
       <button class="pill-btn" onclick="showShortcuts()" title="Atajos de teclado">Atajos</button>
       <button class="pill-btn" id="authBtn" onclick="authButton()" title="Acceso del propietario">Entrar</button>
     </div>
-    <div class="sync-status local" id="syncStatus">Local</div>
+    <div class="sync-status local" id="syncStatus">Guardado solo en este navegador</div>
   </div>
 </header>
 
@@ -1521,8 +1522,8 @@ function setSyncStatus(state) {
   const el = document.getElementById('syncStatus');
   if (!el) return;
   const map = {
-    local:   ['Local', 'Modo visitante: tus datos se guardan solo en este navegador'],
-    ok:      ['Sincronizado', 'Datos guardados en la nube'],
+    local:   ['Guardado solo en este navegador', 'Tus datos no salen de este navegador: si borras sus datos o cambias de dispositivo no estarán. Usa «Exportar» para tener una copia.'],
+    ok:      ['Sincronizado en la nube', 'Datos guardados en la nube'],
     pending: ['Guardando…', 'Subiendo cambios'],
     offline: ['Sin conexión', 'Los cambios se subirán al recuperar la conexión'],
     error:   ['Error de sincronización', 'No se pudo sincronizar']
@@ -4129,9 +4130,9 @@ function showCardPicker(firstRun = false) {
   cardPickerFirstRun = firstRun;
   const on = firstRun ? FIRST_RUN_CARDS : layout();
   cardDraft = [...on, ...CARD_IDS.filter(id => !on.includes(id))].map(id => ({ id, on: on.includes(id) }));
-  document.getElementById('cardsTitle').textContent = firstRun ? '¿Qué quieres ver?' : 'Tarjetas';
+  document.getElementById('cardsTitle').textContent = firstRun ? '¿Qué quieres ver?' : 'Editar tarjetas';
   document.getElementById('cardsNote').textContent = firstRun
-    ? 'Elige las tarjetas de tu dashboard y ordénalas. Puedes cambiarlo cuando quieras desde «Tarjetas».'
+    ? 'Elige las tarjetas de tu dashboard y ordénalas. Puedes cambiarlo cuando quieras desde «Editar tarjetas».'
     : 'Elige qué quieres ver y en qué orden.';
   document.getElementById('cpSave').textContent = firstRun ? 'Empezar' : 'Guardar';
   document.getElementById('cpCancel').style.display = firstRun ? 'none' : '';
