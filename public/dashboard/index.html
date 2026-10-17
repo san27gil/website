@@ -185,6 +185,7 @@
     gap: 6px;
   }
   .pill-btn:hover { background: var(--surface); color: var(--text); }
+  #authBtn[hidden] { display: none; }
   .pill-btn.strong { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
 
   /* ─── GRID / CARDS ─── */
@@ -963,7 +964,7 @@
       <button class="pill-btn" onclick="document.getElementById('importFile').click()" title="Importar JSON">Importar</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
       <button class="pill-btn" onclick="showShortcuts()" title="Atajos de teclado">Atajos</button>
-      <button class="pill-btn" id="authBtn" onclick="authButton()" title="Acceso del propietario">Entrar</button>
+      <button class="pill-btn" id="authBtn" hidden onclick="authButton()" title="Acceso del propietario">Entrar</button>
     </div>
     <div class="sync-status local" id="syncStatus">Guardado solo en este navegador</div>
   </div>
@@ -1654,10 +1655,21 @@ function endSession(msg, keepLocal = false) {
   session = null;
   (keepLocal ? [SESSION_KEY] : [SESSION_KEY, OWNER_KEY, SYNC_BASE_KEY, SYNC_DIRTY_KEY]).forEach(lsDel);
   if (msg) alert(msg);
+  // Al salir a propósito se quita #acceso para que el botón vuelva a quedar oculto
+  if (!keepLocal && location.hash === ACCESS_HASH) history.replaceState(null, '', location.pathname + location.search);
   location.reload();
 }
 
 /* ─── Login / logout ─── */
+// El botón de entrar solo se muestra con /dashboard/#acceso. Es solo para no enseñarlo a los
+// visitantes: la protección real es la contraseña + el código de verificación del servidor.
+const ACCESS_HASH = '#acceso';
+function checkAccessHash() {
+  if (isOwner() || location.hash !== ACCESS_HASH) return;
+  document.getElementById('authBtn').hidden = false;
+  showLogin();
+}
+window.addEventListener('hashchange', checkAccessHash);
 function authButton() {
   if (!isOwner()) return showLogin();
   if (lsGet(SYNC_DIRTY_KEY) === '1' && !confirm('Hay cambios sin subir a la nube. ¿Salir igualmente?')) return;
@@ -4248,12 +4260,14 @@ renderAll();
 if (isOwner()) {
   document.getElementById('authBtn').textContent = 'Salir';
   document.getElementById('authBtn').title = 'Cerrar sesión en este dispositivo';
+  document.getElementById('authBtn').hidden = false;
   setSyncStatus(lsGet(SYNC_DIRTY_KEY) === '1' ? 'pending' : 'ok');
   pullFromCloud();
 } else {
   setSyncStatus('local');
+  checkAccessHash();
   // Primera visita: elegir tarjetas. El propietario no la ve (su layout viene de la nube).
-  if (!Array.isArray(DB.layout) && !hasAnyData()) showCardPicker(true);
+  if (location.hash !== ACCESS_HASH && !Array.isArray(DB.layout) && !hasAnyData()) showCardPicker(true);
 }
 // Redibujar la gráfica cuando cargue la fuente
 if (document.fonts) document.fonts.ready.then(drawWeightChart);

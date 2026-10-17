@@ -59,6 +59,9 @@ Netlify construye con `npm run build` y publica `dist/` en cada push a `main`
 se guardan solo en su navegador. El propietario entra con contraseña + código
 de Google Authenticator y sus datos se sincronizan en Netlify Blobs.
 
+El botón «Entrar» está oculto: aparece abriendo `/dashboard/#acceso`. Es solo
+para no mostrarlo a los visitantes; la protección real es el login del servidor.
+
 - `netlify/functions/dashboard-login.mjs` → `POST /api/dashboard/login`
 - `netlify/functions/dashboard-data.mjs` → `GET|PUT /api/dashboard/data`
 - `netlify/lib/dashboard-auth.mjs` → TOTP, tokens firmados, límite de intentos
@@ -66,3 +69,21 @@ de Google Authenticator y sus datos se sincronizan en Netlify Blobs.
 Variables de entorno necesarias en Netlify (scope Functions):
 `DASHBOARD_PASSWORD`, `DASHBOARD_TOTP_SECRET`, `DASHBOARD_SESSION_SECRET`.
 Se generan con `node scripts/dashboard-setup.mjs`.
+
+### Copias de seguridad
+
+Antes del primer cambio de cada día se guarda la versión anterior en
+`owner/backups/YYYY-MM-DD` (store `dashboard`); se conservan las últimas 30.
+Para recuperar una con la [CLI de Netlify](https://docs.netlify.com/cli/get-started/):
+
+```bash
+netlify blobs:list dashboard --prefix owner/backups/
+netlify blobs:get dashboard owner/backups/2026-10-16 > copia.json
+```
+
+Después, en el dashboard (con sesión iniciada): «Importar» → `copia.json`.
+
+### Si pierdes un dispositivo con la sesión abierta
+
+Cambia `DASHBOARD_SESSION_SECRET` en Netlify y vuelve a desplegar: se cierran
+todas las sesiones y tendrás que entrar de nuevo en cada dispositivo.
