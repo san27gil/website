@@ -182,40 +182,6 @@
   .pill-btn:hover { background: var(--surface); color: var(--text); }
   .pill-btn.strong { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
 
-  /* ─── TODAY STRIP ─── */
-  .today-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
-    grid-column: 1 / -1;
-  }
-  .today-cell {
-    background: var(--surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-  }
-  .today-label { font-size: 0.78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
-  .today-value {
-    font-weight: 300;
-    font-size: clamp(1.6rem, 2.4vw, 2rem);
-    letter-spacing: -0.02em;
-    color: var(--text);
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .today-value .unit { font-size: 0.9rem; color: var(--text-dim); margin-left: 4px; letter-spacing: 0; }
-  .today-value.up { color: var(--up); }
-  .today-value.down { color: var(--down); }
-  .today-value.warn { color: var(--warn); }
-  .today-sub { font-size: 0.82rem; color: var(--text-dim); }
-
   /* ─── GRID / CARDS ─── */
   /* Rejilla fluida: cualquier combinación de tarjetas encaja sin huecos */
   .grid {
@@ -306,7 +272,7 @@
   .stat-row .val.down { color: var(--down); }
 
   /* ─── WEATHER ─── */
-  .weather-now { display: flex; align-items: center; gap: 20px; margin-bottom: 22px; }
+  .weather-now { display: flex; align-items: center; gap: 20px; margin-bottom: 4px; }
   .weather-icon-big { width: 64px; height: 64px; color: var(--text); flex-shrink: 0; }
   .wx .wx-sun   { fill: var(--wx-sun); stroke: none; }
   .wx .wx-ray   { fill: none; stroke: var(--wx-ray); stroke-width: 1.8; }
@@ -323,17 +289,12 @@
   .weather-city { font-size: 1rem; color: var(--text-mid); margin-top: 10px; }
   .weather-desc { font-size: 0.9rem; color: var(--text-dim); margin-top: 2px; }
 
-  .weather-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 14px 0; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
-  .wd-item { min-width: 0; }
-  .wd-item .lbl { font-size: 0.76rem; color: var(--text-dim); }
-  .wd-item .v { font-size: 1.05rem; color: var(--text); margin-top: 2px; }
-
   /* Lluvia hora a hora */
-  .rain { margin-top: 18px; }
+  .rain { margin-top: 14px; }
   .rain-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; }
   .rain-title { font-size: 0.76rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
   .rain-summary { font-size: 0.85rem; color: var(--text-mid); text-align: right; }
-  .rain-chart { display: flex; align-items: flex-end; gap: 2px; height: 96px; border-bottom: 1px solid var(--line); }
+  .rain-chart { display: flex; align-items: flex-end; gap: 2px; height: 64px; border-bottom: 1px solid var(--line); }
   .rain-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; position: relative; min-width: 0; cursor: default; }
   .rain-val { font-size: 0.68rem; color: var(--text-dim); margin-bottom: 3px; white-space: nowrap; }
   .rain-bar { width: 100%; max-width: 22px; border-radius: 4px 4px 0 0; background: var(--accent); min-height: 2px; transition: height 0.4s ease; }
@@ -351,11 +312,25 @@
   .rain-hours span { flex: 1; text-align: center; font-size: 0.68rem; color: var(--text-dim); min-width: 0; }
   .rain-hours span.now { color: var(--text); font-weight: 600; }
 
-  .weather-tomorrow { margin-top: 18px; display: flex; align-items: center; gap: 14px; }
+  .weather-tomorrow { margin-top: 14px; display: flex; align-items: center; gap: 14px; }
   .weather-tomorrow .wx-ic { width: 32px; height: 32px; }
   .weather-tomorrow .tag { font-size: 0.76rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
 
   /* ─── CALENDARIO ─── */
+  .mcal { margin-bottom: 18px; }
+  .mcal-month { font-size: 0.95rem; color: var(--text); margin-bottom: 8px; }
+  .mcal-month::first-letter { text-transform: uppercase; }
+  .mcal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
+  .mcal-dow { font-size: 0.7rem; color: var(--text-dim); padding-bottom: 4px; }
+  .mcal-day {
+    position: relative; height: 32px; border: none; border-radius: 10px; background: none; cursor: pointer;
+    font: inherit; font-size: 0.85rem; color: var(--text-mid); font-variant-numeric: tabular-nums;
+  }
+  .mcal-day:hover { background: var(--bg-soft); color: var(--text); }
+  .mcal-day.past { color: var(--text-dim); opacity: 0.6; }
+  .mcal-day.today { background: var(--accent); color: var(--on-solid); font-weight: 600; opacity: 1; }
+  .mcal-day.has::after { content: ''; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--accent); }
+  .mcal-day.today.has::after { background: var(--on-solid); }
   .cal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
   .cal-form #evTitle, .cal-form select, .cal-form .ev-days, .cal-form .btn { grid-column: 1 / -1; }
   .cal-form input, .cal-form select { width: 100%; }
@@ -388,38 +363,23 @@
   .ag-btn:hover { background: var(--bg-soft); color: var(--text); }
   #calManage { margin-top: 8px; }
 
-  /* ─── TIEMPO: secciones de luz del día y aire ─── */
-  .wx-section:empty { display: none; }
-  .wx-section { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
-  .wx-sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; }
-  .wx-sec-title { font-size: 0.76rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; }
-  .wx-sec-summary { font-size: 0.85rem; color: var(--text-mid); text-align: right; display: inline-flex; align-items: center; gap: 6px; }
-  .wx-sec-summary strong { font-weight: 600; color: var(--text); }
+  /* ─── TIEMPO: sol y aire en una fila ─── */
+  .wx-extra { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 24px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+  .wx-extra > div:empty { display: none; }
   .wx-sec-error { font-size: 0.8rem; color: var(--text-dim); }
-
-  .dl-bar { position: relative; height: 6px; border-radius: 6px; background: var(--bg-soft); margin: 4px 0 8px; }
-  .dl-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, color-mix(in srgb, var(--wx-sun) 45%, transparent), var(--wx-sun)); }
-  .dl-bar.night .dl-fill { background: var(--line); }
-  .dl-sun { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--wx-sun); box-shadow: 0 0 0 3px var(--surface); }
-  .dl-row { display: flex; justify-content: space-between; gap: 8px; font-size: 0.85rem; color: var(--text-mid); }
-  .dl-mid { text-align: center; color: var(--text); }
-  .dl-delta { font-size: 0.75rem; color: var(--text-dim); margin-left: 4px; }
-
+  .dl { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text); white-space: nowrap; }
+  .dl .wx-ic { width: 30px; height: 30px; }
+  .dl .wx-horizon { fill: none; stroke: var(--text-dim); stroke-width: 1.6; }
+  .dl-times { display: flex; flex-direction: column; line-height: 1.35; }
+  .dl-times span { color: var(--text-dim); margin-right: 4px; }
+  .air-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-mid); }
+  .air-head strong { font-weight: 600; color: var(--text); }
+  .air-label { display: inline-flex; align-items: center; gap: 6px; }
   .air-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .air-scale { position: relative; display: flex; gap: 2px; height: 6px; margin: 4px 0 10px; }
+  .air-scale { position: relative; display: flex; gap: 2px; height: 6px; margin-top: 8px; }
   .air-scale span { flex: 1; border-radius: 3px; opacity: 0.8; }
   .air-scale span:last-of-type { flex: 0.2; }
   .air-scale i { position: absolute; top: -4px; width: 4px; height: 14px; margin-left: -2px; border-radius: 2px; background: var(--text); box-shadow: 0 0 0 2px var(--surface); }
-  .air-pollutants { font-size: 0.8rem; color: var(--text-mid); }
-  .air-pollutants span { color: var(--text-dim); }
-  .pollen { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; font-size: 0.85rem; color: var(--text); }
-  .pollen-title { font-size: 0.8rem; color: var(--text-dim); }
-  .pollen-item { display: inline-flex; align-items: center; gap: 5px; }
-  .pollen-lvl { font-size: 0.72rem; padding: 1px 8px; border-radius: 999px; }
-  .pollen-lvl.lo { background: color-mix(in srgb, var(--up) 14%, transparent); color: var(--up); }
-  .pollen-lvl.mid { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
-  .pollen-lvl.hi { background: color-mix(in srgb, var(--down) 14%, transparent); color: var(--down); }
-  .air-none { font-size: 0.85rem; color: var(--text-dim); }
 
   /* ─── ACTIVITY ─── */
   .date-picker-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
@@ -875,8 +835,6 @@
     .pill-btn { flex-shrink: 0; }
     .grid { gap: 14px; }
     .card { padding: 20px 18px 22px; border-radius: 18px; }
-    .today-strip { grid-template-columns: 1fr 1fr; gap: 14px; }
-    .today-cell { border-radius: 18px; padding: 14px 16px; }
     .portfolio-top { grid-template-columns: 1fr 1fr; }
     .stat-row .val, .ring-stat .value, .rep-stat .val { font-size: 1.25rem; }
     .weather-temp { font-size: 3.4rem; }
@@ -939,9 +897,6 @@
 <!-- GRID -->
 <div class="grid" id="cardGrid">
 
-  <!-- TODAY SUMMARY -->
-  <div class="today-strip" id="todayStrip" data-card="summary"></div>
-
   <!-- WEIGHT -->
   <div class="card" data-card="weight">
     <div class="card-head">
@@ -985,8 +940,10 @@
     <div id="weatherContent">
       <div class="loading-state"><div class="spinner"></div> Cargando…</div>
     </div>
-    <div class="wx-section" id="daylightContent"></div>
-    <div class="wx-section" id="airContent"></div>
+    <div class="wx-extra">
+      <div id="daylightContent"></div>
+      <div id="airContent"></div>
+    </div>
   </div>
 
   <!-- CALENDARIO -->
@@ -995,6 +952,7 @@
       <h3 class="card-title">Calendario</h3>
       <span class="card-meta" id="calMeta"></span>
     </div>
+    <div class="mcal" id="miniCal"></div>
     <form class="cal-form" onsubmit="event.preventDefault();saveEvent()">
       <input type="text" id="evTitle" placeholder="Clase de tenis, dentista…" autocomplete="off">
       <input type="date" id="evDate" onchange="evDateChanged()" title="Fecha (o primer día si se repite)">
@@ -1716,97 +1674,6 @@ function importData(event) {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   TODAY STRIP
-   ════════════════════════════════════════════════════════════════ */
-function renderTodayStrip() {
-  const strip = document.getElementById('todayStrip');
-  const todayActivity = DB.activity[todayStr] || {};
-  const todayHabits = DB.habits.filter(h => DB.habitData[`${h}__${todayStr}`] === 'done').length;
-  const totalHabits = DB.habits.length;
-  const lastWeight = DB.weight.length ? DB.weight[DB.weight.length - 1].val : null;
-
-  // Pulso reposo hoy (o último registrado en últimos 7 días)
-  let hrRest = todayActivity.hrRest;
-  let hrDateLabel = 'hoy';
-  if (!hrRest) {
-    for (let i = 1; i <= 7; i++) {
-      const d = addDays(todayStr, -i);
-      if (DB.activity[d] && DB.activity[d].hrRest) {
-        hrRest = DB.activity[d].hrRest;
-        hrDateLabel = `hace ${i}d`;
-        break;
-      }
-    }
-  }
-
-  // Valoración cartera
-  const pSymbols = Object.keys(DB.portfolio);
-  let pTotalValue = 0, pTotalCost = 0;
-  pSymbols.forEach(sym => {
-    const s = DB.portfolio[sym];
-    s.lots.forEach(lot => {
-      const rate = lot.exchangeRate || (s.currency === 'USD' ? DB.fxRate : 1);
-      pTotalCost += lot.shares * lot.purchasePrice * (s.currency === 'USD' ? rate : 1);
-      pTotalValue += lot.shares * (s.currentPrice || lot.purchasePrice * (s.currency === 'USD' ? rate : 1));
-    });
-  });
-  const pGain = pTotalValue - pTotalCost;
-  const pGainPct = pTotalCost > 0 ? (pGain / pTotalCost) * 100 : 0;
-  const fmtEur = n => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-  const portfolioCell = pSymbols.length > 0 ? `
-    <div class="today-cell">
-      <div class="today-label">Cartera</div>
-      <div class="today-value ${pGain >= 0 ? 'up' : 'down'}">${fmtEur(pTotalValue)}</div>
-      <div class="today-sub">${pGain >= 0 ? '+' : ''}${pGainPct.toFixed(2)}% rendimiento</div>
-    </div>` : '';
-
-  // Solo se resumen las tarjetas que están activas
-  const cells = [
-    cardOn('weight') ? `<div class="today-cell">
-      <div class="today-label">Peso</div>
-      <div class="today-value">${lastWeight ? lastWeight.toFixed(1) : '—'}<span class="unit">kg</span></div>
-      <div class="today-sub">${DB.weight.length ? 'último registro' : 'sin datos'}</div>
-    </div>` : '',
-    cardOn('activity') ? `<div class="today-cell">
-      <div class="today-label">Pasos hoy</div>
-      <div class="today-value ${(todayActivity.steps||0) >= DB.goals.steps ? 'up' : ''}">${(todayActivity.steps||0).toLocaleString('es-ES')}</div>
-      <div class="today-sub">objetivo ${DB.goals.steps.toLocaleString('es-ES')}</div>
-    </div>` : '',
-    cardOn('activity') && hrRest ? `<div class="today-cell">
-      <div class="today-label">Pulso reposo</div>
-      <div class="today-value">${hrRest}<span class="unit">bpm</span></div>
-      <div class="today-sub">${hrDateLabel}</div>
-    </div>` : '',
-    cardOn('portfolio') ? portfolioCell : '',
-    cardOn('habits') ? `<div class="today-cell">
-      <div class="today-label">Hábitos hoy</div>
-      <div class="today-value ${totalHabits && todayHabits === totalHabits ? 'up' : ''}">${todayHabits}<span class="unit">/${totalHabits}</span></div>
-      <div class="today-sub">${totalHabits ? Math.round(todayHabits/totalHabits*100)+'% completado' : 'sin hábitos'}</div>
-    </div>` : '',
-    cardOn('calendar') ? nextEventCell() : '',
-    cardOn('todos') ? `<div class="today-cell">
-      <div class="today-label">Tareas</div>
-      <div class="today-value">${DB.todos.filter(t => !t.done).length}</div>
-      <div class="today-sub">pendientes</div>
-    </div>` : ''
-  ].filter(Boolean);
-  strip.innerHTML = cells.join('');
-  strip.style.display = cells.length ? '' : 'none';
-}
-
-// Próximo evento que aún no ha pasado (hoy más tarde o en los próximos días)
-function nextEventCell() {
-  const nowHm = new Date().toTimeString().slice(0, 5);
-  const next = occurrences(todayStr, CAL_DAYS_AHEAD)
-    .find(o => o.date > todayStr || !o.ev.time || o.ev.time >= nowHm);
-  return `<div class="today-cell">
-      <div class="today-label">Próximo</div>
-      <div class="today-value" style="font-size:clamp(1.15rem,1.8vw,1.4rem);padding:4px 0 2px">${next ? escapeHtml(next.ev.title) : '—'}</div>
-      <div class="today-sub">${next ? dayLabel(next.date) + (next.ev.time ? ' · ' + next.ev.time : '') : 'nada esta semana'}</div>
-    </div>`;
-}
-
-/* ════════════════════════════════════════════════════════════════
    WEIGHT
    ════════════════════════════════════════════════════════════════ */
 document.getElementById('weightDate').value = todayStr;
@@ -1825,7 +1692,6 @@ function addWeight() {
   document.getElementById('weightVal').value = '';
   drawWeightChart();
   updateWeightStats();
-  renderTodayStrip();
   toast('Peso registrado');
 }
 
@@ -1967,7 +1833,7 @@ async function searchWeather() {
 }
 
 // La ciudad del tiempo es la ubicación de todas las tarjetas que la usan
-const LOCATION_CARDS = { weather: c => { fetchWeather(c); fetchDaylight(c); fetchAir(c); } };
+const LOCATION_CARDS = { weather: c => { fetchWeather(c); fetchAir(c); } };
 function refreshLocationCards(only) {
   Object.entries(LOCATION_CARDS).forEach(([id, load]) => {
     if (cardOn(id) && (!only || only.includes(id))) load(DB.weatherCity);
@@ -1994,12 +1860,14 @@ const RAIN_HOURS = 12;
 async function fetchWeather(city) {
   const el = document.getElementById('weatherContent');
   el.innerHTML = `<div class="loading-state"><div class="spinner"></div> Cargando ${escapeHtml(city)}…</div>`;
+  document.getElementById('daylightContent').innerHTML = '';
   try {
     const loc = await geocode(city);
-    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,is_day&hourly=precipitation_probability,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3`);
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code,is_day&hourly=precipitation_probability,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset&timezone=auto&forecast_days=3`);
     const wData = await wRes.json();
     if (!wData.current) throw new Error('No se pudo cargar el tiempo');
     renderWeather(loc, wData.current, wData.daily, nextHours(wData.hourly, wData.current.time, RAIN_HOURS));
+    renderDaylight(wData.daily);
     document.getElementById('weatherMeta').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   } catch (e) {
     el.innerHTML = `<div class="error-state">${escapeHtml(e.message || 'Error')}</div>`;
@@ -2116,11 +1984,6 @@ function renderWeather(loc, c, d, hours) {
         <div class="weather-desc">${wmoDesc(c.weather_code)}</div>
       </div>
     </div>
-    <div class="weather-details">
-      <div class="wd-item"><div class="lbl">Sensación</div><div class="v">${Math.round(c.apparent_temperature)}°</div></div>
-      <div class="wd-item"><div class="lbl">Humedad</div><div class="v">${c.relative_humidity_2m}%</div></div>
-      <div class="wd-item"><div class="lbl">Viento</div><div class="v">${Math.round(c.wind_speed_10m)} km/h</div></div>
-    </div>
     ${renderRain(hours)}
     <div class="weather-tomorrow">
       <span class="wx-ic">${wmoIcon(d.weather_code[1])}</span>
@@ -2133,64 +1996,26 @@ function renderWeather(loc, c, d, hours) {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   LUZ DEL DÍA — amanecer, atardecer y cuánto cambia la duración del día
+   LUZ DEL DÍA — a qué hora sale y se pone el sol hoy
    ════════════════════════════════════════════════════════════════ */
-const hm = t => { const [h, m] = String(t).slice(11, 16).split(':').map(Number); return h * 60 + m; };
+const SUNRISE_SVG = '<svg class="wx" viewBox="0 0 24 24" stroke-linecap="round" aria-hidden="true"><path class="wx-sun" d="M6.5 17a5.5 5.5 0 0 1 11 0Z"/><path class="wx-ray" d="M12 5.5v2.2M5.6 10.6l1.5 1.5M18.4 10.6l-1.5 1.5M2.8 17h1.9M19.3 17h1.9"/><path class="wx-horizon" d="M3 20.5h18"/></svg>';
 const fmtHm = t => String(t).slice(11, 16);
-function fmtDur(min) {
-  min = Math.round(Math.abs(min));
-  const h = Math.floor(min / 60), m = min % 60;
-  return h ? `${h} h${m ? ' ' + m + ' min' : ''}` : `${m} min`;
-}
 
-async function fetchDaylight(city) {
+function renderDaylight(d) {
   const el = document.getElementById('daylightContent');
-  el.innerHTML = '';
-  try {
-    const loc = await geocode(city);
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=is_day&daily=sunrise,sunset,daylight_duration&timezone=auto&past_days=1&forecast_days=2`);
-    const d = await res.json();
-    if (!d.daily || !d.current) throw new Error('No se pudo cargar');
-    renderDaylight(loc, d.current.time, d.daily);
-  } catch (e) {
-    el.innerHTML = `<div class="wx-sec-error">Luz del día: ${escapeHtml(e.message || 'sin datos')}</div>`;
-  }
-}
-
-function renderDaylight(loc, nowTime, d) {
-  // índices: 0 = ayer, 1 = hoy, 2 = mañana (en la hora local de la ciudad)
-  const rise = hm(d.sunrise[1]), set = hm(d.sunset[1]), now = hm(nowTime);
-  const p = (now - rise) / (set - rise);
-  const delta = (d.daylight_duration[1] - d.daylight_duration[0]) / 60;
-  const deltaTxt = Math.abs(delta) < 0.5 ? 'Igual que ayer'
-    : `${delta > 0 ? '+' : '−'}${Math.abs(delta) < 1 ? Math.round(Math.abs(delta) * 60) + ' s' : fmtDur(delta)} respecto a ayer`;
-
-  let headline;
-  if (p < 0) headline = `Amanece a las ${fmtHm(d.sunrise[1])}`;
-  else if (p > 1) headline = `Mañana amanece a las ${fmtHm(d.sunrise[2])}`;
-  else headline = `Quedan ${fmtDur(set - now)} de luz`;
-
-  // Barra del día: de amanecer a atardecer, con el sol en la hora actual
-  const pc = Math.min(1, Math.max(0, p)) * 100;
-  const isDay = p >= 0 && p <= 1;
-  document.getElementById('daylightContent').innerHTML = `
-    <div class="wx-sec-head">
-      <span class="wx-sec-title">Luz del día</span>
-      <span class="wx-sec-summary">${headline}</span>
-    </div>
-    <div class="dl-bar${isDay ? '' : ' night'}">
-      <div class="dl-fill" style="width:${pc}%"></div>
-      ${isDay ? `<span class="dl-sun" style="left:${pc}%"></span>` : ''}
-    </div>
-    <div class="dl-row">
-      <span>↑ ${fmtHm(d.sunrise[1])}</span>
-      <span class="dl-mid">${fmtDur(d.daylight_duration[1] / 60)} <span class="dl-delta ${delta >= 0 ? 'up' : 'down'}">${deltaTxt.replace(' respecto a ayer', ' vs. ayer')}</span></span>
-      <span>↓ ${fmtHm(d.sunset[1])}</span>
+  if (!d.sunrise || !d.sunset) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="dl" aria-label="Amanece a las ${fmtHm(d.sunrise[0])}, anochece a las ${fmtHm(d.sunset[0])}">
+      <span class="wx-ic">${SUNRISE_SVG}</span>
+      <div class="dl-times">
+        <div><span>↑</span>${fmtHm(d.sunrise[0])}</div>
+        <div><span>↓</span>${fmtHm(d.sunset[0])}</div>
+      </div>
     </div>`;
 }
 
 /* ════════════════════════════════════════════════════════════════
-   CALIDAD DEL AIRE Y POLEN — Open-Meteo Air Quality (índice europeo)
+   CALIDAD DEL AIRE — Open-Meteo Air Quality (índice europeo)
    ════════════════════════════════════════════════════════════════ */
 const AQI_LEVELS = [
   { max: 20,  label: 'Buena',               color: '#2a9a63' },
@@ -2200,62 +2025,33 @@ const AQI_LEVELS = [
   { max: 100, label: 'Muy mala',            color: '#d6544e' },
   { max: Infinity, label: 'Extremadamente mala', color: '#8e3b8f' }
 ];
-// Umbrales aproximados en granos/m³ (bajo < a, medio < b, alto ≥ b)
-const POLLEN = [
-  ['grass_pollen',   'Gramíneas', 10, 50],
-  ['olive_pollen',   'Olivo',     15, 90],
-  ['birch_pollen',   'Abedul',    15, 90],
-  ['alder_pollen',   'Aliso',     15, 90],
-  ['mugwort_pollen', 'Artemisa',  10, 50],
-  ['ragweed_pollen', 'Ambrosía',  10, 50]
-];
-
 async function fetchAir(city) {
   const el = document.getElementById('airContent');
   el.innerHTML = '';
   try {
     const loc = await geocode(city);
-    const vars = ['european_aqi', 'pm2_5', 'pm10', 'nitrogen_dioxide', 'ozone', ...POLLEN.map(p => p[0])].join(',');
-    const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${loc.latitude}&longitude=${loc.longitude}&current=${vars}&timezone=auto`);
+    const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${loc.latitude}&longitude=${loc.longitude}&current=european_aqi&timezone=auto`);
     const d = await res.json();
     if (!d.current || d.current.european_aqi == null) throw new Error('Sin datos de calidad del aire');
-    renderAir(loc, d.current);
+    renderAir(d.current);
   } catch (e) {
-    el.innerHTML = `<div class="wx-sec-error">Calidad del aire: ${escapeHtml(e.message || 'sin datos')}</div>`;
+    el.innerHTML = `<div class="wx-sec-error">Aire: ${escapeHtml(e.message || 'sin datos')}</div>`;
   }
 }
 
-function renderAir(loc, c) {
+function renderAir(c) {
   const aqi = Math.round(c.european_aqi);
   const lvl = AQI_LEVELS.find(l => aqi <= l.max);
   const marker = Math.min(100, aqi / 120 * 100);
-  const val = v => v == null ? '—' : Math.round(v);
-
-  const pollen = POLLEN.filter(([k]) => c[k] != null);
-  let pollenHtml;
-  if (!pollen.length) pollenHtml = '<span class="air-none">sin datos en esta zona</span>';
-  else {
-    const active = pollen.filter(([k]) => c[k] >= 1).sort((a, b) => c[b[0]] - c[a[0]]).slice(0, 3);
-    pollenHtml = active.length
-      ? active.map(([k, name, lo, hi]) => {
-          const v = c[k];
-          const [txt, cls] = v < lo ? ['bajo', 'lo'] : v < hi ? ['medio', 'mid'] : ['alto', 'hi'];
-          return `<span class="pollen-item">${name} <span class="pollen-lvl ${cls}">${txt}</span></span>`;
-        }).join('')
-      : '<span class="air-none">nada ahora mismo</span>';
-  }
-
   document.getElementById('airContent').innerHTML = `
-    <div class="wx-sec-head">
-      <span class="wx-sec-title">Aire</span>
-      <span class="wx-sec-summary"><span class="air-dot" style="background:${lvl.color}"></span>${lvl.label} · <strong>${aqi}</strong></span>
+    <div class="air-head">
+      <span>Aire</span>
+      <span class="air-label"><span class="air-dot" style="background:${lvl.color}"></span>${lvl.label} · <strong>${aqi}</strong></span>
     </div>
     <div class="air-scale" role="img" aria-label="Índice europeo ${aqi}: ${lvl.label}">
       ${AQI_LEVELS.map(l => `<span style="background:${l.color}"></span>`).join('')}
       <i style="left:${marker}%"></i>
-    </div>
-    <div class="air-pollutants">PM2.5 ${val(c.pm2_5)} · PM10 ${val(c.pm10)} · NO₂ ${val(c.nitrogen_dioxide)} · O₃ ${val(c.ozone)} <span>µg/m³</span></div>
-    <div class="pollen"><span class="pollen-title">Polen</span>${pollenHtml}</div>`;
+    </div>`;
 }
 
 function escapeHtml(s) {
@@ -2287,7 +2083,6 @@ function saveActivity() {
   DB.activity[date] = { steps, kcal, exercise, stand };
   saveDB();
   renderActivity();
-  renderTodayStrip();
   toast('Actividad guardada');
 }
 
@@ -2540,7 +2335,6 @@ async function importHealth(event) {
 
     saveDB();
     renderActivity();
-    renderTodayStrip();
   
     updateHealthProgress('Finalizado', 100, '');
     await nextFrame();
@@ -2609,7 +2403,6 @@ function addHabit() {
   saveDB();
   document.getElementById('habitName').value = '';
   renderHabits();
-  renderTodayStrip();
 }
 
 function renameHabit(i) {
@@ -2634,7 +2427,6 @@ function renameHabit(i) {
   DB.habits[i] = name;
   saveDB();
   renderHabits();
-  renderTodayStrip();
   toast('Hábito renombrado');
 }
 
@@ -2645,7 +2437,6 @@ function removeHabit(i) {
   DB.habits.splice(i, 1);
   saveDB();
   renderHabits();
-  renderTodayStrip();
 }
 
 function toggleCell(i, dateStr) {
@@ -2656,7 +2447,6 @@ function toggleCell(i, dateStr) {
   else DB.habitData[key] = 'done';
   saveDB();
   renderHabits();
-  renderTodayStrip();
 }
 
 function calculateStreak(habit) {
@@ -2882,7 +2672,6 @@ function pDeleteLot(symbol, lotId) {
   saveDB();
   pRenderHoldings();
   pUpdateStats();
-  renderTodayStrip();
 }
 
 function pToggleLots(symbol) {
@@ -2908,7 +2697,7 @@ async function pFetchPrice(symbol) {
 
 async function pRefreshPrices() {
   const symbols = Object.keys(DB.portfolio);
-  if (symbols.length === 0) { pRenderHoldings(); pUpdateStats(); renderTodayStrip(); return; }
+  if (symbols.length === 0) { pRenderHoldings(); pUpdateStats(); return; }
   document.getElementById('refreshIcon').style.animation = 'spin 0.7s linear infinite';
   if (pApiKey) {
     const results = await Promise.all(symbols.map(s => pFetchPrice(s)));
@@ -2931,7 +2720,6 @@ async function pRefreshPrices() {
   document.getElementById('refreshIcon').style.animation = '';
   pRenderHoldings();
   pUpdateStats();
-  renderTodayStrip();
 }
 
 function pFmtEur(n) { return new Intl.NumberFormat('es-ES', { style:'currency', currency:'EUR', minimumFractionDigits:2 }).format(n); }
@@ -3116,7 +2904,6 @@ function deleteTodo(id) {
 
 function renderTodos() {
   if (!DB.todos) DB.todos = [];
-  renderTodayStrip();
   const list = document.getElementById('todoList');
   const priorityOrder = { alta: 0, media: 1, baja: 2 };
   const sorted = [...DB.todos].sort((a, b) => {
@@ -3796,8 +3583,32 @@ function editSubFromCalendar(id) {
 
 function toggleCalManage() { showCalManage = !showCalManage; renderCalendar(); }
 
+// Mes actual, lunes primero; un punto en los días con algo apuntado. Pulsar un día lo pone en el formulario
+function renderMiniCal() {
+  const first = todayStr.slice(0, 8) + '01';
+  const d0 = new Date(first + 'T12:00:00');
+  const days = new Date(d0.getFullYear(), d0.getMonth() + 1, 0).getDate();
+  const busy = new Set(occurrences(first, days).map(o => o.date));
+  const lead = (d0.getDay() + 6) % 7;
+  let cells = WEEK.map(d => `<span class="mcal-dow">${DOW_SHORT[d]}</span>`).join('') + '<span></span>'.repeat(lead);
+  for (let i = 0; i < days; i++) {
+    const iso = addDays(first, i);
+    const cls = [iso === todayStr ? 'today' : iso < todayStr ? 'past' : '', busy.has(iso) ? 'has' : ''].filter(Boolean).join(' ');
+    cells += `<button type="button" class="mcal-day ${cls}" onclick="pickCalDay('${iso}')" aria-label="${dayLabel(iso)}"${iso === todayStr ? ' aria-current="date"' : ''}>${i + 1}</button>`;
+  }
+  document.getElementById('miniCal').innerHTML = `
+    <div class="mcal-month">${d0.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</div>
+    <div class="mcal-grid">${cells}</div>`;
+}
+function pickCalDay(iso) {
+  document.getElementById('evDate').value = iso;
+  evDateChanged();
+  document.getElementById('evTitle').focus();
+}
+
 function renderCalendar() {
   if (!Array.isArray(DB.calendar)) DB.calendar = [];
+  renderMiniCal();
   const occ = occurrences(todayStr, CAL_DAYS_AHEAD);
   const nowHm = new Date().toTimeString().slice(0, 5);
   const todayCount = occ.filter(o => o.date === todayStr).length;
@@ -3850,16 +3661,14 @@ function renderCalendar() {
         <button class="ag-btn" onclick="deleteEvent(${Number(ev.id)})" title="Borrar">✕</button>
       </div>`).join('');
   }
-  renderTodayStrip();
 }
 
 /* ════════════════════════════════════════════════════════════════
    TARJETAS — cuáles se muestran y en qué orden (DB.layout)
    ════════════════════════════════════════════════════════════════ */
 const CARDS = [
-  { id: 'summary',   name: 'Resumen de hoy', desc: 'Peso, pasos, pulso, cartera y hábitos de un vistazo' },
   { id: 'calendar',  name: 'Calendario',     desc: 'Tus eventos de la semana; pueden repetirse' },
-  { id: 'weather',   name: 'Tiempo',         desc: 'Lluvia hora a hora, luz del día y calidad del aire' },
+  { id: 'weather',   name: 'Tiempo',         desc: 'Lluvia hora a hora, amanecer y calidad del aire' },
   { id: 'habits',    name: 'Hábitos',        desc: 'Calendario mensual con rachas' },
   { id: 'todos',     name: 'Tareas',         desc: 'Lista de pendientes con prioridad' },
   { id: 'links',     name: 'Para luego',     desc: 'Links guardados para leer más tarde' },
@@ -3870,7 +3679,7 @@ const CARDS = [
   { id: 'coche',     name: 'Coche',          desc: 'Mantenimiento y consumo' }
 ];
 const CARD_IDS = CARDS.map(c => c.id);
-const FIRST_RUN_CARDS = ['summary', 'calendar', 'weather', 'habits', 'todos', 'links'];
+const FIRST_RUN_CARDS = ['calendar', 'weather', 'habits', 'todos', 'links'];
 
 // Sin layout guardado se muestra todo (p. ej. quien ya usaba el dashboard antes de esto)
 function layout() {
@@ -3956,7 +3765,6 @@ function saveCardPicker() {
   applyLayout();
   // Las tarjetas que se acaban de mostrar necesitan medir su tamaño o cargar datos
   drawWeightChart();
-  renderTodayStrip();
   refreshLocationCards(Object.keys(LOCATION_CARDS).filter(id => !wasOn.includes(id)));
 }
 
@@ -3973,7 +3781,6 @@ function renderAll() {
   renderHabits();
   pRenderHoldings();
   pUpdateStats();
-  renderTodayStrip();
   renderTodos();
   renderLinks();
   renderSubs();
